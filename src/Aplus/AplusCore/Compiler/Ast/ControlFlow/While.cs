@@ -37,7 +37,7 @@ namespace AplusCore.Compiler.AST
             DLR.Expression result = DLR.Expression.Block(
                 new DLR.ParameterExpression[] { returnValue },
                 // Assign the default return value: ANull
-                DLR.Expression.Assign(returnValue, DLR.Expression.Constant(ANull.Create())),
+                DLR.Expression.Assign(returnValue, DLR.Expression.Constant(AArray.ANull())),
                 DLR.Expression.Loop(
                     DLR.Expression.Block(
                         DLR.Expression.IfThen(

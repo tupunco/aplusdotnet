@@ -212,7 +212,7 @@ namespace AplusCore.Runtime.Function.Dyadic
             {
                 if (this.combination == CombinationKey(ATypes.ANull, ATypes.ANull))
                 {
-                    return ANull.Create();
+                    return AArray.ANull();
                 }
 
                 // Get the method for the current input type combination

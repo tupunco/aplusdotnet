@@ -277,7 +277,6 @@
     <Compile Include="Types\AReference.cs" />
     <Compile Include="Types\AValue.cs" />
     <Compile Include="Types\AFunc.cs" />
-    <Compile Include="Types\ANull.cs" />
     <Compile Include="Types\AChar.cs" />
     <Compile Include="Types\ASymbol.cs" />
     <Compile Include="Types\AType.cs" />

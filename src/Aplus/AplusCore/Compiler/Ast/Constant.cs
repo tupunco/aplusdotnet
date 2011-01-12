@@ -99,7 +99,7 @@ namespace AplusCore.Compiler.AST
                     return DLR.Expression.Constant(Runtime.Helpers.BuildString(this.AsString));
 
                 case ConstantType.Null:
-                    return DLR.Expression.Constant(ANull.Create());
+                    return DLR.Expression.Constant(AArray.ANull());
 
                 case ConstantType.Integer:
                     return DLR.Expression.Constant(this.AsNumericAType);

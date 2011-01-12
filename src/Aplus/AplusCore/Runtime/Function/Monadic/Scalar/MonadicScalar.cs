@@ -30,8 +30,7 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
         public MonadicScalar()
         {
             this.allowedTypes = new HashSet<byte>();
-            this.allowedTypes.Add((byte)Utils.GetATypesFromType(typeof(ANull)));
-
+            
             MethodInfo[] methods = this.GetType().GetMethods(
                 BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public
             );

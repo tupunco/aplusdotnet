@@ -196,7 +196,6 @@ namespace AplusCore.Types
                 { typeof(ASymbol), ATypes.ASymbol },
                 { typeof(AChar), ATypes.AChar },
                 { typeof(ABox), ATypes.ABox },
-                { typeof(ANull), ATypes.ANull },
                 { typeof(AArray), ATypes.AArray },
                 { typeof(AType), ATypes.AType },
                 { typeof(AFunc), ATypes.AFunc }
@@ -232,7 +231,7 @@ namespace AplusCore.Types
             {
                 case ATypes.ABox:
                 case ATypes.AFunc:
-                    filler = ABox.Create(ANull.Create());
+                    filler = ABox.Create(AArray.ANull());
                     break;
                 case ATypes.AChar:
                     filler = AChar.Create(' ');

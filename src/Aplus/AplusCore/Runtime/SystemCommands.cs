@@ -27,7 +27,7 @@ namespace AplusCore.Runtime
 
             Console.WriteLine(String.Join(" ", storage.GetDynamicMemberNames()));
 
-            return ANull.Create();
+            return AArray.ANull();
         }
     }
 }
