@@ -71,14 +71,9 @@ namespace AplusCore.Compiler.AST
                 }
             }
 
+            // 0. Add A+ environment as first argument for user defined functions
             callArguments.AddFirst(scope.GetAplusEnvironment());
 
-            // 0.5. Convert the method's name to a qualified name
-            if (this.method.Type == IdentifierType.UnQualifiedName)
-            {
-                this.method.Name = this.method.BuildQualifiedName(runtime.CurrentContext);
-                this.method.Type = IdentifierType.QualifiedName;
-            }
             // 1. Construct the method body
             callArguments.AddFirst(this.method.Generate(scope));
 
