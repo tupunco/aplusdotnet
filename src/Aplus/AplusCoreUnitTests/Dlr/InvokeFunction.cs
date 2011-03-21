@@ -31,7 +31,7 @@ namespace AplusCoreUnitTests.Dlr
         }
 
         [TestCategory("DLR"), TestCategory("InvokeFunction"), TestMethod]
-        public void FunctionCallInsiedFunction()
+        public void FunctionCallInsideEval()
         {
             ScriptScope scope = this.engine.CreateScope();
 
