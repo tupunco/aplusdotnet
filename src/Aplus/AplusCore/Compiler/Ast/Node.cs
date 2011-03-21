@@ -41,8 +41,6 @@ namespace AplusCore.Compiler.AST
                 default:
                     throw new ParseException("valence?", false);
             }
-            
-            //return Node.NullConstant();
         }
 
         /// <summary>

@@ -20,7 +20,7 @@ namespace AplusCore.Compiler
         ///  1. The name of the context
         ///  2. The name of the variable inside the context
         /// </param>
-        /// <returns>Expression tree</returns>
+        /// <returns>Expression tree for retrieving a value for the given context parts</returns>
         internal static DLR.Expression GetVariable(Aplus runtime, DLR.Expression variableContainer, string[] contextParts)
         {
             // Get the context
@@ -54,12 +54,10 @@ namespace AplusCore.Compiler
         /// The returned DLR Expression tree will try to fetch the context inside the container.
         /// If the context does not exists, this will result an exception.
         /// If the exception occured, the context will be created inside the catch block.
-        /// After this the context surely exists.
-        /// 
-        /// 
+        /// After this the context surely exists, so we can simply set the variable to the provided value.
         /// 
         /// </remarks>
-        /// <returns>Expression tree</returns>
+        /// <returns>>Expression tree for setting a value for the given context parts</returns>
         internal static DLR.Expression SetVariable(Aplus runtime, DLR.Expression variableContainer, string[] contextParts, DLR.Expression value)
         {
             // Get the context
@@ -98,9 +96,13 @@ namespace AplusCore.Compiler
         /// <summary>
         /// Build a method for accessing a variable in a context.
         /// </summary>
-        /// <param name="environment"></param>
-        /// <param name="contextParts"></param>
-        /// <returns></returns>
+        /// <param name="environment">
+        /// <see cref="AplusEnvironment>">AplusEnvironment</see>, which contains the variables.
+        /// </param>
+        /// <param name="contextParts">
+        /// (context, variablename), as returned from <see cref="CreateContextParts"/> method.
+        /// </param>
+        /// <returns>Expression tree of a Lambda expression.</returns>
         internal static DLR.Expression<Func<AType>> BuildVariableAccessMethod(AplusEnvironment environment, 
             string[] contextParts)
         {
@@ -126,10 +128,14 @@ namespace AplusCore.Compiler
         /// <summary>
         /// Build a method for setting a variable in a context.
         /// </summary>
-        /// <param name="environment"></param>
-        /// <param name="contextParts"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <param name="environment">
+        /// <see cref="AplusEnvironment>">AplusEnvironment</see>, which contains the variables.
+        /// </param>
+        /// <param name="contextParts">
+        /// (context, variablename), as returned from <see cref="CreateContextParts"/> method.
+        /// </param>
+        /// <param name="value">Value to set for the provided <see cref="contextParts">variable</see>.</param>
+        /// <returns>Expression tree of a Lambda expression.</returns>
         internal static DLR.Expression<Func<AType>> BuildVariableAssignMethod(AplusEnvironment environment, 
             string[] contextParts, AType value)
         {
