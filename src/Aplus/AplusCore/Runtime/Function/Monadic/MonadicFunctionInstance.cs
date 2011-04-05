@@ -112,6 +112,7 @@ namespace AplusCore.Runtime.Function.Monadic
         internal static readonly AbstractMonadicFunction Print = new Print();
         internal static readonly AbstractMonadicFunction Signal = new Signal();
         internal static readonly AbstractMonadicFunction Stop = new Stop();
+        internal static readonly AbstractMonadicFunction MapIn = new MapIn();
         internal static readonly AbstractMonadicFunction Value = new Value();
 
         #endregion

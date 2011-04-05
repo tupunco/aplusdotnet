@@ -72,6 +72,7 @@ GradeUp:			'upg';
 Identity:			'+';
 Interval:			'iota';
 ItemRavel:			'!';
+MapIn:				'beam';
 NaturalLog:			'log';
 Negate:				'-';
 Not:				'~';

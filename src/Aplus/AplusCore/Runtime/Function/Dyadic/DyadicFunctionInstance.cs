@@ -117,6 +117,7 @@ namespace AplusCore.Runtime.Function.Dyadic
         internal static readonly AbstractDyadicFunction Cast = new Cast();
         internal static readonly AbstractDyadicFunction ExecuteInContext = new ExecuteInContext();
         internal static readonly AbstractDyadicFunction Format = new Format();
+        internal static readonly AbstractDyadicFunction Map = new Map();
         internal static readonly AbstractDyadicFunction ValueInContext = new ValueInContext();
 
         #endregion

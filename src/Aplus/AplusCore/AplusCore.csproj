@@ -138,6 +138,7 @@
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Other\Cast.cs" />
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Other\ExecuteInContext.cs" />
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Other\Format.cs" />
+    <Compile Include="Runtime\Function\Dyadic\NonScalar\Other\Map.cs" />
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Other\ValueInContext.cs" />
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Selection\Choose.cs" />
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Selection\Left.cs" />
@@ -214,6 +215,7 @@
     <Compile Include="Runtime\Function\Monadic\NonScalar\Informational\Shape.cs" />
     <Compile Include="Runtime\Function\Monadic\NonScalar\Informational\TypeFunction.cs" />
     <Compile Include="Runtime\Function\Monadic\NonScalar\Other\Execute.cs" />
+    <Compile Include="Runtime\Function\Monadic\NonScalar\Other\MapIn.cs" />
     <Compile Include="Runtime\Function\Monadic\NonScalar\Other\Print.cs" />
     <Compile Include="Runtime\Function\Monadic\NonScalar\Other\Signal.cs" />
     <Compile Include="Runtime\Function\Monadic\NonScalar\Other\Stop.cs" />

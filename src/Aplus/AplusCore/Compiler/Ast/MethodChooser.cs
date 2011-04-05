@@ -33,6 +33,7 @@ namespace AplusCore.Compiler.AST
             { Tokens.IDENTITY, Tokens.ADD },
             { Tokens.INTERVAL, Tokens.FIND },
             { Tokens.ITEMRAVEL, Tokens.RESTRUCTURE },
+            { Tokens.MAPIN, Tokens.MAP },
             { Tokens.NATURALLOG, Tokens.LOG },
             { Tokens.NEGATE, Tokens.SUBTRACT },
             { Tokens.NOT, Tokens.LAMINATE },
@@ -120,6 +121,8 @@ namespace AplusCore.Compiler.AST
                     return MonadicFunctionInstance.Interval;
                 case Tokens.ITEMRAVEL:
                     return MonadicFunctionInstance.ItemRavel;
+                case Tokens.MAPIN:
+                    return MonadicFunctionInstance.MapIn;
                 case Tokens.NULL:
                     return MonadicFunctionInstance.NullFunction;
                 case Tokens.PACK:
@@ -279,6 +282,8 @@ namespace AplusCore.Compiler.AST
                     return DyadicFunctionInstance.Laminate;
                 case Tokens.LEFT:
                     return DyadicFunctionInstance.Left;
+                case Tokens.MAP:
+                    return DyadicFunctionInstance.Map;
                 case Tokens.MATCH:
                     return DyadicFunctionInstance.Match;
                 case Tokens.MEMBER:

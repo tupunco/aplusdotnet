@@ -71,6 +71,7 @@ GradeUp:			'\u00E8';
 Identity:			'\u002B';
 Interval:			'\u00C9';
 ItemRavel:			'\u0021';
+MapIn:				'\u00E0';
 NaturalLog:			'\u00F0';
 Negate:				'\u002D';
 Not:				'\u007E';
