@@ -41,7 +41,11 @@ namespace AplusCore.Compiler.AST
         public override DLR.Expression Generate(AplusScope scope)
         {
             DLR.Expression result = null;
-            DLR.Expression value = this.expression.Generate(scope);
+            // Clone the rhs value of the assignment to ensure correct results
+            // in case of: a:=b:=[...:=] [rhs]  assignments
+            DLR.Expression value = DLR.Expression.Call(
+                this.expression.Generate(scope), typeof(AType).GetMethod("Clone")
+            );
 
             if (this.target is Identifier)
             {

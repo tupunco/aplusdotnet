@@ -108,5 +108,20 @@ namespace AplusCoreUnitTests.Dlr.Assignments
             Assert.AreEqual(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
         }
+
+        [TestCategory("DLR"), TestCategory("Assign"), TestMethod]
+        public void AssignmentResultCopy()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("a := iota 3", scope);
+            this.engine.Execute<AType>("b := a", scope);
+            this.engine.Execute<AType>("(1 # a) := -200", scope);
+
+            Assert.AreNotEqual(
+                scope.GetVariable<AType>(".a"), 
+                scope.GetVariable<AType>(".b"),
+                "Assignment produced the same results (should not!)"
+            );
+        }
     }
 }
