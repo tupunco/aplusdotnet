@@ -93,5 +93,20 @@ namespace AplusCoreUnitTests.Dlr.Assignments
             Assert.AreEqual<AType>(AInteger.Create(2), result, "Function call made incorrect calculation");
             Assert.AreEqual<AType>(AInteger.Create(3), scope.GetVariable<AType>(".d"), "Function overwrote the variable");
         }
+
+        [TestCategory("DLR"), TestCategory("Assign"), TestMethod]
+        public void VariableHandling4()
+        {
+            AType expected = AInteger.Create(0);
+
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("a := b := iota 3", scope);
+            this.engine.Execute<AType>("(1 # a) := 5", scope);
+            
+            AType result = this.engine.Execute<AType>("a == b", scope);
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
     }
 }
