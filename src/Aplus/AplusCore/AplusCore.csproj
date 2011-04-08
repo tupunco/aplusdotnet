@@ -71,6 +71,7 @@
     <Compile Include="Compiler\Ast\BuiltInOperator.cs" />
     <Compile Include="Compiler\Ast\ControlFlow\Case.cs" />
     <Compile Include="Compiler\Ast\ControlFlow\DyadicDo.cs" />
+    <Compile Include="Compiler\Ast\Dependency.cs" />
     <Compile Include="Compiler\Ast\DyadicFunction.cs" />
     <Compile Include="Compiler\Ast\ControlFlow\If.cs" />
     <Compile Include="Compiler\Ast\Indexing.cs" />
@@ -126,6 +127,9 @@
     <Compile Include="Runtime\Binder\InvokeBinder.cs" />
     <Compile Include="Runtime\Binder\SetIndexBinder.cs" />
     <Compile Include="Runtime\Binder\SetMemberBinder.cs" />
+    <Compile Include="Runtime\DependencyState.cs" />
+    <Compile Include="Runtime\DependencyItem.cs" />
+    <Compile Include="Runtime\DependencyManager.cs" />
     <Compile Include="Runtime\Error.cs" />
     <Compile Include="Runtime\Function\Dyadic\AbstractDyadicFunction.cs" />
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Comparison\Bins.cs" />

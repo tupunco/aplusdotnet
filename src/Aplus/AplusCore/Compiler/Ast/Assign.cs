@@ -453,24 +453,13 @@ namespace AplusCore.Compiler.AST
                                 ),
                                 // did NOT found the variable in the function scope
                                 // perform the assignment in the global scope
-                                VariableHelper.SetVariable(
-                                    runtime,
-                                    globalScopeParam, // Global scope
-                                    target.CreateContextNames(runtime.CurrentContext),
-                                    value
-                                )
+                                BuildGlobalAssignment(scope, runtime, globalScopeParam, target, value)
                             );
 
                         }
                         else if (target.IsEnclosed)
                         {
-                            result = VariableHelper.SetVariable(
-                                runtime,
-                                globalScopeParam,
-                                target.CreateContextNames(runtime.CurrentContext),
-                                value
-                            );
-                            break;
+                            result = BuildGlobalAssignment(scope, runtime, globalScopeParam, target, value);
                         }
                         else
                         {
@@ -488,28 +477,38 @@ namespace AplusCore.Compiler.AST
                     case IdentifierType.SystemName:
                     default:
                         // Do an assignment on the global scope
-                        result = VariableHelper.SetVariable(
-                            runtime,
-                            globalScopeParam,
-                            target.CreateContextNames(runtime.CurrentContext),
-                            value
-                        );
+                        result = BuildGlobalAssignment(scope, runtime, globalScopeParam, target, value);
                         break;
                 }
             }
             else
             {
-
-                result = VariableHelper.SetVariable(
-                    runtime,
-                    scope.GetModuleExpression(),
-                    target.CreateContextNames(runtime.CurrentContext),
-                    value
-                );
+                result = BuildGlobalAssignment(scope, runtime, scope.GetModuleExpression(), target, value);
             }
 
 
             return DLR.Expression.Convert(result, typeof(AType));
+        }
+
+
+        private static DLR.Expression BuildGlobalAssignment(
+            AplusScope scope, Aplus runtime, DLR.Expression variableContainer, Identifier target, DLR.Expression value)
+        {
+            DLR.Expression dependencyManager = DLR.Expression.Property(scope.GetRuntimeExpression(), "DependencyManager");
+            DLR.Expression result = DLR.Expression.Block(
+                DLR.Expression.Call(
+                    dependencyManager,
+                    typeof(DependencyManager).GetMethod("InvalidateDependencies"),
+                    DLR.Expression.Constant(target.BuildQualifiedName(runtime.CurrentContext))
+                ),
+                VariableHelper.SetVariable(
+                    runtime,
+                    variableContainer,
+                    target.CreateContextNames(runtime.CurrentContext),
+                    value
+                )
+            );
+            return result;
         }
 
         #endregion

@@ -16,8 +16,19 @@ using System.Collections.Generic;
 @members {
     private Dictionary<string, List<AST.Identifier>> localAssignments = null;
 	private Dictionary<string, List<AST.Identifier>> globalAssignments = null;
+
+
+	/// <summary>
+	/// Describes if the current parsing state is inside a function.
+	/// </summary>
 	private bool isfunction = false;
 	private AST.Node function;
+
+	/// <summary>
+	/// Describes if the current parsing state is inside a function.
+	/// </summary>
+	private bool isdependency = false;
+	private HashSet<AST.Identifier> variableAccessing = null;
 
 	public AST.Node tree;
 
@@ -49,6 +60,22 @@ using System.Collections.Generic;
 		// Throw an error, maybe we can continue the execution?
     	throw new ParseException(exception.Message, true, exception);
     }
+
+	private void SetupUserDefFunction()
+	{
+		this.localAssignments = new Dictionary<string, List<AST.Identifier>>();
+		this.globalAssignments = new Dictionary<string, List<AST.Identifier>>();
+		this.isfunction = true;
+		this.function = null;
+	}
+
+	private void TearDownUserDefFunction()
+	{
+		this.localAssignments = null;
+		this.globalAssignments = null;
+		this.isfunction = false;
+		this.function = null;
+	}
 
 	private AST.Node BuildMonadic(AST.Token symbol, AST.Node argument)
 	{
@@ -197,9 +224,9 @@ statements returns [AST.ExpressionList node]
 	
 statement returns [AST.Node node]
 	:	systemCommand						{ node = $systemCommand.node; }
+	|	dependencyDefinition				{ node = $dependencyDefinition.node; }
 	|	userDefinedFunction					{ node = $userDefinedFunction.node; }
 	|	expressionList						{ node = $expressionList.node; }
-	//Dependecies
 	;
 	
 systemCommand returns [AST.SystemCommand node]
@@ -209,15 +236,25 @@ systemCommand returns [AST.SystemCommand node]
 		)?
 	;
 	
+dependencyDefinition returns [AST.Node node]
+	@init{	this.variableAccessing = new HashSet<AST.Identifier>();
+			this.isdependency = false; 
+			SetupUserDefFunction(); 
+		}
+	@after{ this.variableAccessing = null;
+			this.isdependency = false;
+			TearDownUserDefFunction();
+		}
+	:	variableName { this.isdependency = true; }	Colon  functionBody
+			{ 
+				AST.Dependency.UpdateDependantSet(this.localAssignments, this.globalAssignments, this.variableAccessing);
+				$node = AST.Node.Dependency($variableName.node, $functionBody.node, $text, this.variableAccessing);
+			}
+	;
+
 userDefinedFunction  returns [AST.Node node]
-	@init { this.localAssignments = new Dictionary<string, List<AST.Identifier>>();
-			this.globalAssignments = new Dictionary<string, List<AST.Identifier>>();
-			this.isfunction = true;
-			this.function = null; }
-	@after { this.localAssignments = null;
-			 this.globalAssignments = null;
-			 this.isfunction = false;
-			 this.function = null; }
+	@init { SetupUserDefFunction(); }
+	@after { TearDownUserDefFunction(); }
 	:	variableName										{ this.function = $variableName.node; }
 		expressionGroup Colon functionBody
 			{ $node = AST.Node.UserDefFunction($variableName.node, $expressionGroup.node, $functionBody.node, $text); }
@@ -570,9 +607,23 @@ characterConstant returns [AST.Node node]
 	|	CharachterConstantDQ				{ node = AST.Node.DoubleQuotedConstant($CharachterConstantDQ.text); }
 	;
 
-variableName returns [AST.Node node]
+variableName returns [AST.Identifier node]
  	:	SystemName							{ node = AST.Node.SystemName($SystemName.Text); }
 		// User Name:
-	|	QualifiedName						{ node = AST.Node.QualifiedName($QualifiedName.Text); }
-	|	UnqualifiedName						{ node = AST.Node.UnQualifiedName($UnqualifiedName.Text); }
+	|	QualifiedName						{ 
+												node = AST.Node.QualifiedName($QualifiedName.Text);
+
+												if(this.isdependency)
+												{
+													this.variableAccessing.Add(node);
+												}
+											}
+	|	UnqualifiedName						{ 
+												node = AST.Node.UnQualifiedName($UnqualifiedName.Text);
+
+												if(this.isdependency)
+												{
+													this.variableAccessing.Add(node);
+												}
+											}
 	;

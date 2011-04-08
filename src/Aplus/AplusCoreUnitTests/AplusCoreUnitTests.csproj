@@ -87,6 +87,7 @@
     <Compile Include="Dlr\ControlFlow\DyadicDo.cs" />
     <Compile Include="Dlr\ControlFlow\MonadicDo.cs" />
     <Compile Include="Dlr\ControlFlow\While.cs" />
+    <Compile Include="Dlr\Dependencies.cs" />
     <Compile Include="Dlr\ExtendedSlotFiller.cs" />
     <Compile Include="Dlr\Function\Dyadic\NonScalar\Bins.cs" />
     <Compile Include="Dlr\Function\Dyadic\NonScalar\Cast.cs" />

@@ -66,7 +66,6 @@ namespace AplusCore.Compiler.AST
 
             string[] contextParts = CreateContextNames(runtime.CurrentContext);
             DLR.Expression result;
-            DLR.Expression getVariable;
 
             // Check if the scope is a method
             if (scope.IsMethod)
@@ -96,7 +95,7 @@ namespace AplusCore.Compiler.AST
                     //      return $GlobalScope.$VARIABLE
                     // }
                     //
-                    getVariable = DLR.Expression.Condition(
+                    DLR.Expression getVariable = DLR.Expression.Condition(
                         DLR.Expression.Call(
                             DLR.Expression.Convert(variableContainer, typeof(IDictionary<string, object>)),
                             typeof(IDictionary<string, object>).GetMethod("ContainsKey"),
@@ -109,7 +108,7 @@ namespace AplusCore.Compiler.AST
                             variableContainer
                         ),
                         // False case:
-                        VariableHelper.GetVariable(runtime, parentVariableContainer, contextParts),
+                        BuildGlobalAccessor(scope, runtime, parentVariableContainer, contextParts),
                         // resulting type
                         typeof(object)
                     );
@@ -132,17 +131,64 @@ namespace AplusCore.Compiler.AST
 
             }
 
-
-            getVariable = VariableHelper.GetVariable(runtime, variableContainer, contextParts);
-
-            result = DLR.Expression.Dynamic(
-                runtime.ConvertBinder(typeof(AType)),
-                typeof(AType),
-                getVariable
-            );
+            result = BuildGlobalAccessor(scope, runtime, variableContainer, contextParts);
 
             return result;
+        }
 
+        private DLR.Expression BuildGlobalAccessor(
+            AplusScope scope, Aplus runtime, DLR.Expression variableContainer, string[] contextParts)
+        {
+            DLR.Expression name = DLR.Expression.Constant(BuildQualifiedName(runtime.CurrentContext));
+            DLR.Expression dependencyManager = DLR.Expression.Property(scope.GetRuntimeExpression(), "DependencyManager");
+            DLR.Expression dependencyInformation =
+                DLR.Expression.Call(
+                    dependencyManager,
+                    typeof(DependencyManager).GetMethod("GetDependency"),
+                    name
+                );
+            DLR.Expression dependencyEvaulate =
+                AST.UserDefInvoke.BuildInvoke(
+                    runtime,
+                    new DLR.Expression[] 
+                    {
+                        DLR.Expression.Property(dependencyInformation, "Function"),
+                        scope.GetAplusEnvironment()
+                    }
+                );
+
+            DLR.ParameterExpression returnValue = DLR.Expression.Parameter(typeof(AType), "__VALUE__");
+
+            DLR.Expression result = 
+                DLR.Expression.Block(
+                    new DLR.ParameterExpression[] { returnValue },
+                    DLR.Expression.IfThenElse(
+                        DLR.Expression.Call(
+                            dependencyManager,
+                            typeof(DependencyManager).GetMethod("IsInvalid"),
+                            name
+                        ),
+                        DLR.Expression.Assign(
+                            returnValue,
+                            VariableHelper.SetVariable(
+                                runtime,
+                                variableContainer,
+                                contextParts,
+                                dependencyEvaulate
+                            ).ConvertToAType(runtime)
+                        ),
+                        DLR.Expression.Assign(
+                            returnValue,
+                            VariableHelper.GetVariable(
+                                runtime,
+                                variableContainer,
+                                contextParts
+                            ).ConvertToAType(runtime)
+                        )
+                    ),
+                    returnValue
+                );
+            return result;
         }
 
         #endregion

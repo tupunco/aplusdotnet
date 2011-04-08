@@ -98,7 +98,7 @@ namespace AplusCore.Compiler.AST
             return result;
         }
 
-        private static DLR.Expression BuildInvoke(Aplus runtime, LinkedList<DLR.Expression> callArguments)
+        internal static DLR.Expression BuildInvoke(Aplus runtime, ICollection<DLR.Expression> callArguments)
         {
             DLR.Expression result = DLR.Expression.Convert(
                 DLR.Expression.Dynamic(

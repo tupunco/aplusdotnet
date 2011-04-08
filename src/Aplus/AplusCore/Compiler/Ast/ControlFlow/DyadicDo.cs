@@ -200,27 +200,42 @@ namespace AplusCore.Compiler.AST
 
         private DLR.Expression DomainTest(DLR.Expression value, DLR.ParameterExpression scalar)
         {
+            // What do we do here?
+            //   First we assign the $value to the $scalar, then check if it is valid for a Dyadic do statement
+            //   if not then we throw an exception
+            // code:
+            // 
+            // $scalar = $value;
+            // if($scalar.TryFirstScalar(out scalar, true) == false || !scalar.IsTolerablyWholeNumber)
+            // {
+            //     throw new Error.Domain("DO");
+            // }
+            //
+
             DLR.Expression test =
-                DLR.Expression.Call(value, typeof(AType).GetMethod("TryFirstScalar"),
+                DLR.Expression.Call(scalar, typeof(AType).GetMethod("TryFirstScalar"),
                     scalar, DLR.Expression.Constant(true)
                 );
 
             DLR.Expression block = 
-                DLR.Expression.IfThen(
-                    DLR.Expression.OrElse(
-                        // Test and get item from the array
-                        DLR.Expression.IsFalse(test),
-                        // Test if the scalar is a tolerably whole number
-                        DLR.Expression.Not(DLR.Expression.Property(scalar, "IsTolerablyWholeNumber"))
-                    ),
-                    DLR.Expression.Throw(
-                        DLR.Expression.New(
-                            typeof(Error.Domain).GetConstructor(new Type[] { typeof(string) }),
-                            DLR.Expression.Constant("DO", typeof(string))
+                DLR.Expression.Block(
+                    DLR.Expression.Assign(scalar, value),
+                    DLR.Expression.IfThen(
+                        DLR.Expression.OrElse(
+                            // Test and get item from the array
+                            DLR.Expression.IsFalse(test),
+                            // Test if the scalar is a tolerably whole number
+                            DLR.Expression.Not(DLR.Expression.Property(scalar, "IsTolerablyWholeNumber"))
                         ),
-                        typeof(Error.Domain)
+                        DLR.Expression.Throw(
+                            DLR.Expression.New(
+                                typeof(Error.Domain).GetConstructor(new Type[] { typeof(string) }),
+                                DLR.Expression.Constant("DO", typeof(string))
+                            ),
+                            typeof(Error.Domain)
+                        )
                     )
-            );
+               );
 
             return block;
         }

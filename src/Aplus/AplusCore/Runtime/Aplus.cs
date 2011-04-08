@@ -18,6 +18,7 @@ namespace AplusCore.Runtime
         private Scope dlrglobals;
 
         private SystemVariables sysvars;
+        private DependencyManager dependencies;
 
         #endregion
 
@@ -26,6 +27,11 @@ namespace AplusCore.Runtime
         public SystemVariables SystemVariables
         {
             get { return this.sysvars; }
+        }
+
+        public DependencyManager DependencyManager
+        {
+            get { return this.dependencies; }
         }
 
         public LexerMode LexerMode
@@ -47,6 +53,7 @@ namespace AplusCore.Runtime
         public Aplus(Scope dlrglobals, LexerMode parsemode)
         {
             this.sysvars = new SystemVariables();
+            this.dependencies = new DependencyManager();
 
             this.dlrglobals = dlrglobals;
             this.globals = new ExpandoObject();
