@@ -25,7 +25,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
                     throw new Error.Domain(DomainErrorText);
                 }
 
-                return DiscloseNestedtArray(argument, environment);
+                return DiscloseNestedArray(argument, environment);
             }
         }
 
@@ -33,20 +33,9 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
 
         #region Computation
 
-        /// <summary>
-        /// Disclose the argument if it's not a function expression.
-        /// </summary>
-        /// <param name="argument"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        private AType DiscloseNestedScalar(AType argument)
-        {
-            return argument.NestedItem;
-        }
-
         private AType DiscloseNestedVector(AType argument, out List<int> shape)
         {
-            AType item = DiscloseNestedScalar(argument[0]);
+            AType item = argument[0].NestedItem;
             ATypes type = item.Type;
             shape = item.Shape;
             int rank = item.Rank;
@@ -69,10 +58,11 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
             AType result = AArray.Create(type, item);
 
             for (int i = 1; i < argument.Length; i++)
-            {   
-                item = DiscloseNestedScalar(argument[i]);
+            {
+                // Get the nested item
+                item = argument[i].NestedItem;
 
-                //Uniform rules!
+                // Uniform rules!
                 if (item.Type != type)
                 {
                     if (type == ATypes.AFloat && item.Type == ATypes.AInteger)
@@ -157,8 +147,9 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
         /// Reconduct the argument to vectors.
         /// </summary>
         /// <param name="argument"></param>
+        /// <param name="environment"></param>
         /// <returns></returns>
-        private AType DiscloseNestedtArray(AType argument, AplusEnvironment environment)
+        private AType DiscloseNestedArray(AType argument, AplusEnvironment environment)
         {
             AType result;
 
@@ -169,7 +160,6 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
                 if (argument.Rank > 1)
                 {
                     result = MonadicFunctionInstance.Ravel.Execute(argument, environment);
-
                     result = DiscloseNestedVector(result, out insideShape);
 
                     List<int> newShape = new List<int>(argument.Shape);
@@ -184,8 +174,8 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
             }
             else
             {
-                //Scalar
-                result = DiscloseNestedScalar(argument);
+                // Get the nested scalar
+                result = argument.NestedItem;
             }
 
             if (result.Rank > 9)
