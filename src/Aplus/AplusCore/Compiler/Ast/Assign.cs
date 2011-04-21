@@ -389,24 +389,18 @@ namespace AplusCore.Compiler.AST
 
             // case A)
             DLR.Expression caseStrand2Strand =
-                DLR.Expression.Block(
-                    typeof(void),
-                    DLR.Expression.IfThenElse(
-                        DLR.Expression.NotEqual(
-                            DLR.Expression.PropertyOrField(valuesParam, "Length"),
-                            DLR.Expression.Constant(indexCounter, typeof(int))
-                        ),
-                        DLR.Expression.Throw(
-                            DLR.Expression.New(
-                                typeof(Error.Length).GetConstructor(new Type[] { typeof(string) }),
-                                DLR.Expression.Constant("assign", typeof(string))
-                            )
-                        ),
-                        DLR.Expression.Block(
-                            typeof(void),
-                            strand2StrandAssigns
+                DLR.Expression.IfThenElse(
+                    DLR.Expression.NotEqual(
+                        DLR.Expression.PropertyOrField(valuesParam, "Length"),
+                        DLR.Expression.Constant(indexCounter, typeof(int))
+                    ),
+                    DLR.Expression.Throw(
+                        DLR.Expression.New(
+                            typeof(Error.Length).GetConstructor(new Type[] { typeof(string) }),
+                            DLR.Expression.Constant("assign", typeof(string))
                         )
-                    )
+                    ),
+                    DLR.Expression.Block(strand2StrandAssigns)
             );
 
             DLR.Expression dependencyManager = DLR.Expression.Property(scope.GetRuntimeExpression(), "DependencyManager");
@@ -414,13 +408,12 @@ namespace AplusCore.Compiler.AST
             DLR.Expression result = DLR.Expression.Block(
                 new DLR.ParameterExpression[] { valuesParam },
                 DLR.Expression.Assign(valuesParam, DLR.Expression.Convert(value, typeof(AType))),
-                DLR.Expression.Condition(
+                DLR.Expression.IfThenElse(
                     DLR.Expression.PropertyOrField(valuesParam, "IsArray"),
                 // case A)
                     caseStrand2Strand,
                 // case B)
-                    DLR.Expression.Block(typeof(void), strand2ValueAssigns),
-                    typeof(void)
+                    DLR.Expression.Block(strand2ValueAssigns)
                 ),
                 DLR.Expression.Call(
                     dependencyManager,
