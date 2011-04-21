@@ -415,7 +415,7 @@ namespace AplusCore.Compiler.AST
                 new DLR.ParameterExpression[] { valuesParam },
                 DLR.Expression.Assign(valuesParam, DLR.Expression.Convert(value, typeof(AType))),
                 DLR.Expression.Condition(
-                    DLR.Expression.IsTrue(DLR.Expression.PropertyOrField(valuesParam, "IsArray")),
+                    DLR.Expression.PropertyOrField(valuesParam, "IsArray"),
                 // case A)
                     caseStrand2Strand,
                 // case B)
