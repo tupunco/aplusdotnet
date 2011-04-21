@@ -3,6 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AplusCore;
 using AplusCore.Types;
 using AplusCore.Runtime;
 using AplusCore.Compiler;
@@ -68,6 +69,34 @@ namespace AplusCoreUnitTests.Dlr.Assignments
 
             Assert.IsFalse(scope.ContainsVariable("A.a"), "Variable found! Shouldn't be.");
             Assert.IsFalse(scope.ContainsVariable("A.b"), "Variable found! Shouldn't be.");
+        }
+
+        [TestCategory("DLR"), TestCategory("Assign"), TestCategory("Strand"), TestMethod]
+        [Description("Test checks if the strand assignment performs disclose on the rhs.")]
+        public void StrandBoxAssignment()
+        {
+            var expected = (new List<int>(){ 1, 2 }).ToAArray();
+            var scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("(a;b) := <1 2", scope);
+
+            Assert.AreEqual<AType>(expected, scope.GetVariable<AType>(".a"));
+            Assert.AreEqual<AType>(expected, scope.GetVariable<AType>(".b"));
+        }
+
+        [TestCategory("DLR"), TestCategory("Assign"), TestCategory("Strand"), TestMethod]
+        [Description("Test checks if the strand assignment assigns different copies of the rhs")]
+        public void StrandBoxDifferentAssignment()
+        {
+            var expectedA = (new List<int>() { 1, 3 }).ToAArray();
+            var expectedB = (new List<int>() { 1, 2 }).ToAArray();
+
+            var scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("(a;b) := <1 2", scope);
+            this.engine.Execute<AType>("a[1] := 3", scope);
+
+            Assert.AreEqual<AType>(expectedA, scope.GetVariable<AType>(".a"), "Invalid result for '.a' variable");
+            Assert.AreEqual<AType>(expectedB, scope.GetVariable<AType>(".b"), "Invalid result for '.b' variable");
+
         }
 
         [TestCategory("DLR"), TestCategory("Assign"), TestCategory("Strand"), TestMethod]

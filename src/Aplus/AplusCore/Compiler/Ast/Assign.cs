@@ -294,8 +294,13 @@ namespace AplusCore.Compiler.AST
         /// }
         /// else    // case B
         /// {
-        ///     a = $VALUES;
-        ///     b = $VALUES;
+        ///     // need to disclose the box
+        ///     if($__VALUES__.Type == ATypes.Box)
+        ///     {
+        ///         $__VALUES__ = disclose($__VALUES__);
+        ///     }
+        ///     a = $VALUES.Clone();
+        ///     b = $VALUES.Clone();
         ///     ...
         /// }
         /// $__DependencyManager__.InvalidateDependencies(string[] { a,b, .. })
@@ -315,13 +320,25 @@ namespace AplusCore.Compiler.AST
             DLR.ParameterExpression environment = scope.GetAplusEnvironment();
 
             DLR.ParameterExpression valuesParam = DLR.Expression.Parameter(typeof(AType), "__VALUES__");
+            // for dependency evaluation
+            List<string> targetVariables = new List<string>();
 
             // for case A) assigns
             List<DLR.Expression> strand2StrandAssigns = new List<DLR.Expression>();
             // for case B) assigns
-            List<DLR.Expression> strand2ValueAssigns = new List<DLR.Expression>();
-            // for dependency evaluation
-            List<string> targetVariables = new List<string>();
+            List<DLR.Expression> strand2ValueAssigns = new List<DLR.Expression>()
+            {
+                DLR.Expression.Assign(
+                    valuesParam,
+                    DLR.Expression.Call(
+                        DLR.Expression.Constant(disclose),
+                        disclose.GetType().GetMethod("Execute"),
+                        valuesParam,
+                        environment
+                    )
+                )
+            };
+
             int indexCounter = 0;
 
             foreach (Node node in targets.Items)
@@ -347,8 +364,18 @@ namespace AplusCore.Compiler.AST
                 // case A) $TARGETS[i] = disclose($VALUES[i])
                 strand2StrandAssigns.Add(GenerateIdentifierAssign(scope, id, strandValue, isStrand: true));
 
-                // case B) $TARGETS[i] = $VALUE
-                strand2ValueAssigns.Add(GenerateIdentifierAssign(scope, id, valuesParam, isStrand: true));
+                // case B) $TARGETS[i] = $VALUE.Clone()
+                strand2ValueAssigns.Add(
+                    GenerateIdentifierAssign(
+                        scope,
+                        id,
+                        DLR.Expression.Call(
+                            valuesParam,
+                            typeof(AType).GetMethod("Clone")
+                        ),
+                        isStrand: true
+                    )
+                );
 
 
                 // gather the global variables for dependency validation/invalidation. 
