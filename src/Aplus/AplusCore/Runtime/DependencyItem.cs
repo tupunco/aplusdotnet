@@ -20,6 +20,14 @@ namespace AplusCore.Runtime
         #region Properties
 
         /// <summary>
+        /// Returns the Qualified name of the associated variable.
+        /// </summary>
+        public string VariableName
+        {
+            get { return this.variableName; }
+        }
+
+        /// <summary>
         /// State of the Dependency
         /// </summary>
         public DependencyState State
@@ -45,6 +53,7 @@ namespace AplusCore.Runtime
             this.dependentItems = dependentItems;
             this.function = function;
 
+            // By default the dependencies are invalid.
             MarkAsInvalid();
         }
 
@@ -52,16 +61,38 @@ namespace AplusCore.Runtime
 
         #region Methods
 
+        /// <summary>
+        /// Check if the dependency definition contains the variable.
+        /// </summary>
+        /// <param name="variableName">Name of the variable to check for.</param>
+        /// <returns>True if the variable is used inside the dependency's definition.</returns>
         public bool ContainsVariable(string variableName)
         {
             return this.dependentItems.Contains(variableName);
         }
 
+        /// <summary>
+        /// Check if the dependency definition contains any of the variables.
+        /// </summary>
+        /// <param name="variableNames">Names of the variables to check for.</param>
+        /// <returns>True if any of the variables is used inside the dependency's definition.</returns>
+        public bool ContainsVariable(string[] variableNames)
+        {
+            return this.dependentItems.Any(item => { return variableNames.Contains(item); });
+        }
+
+        /// <summary>
+        /// Mark the dependency as invalid.
+        /// </summary>
         public void MarkAsInvalid()
         {
             this.state = DependencyState.Invalid;
         }
 
+        /// <summary>
+        /// Mark the dependency.
+        /// </summary>
+        /// <param name="state"></param>
         public void Mark(DependencyState state)
         {
             this.state = state;

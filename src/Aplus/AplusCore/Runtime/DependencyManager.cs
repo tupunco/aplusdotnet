@@ -40,11 +40,11 @@ namespace AplusCore.Runtime
         /// <returns>Returns the registerd dependency information.</returns>
         public DependencyItem Register(string variableName, HashSet<string> dependentItems, AType function)
         {
+            // Invalidate any dependencies using the variable
+            InvalidateDependencies(variableName);
+
             DependencyItem item = new DependencyItem(variableName, dependentItems, function);
             this.mapping[variableName] = item;
-
-            // Invalidate any dependencies using this one
-            InvalidateDependencies(variableName);
             return item;
         }
 
@@ -76,22 +76,60 @@ namespace AplusCore.Runtime
         /// <summary>
         /// Mark dependencies invalid, based on the variable.
         /// </summary>
+        /// <remarks>Only valid dependencies will be marked as invalid.</remarks>
         /// <param name="variableName">The name of the variable to check for.</param>
-        /// <returns>Number of dependencies marked invalid.</returns>
-        public int InvalidateDependencies(string variableName)
+        public void InvalidateDependencies(string variableName)
         {
-            int markedCount = 0;
-
             foreach (DependencyItem item in this.mapping.Values)
             {
-                if (item.ContainsVariable(variableName))
+                if (item.ContainsVariable(variableName) && item.State == DependencyState.Valid)
                 {
                     item.MarkAsInvalid();
-                    markedCount++;
                 }
             }
+        }
 
-            return markedCount;
+        /// <summary>
+        /// Mark dependencies invalid, based on the variables.
+        /// </summary>
+        /// <remarks>Only valid dependencies will be marked as invalid.</remarks>
+        /// <param name="variableNames">Array of the variableNames to check for.</param>
+        public void InvalidateDependencies(string[] variableNames)
+        {
+            foreach (DependencyItem item in this.mapping.Values)
+            {
+                if (item.ContainsVariable(variableNames) && item.State == DependencyState.Valid)
+                {
+                    item.MarkAsInvalid();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Mark a dependency valid.
+        /// </summary>
+        /// <param name="variableName">The variable name of the dependency to mark valid.</param>
+        public void ValidateDependency(string variableName)
+        {
+            if (this.mapping.ContainsKey(variableName))
+            {
+                this.mapping[variableName].Mark(DependencyState.Valid);
+            }
+        }
+
+        /// <summary>
+        /// Mark a dependencies valid.
+        /// </summary>
+        /// <param name="variableNames">The array of variable names of the dependencies to mark valid.</param>
+        public void ValidateDependencies(string[] variableNames)
+        {
+            foreach (string varName in variableNames)
+            {
+                if (this.mapping.ContainsKey(varName))
+                {
+                    this.mapping[varName].Mark(DependencyState.Valid);
+                }
+            }
         }
 
         #endregion
