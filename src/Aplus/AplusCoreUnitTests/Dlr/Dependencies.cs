@@ -46,5 +46,22 @@ namespace AplusCoreUnitTests.Dlr
 
             Assert.AreEqual<AType>(expected, result, "Incorrect dependency evaluation");
         }
+
+
+        [TestCategory("DLR"), TestCategory("Dependencies"), TestMethod]
+        public void CyclicDependencyEvaluation()
+        {
+            var expected = AFloat.Create(0.085);
+            var scope = this.engine.CreateScope();
+
+            this.engine.Execute<AType>("y: u + s", scope);
+            this.engine.Execute<AType>("u: y - s", scope);
+            this.engine.Execute<AType>("s: y - u", scope);
+            this.engine.Execute<AType>("(u;s):= (0.08; 0.005)", scope);
+
+            AType result = this.engine.Execute<AType>("y", scope);
+
+            Assert.AreEqual<AType>(expected, result, "Incorrect dependency evaluation");
+        }
     }
 }

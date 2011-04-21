@@ -57,6 +57,20 @@ namespace AplusCoreUnitTests.Dlr.Assignments
         }
 
         [TestCategory("DLR"), TestCategory("Assign"), TestCategory("Strand"), TestMethod]
+        [Description("Test ensures that changing context does not change the target context.")]
+        public void StrandAssignTargetCorrection()
+        {
+            var scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("(a;b) := ( {eval '$cx A'; 5 }; 7 )", scope);
+
+            Assert.IsTrue(scope.ContainsVariable(".a"), "No variable found");
+            Assert.IsTrue(scope.ContainsVariable(".b"), "No variable found");
+
+            Assert.IsFalse(scope.ContainsVariable("A.a"), "Variable found! Shouldn't be.");
+            Assert.IsFalse(scope.ContainsVariable("A.b"), "Variable found! Shouldn't be.");
+        }
+
+        [TestCategory("DLR"), TestCategory("Assign"), TestCategory("Strand"), TestMethod]
         [ExpectedException(typeof(ParseException))]
         public void StrandAssignParseException()
         {
