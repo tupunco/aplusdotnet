@@ -114,21 +114,24 @@ namespace AplusCore.Compiler.AST
             );
 
             // 3.5 Build dependant set
-            HashSet<string> dependats = new HashSet<string>(
+            HashSet<string> dependents = new HashSet<string>(
                 this.dependantSet.Select(item => { return item.BuildQualifiedName(runtime.CurrentContext); })
             );
 
             // 4. Register the method for the Dependency manager
-            DLR.Expression dependencyManager = DLR.Expression.Property(scope.RuntimeExpression, "DependencyManager");
+            DLR.ParameterExpression dependencyMethodParam = DLR.Expression.Parameter(typeof(AType), "__DEP._METHOD__");
+            DLR.Expression dependencyManager = DLR.Expression.Property(scope.GetRuntimeExpression(), "DependencyManager");
             result = DLR.Expression.Block(
+                new DLR.ParameterExpression[] { dependencyMethodParam },
+                DLR.Expression.Assign(dependencyMethodParam, wrappedLambda),
                 DLR.Expression.Call(
                     dependencyManager,
                     typeof(DependencyManager).GetMethod("Register"),
                     DLR.Expression.Constant(dependencyName, typeof(string)),
-                    DLR.Expression.Constant(dependats, typeof(HashSet<string>)),
-                    wrappedLambda
+                    DLR.Expression.Constant(dependents, typeof(HashSet<string>)),
+                    dependencyMethodParam
                 ),
-                wrappedLambda
+                dependencyMethodParam
             );
 
             return result;

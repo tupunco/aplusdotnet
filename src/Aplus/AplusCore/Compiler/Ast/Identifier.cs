@@ -141,12 +141,15 @@ namespace AplusCore.Compiler.AST
         {
             DLR.Expression name = DLR.Expression.Constant(BuildQualifiedName(runtime.CurrentContext));
             DLR.Expression dependencyManager = DLR.Expression.Property(scope.GetRuntimeExpression(), "DependencyManager");
+            // Build the ET for getting the dependecy for the variable
             DLR.Expression dependencyInformation =
                 DLR.Expression.Call(
                     dependencyManager,
                     typeof(DependencyManager).GetMethod("GetDependency"),
                     name
                 );
+
+            // Build the ET for invoking the dependecy.
             DLR.Expression dependencyEvaulate =
                 AST.UserDefInvoke.BuildInvoke(
                     runtime,
@@ -157,37 +160,34 @@ namespace AplusCore.Compiler.AST
                     }
                 );
 
-            DLR.ParameterExpression returnValue = DLR.Expression.Parameter(typeof(AType), "__VALUE__");
-
-            DLR.Expression result = 
-                DLR.Expression.Block(
-                    new DLR.ParameterExpression[] { returnValue },
-                    DLR.Expression.IfThenElse(
-                        DLR.Expression.Call(
-                            dependencyManager,
-                            typeof(DependencyManager).GetMethod("IsInvalid"),
-                            name
-                        ),
-                        DLR.Expression.Assign(
-                            returnValue,
-                            VariableHelper.SetVariable(
-                                runtime,
-                                variableContainer,
-                                contextParts,
-                                dependencyEvaulate
-                            ).ConvertToAType(runtime)
-                        ),
-                        DLR.Expression.Assign(
-                            returnValue,
-                            VariableHelper.GetVariable(
-                                runtime,
-                                variableContainer,
-                                contextParts
-                            ).ConvertToAType(runtime)
-                        )
+            /* 
+             * Simplified code of the resulting ET:
+             * 
+             * result = $runtime.DependecyManager.IsInvalid($$variable)
+             *          ? ($$variable = $runtime.DependencyManager.GetDependency($$name).Function())
+             *          : $$variable
+             */
+            DLR.Expression result =
+                DLR.Expression.Condition(
+                    DLR.Expression.Call(
+                        dependencyManager,
+                        typeof(DependencyManager).GetMethod("IsInvalid"),
+                        name
                     ),
-                    returnValue
-                );
+                    VariableHelper.SetVariable(
+                            runtime,
+                            variableContainer,
+                            contextParts,
+                            dependencyEvaulate
+                    ),
+                    VariableHelper.GetVariable(
+                            runtime,
+                            variableContainer,
+                            contextParts
+                    ),
+                    typeof(object)
+                ).ConvertToAType(runtime);
+
             return result;
         }
 
