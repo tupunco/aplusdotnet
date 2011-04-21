@@ -298,6 +298,8 @@ namespace AplusCore.Compiler.AST
         ///     b = $VALUES;
         ///     ...
         /// }
+        /// $__DependencyManager__.InvalidateDependencies(string[] { a,b, .. })
+        /// $__DependencyManager__.ValidateDependencies(string[] { a,b, .. })
         /// </remarks>
         /// <param name="scope"></param>
         /// <param name="targets">
@@ -318,7 +320,10 @@ namespace AplusCore.Compiler.AST
             List<DLR.Expression> strand2StrandAssigns = new List<DLR.Expression>();
             // for case B) assigns
             List<DLR.Expression> strand2ValueAssigns = new List<DLR.Expression>();
+            // for dependency evaluation
+            List<string> targetVariables = new List<string>();
             int indexCounter = 0;
+
             foreach (Node node in targets.Items)
             {
                 if (!(node is Identifier))
@@ -340,10 +345,17 @@ namespace AplusCore.Compiler.AST
                 );
 
                 // case A) $TARGETS[i] = disclose($VALUES[i])
-                strand2StrandAssigns.Add(GenerateIdentifierAssign(scope, id, strandValue));
+                strand2StrandAssigns.Add(GenerateIdentifierAssign(scope, id, strandValue, isStrand: true));
 
                 // case B) $TARGETS[i] = $VALUE
-                strand2ValueAssigns.Add(GenerateIdentifierAssign(scope, id, valuesParam));
+                strand2ValueAssigns.Add(GenerateIdentifierAssign(scope, id, valuesParam, isStrand: true));
+
+
+                // gather the global variables for dependency validation/invalidation. 
+                if((scope.IsMethod && id.IsEnclosed) || !scope.IsMethod)
+                {
+                    targetVariables.Add(id.BuildQualifiedName(runtime.CurrentContext));
+                }
 
                 indexCounter++;
             }
@@ -370,6 +382,8 @@ namespace AplusCore.Compiler.AST
                     )
             );
 
+            DLR.Expression dependencyManager = DLR.Expression.Property(scope.GetRuntimeExpression(), "DependencyManager");
+
             DLR.Expression result = DLR.Expression.Block(
                 new DLR.ParameterExpression[] { valuesParam },
                 DLR.Expression.Assign(valuesParam, DLR.Expression.Convert(value, typeof(AType))),
@@ -381,6 +395,16 @@ namespace AplusCore.Compiler.AST
                     DLR.Expression.Block(typeof(void), strand2ValueAssigns),
                     typeof(void)
                 ),
+                DLR.Expression.Call(
+                    dependencyManager,
+                    typeof(DependencyManager).GetMethod("InvalidateDependencies", new Type[] { typeof(string[]) }),
+                    DLR.Expression.Constant(targetVariables.ToArray())
+                ),
+                DLR.Expression.Call(
+                    dependencyManager,
+                    typeof(DependencyManager).GetMethod("ValidateDependencies"),
+                    DLR.Expression.Constant(targetVariables.ToArray())
+                ),
                 valuesParam
             );
 
@@ -391,7 +415,8 @@ namespace AplusCore.Compiler.AST
 
         #region DLR: Assign to Identifier
 
-        internal static DLR.Expression GenerateIdentifierAssign(AplusScope scope, Identifier target, DLR.Expression value)
+        internal static DLR.Expression GenerateIdentifierAssign(
+            AplusScope scope, Identifier target, DLR.Expression value, bool isStrand = false)
         {
             Aplus runtime = scope.GetRuntime();
             DLR.Expression result = null;
@@ -453,13 +478,13 @@ namespace AplusCore.Compiler.AST
                                 ),
                                 // did NOT found the variable in the function scope
                                 // perform the assignment in the global scope
-                                BuildGlobalAssignment(scope, runtime, globalScopeParam, target, value)
+                                BuildGlobalAssignment(scope, runtime, globalScopeParam, target, value, isStrand)
                             );
 
                         }
                         else if (target.IsEnclosed)
                         {
-                            result = BuildGlobalAssignment(scope, runtime, globalScopeParam, target, value);
+                            result = BuildGlobalAssignment(scope, runtime, globalScopeParam, target, value, isStrand);
                         }
                         else
                         {
@@ -492,22 +517,48 @@ namespace AplusCore.Compiler.AST
 
 
         private static DLR.Expression BuildGlobalAssignment(
-            AplusScope scope, Aplus runtime, DLR.Expression variableContainer, Identifier target, DLR.Expression value)
+            AplusScope scope,
+            Aplus runtime,
+            DLR.Expression variableContainer,
+            Identifier target,
+            DLR.Expression value,
+            bool isStrand = false)
         {
-            DLR.Expression dependencyManager = DLR.Expression.Property(scope.GetRuntimeExpression(), "DependencyManager");
-            DLR.Expression result = DLR.Expression.Block(
-                DLR.Expression.Call(
+            // Build the ET for updating the dependency
+            DLR.Expression dependencyCall;
+
+            if (isStrand)
+            {
+                // We are inside a starnd assignment, do nothing.
+                // Dependency update will be handled later.
+                dependencyCall = DLR.Expression.Empty();
+            }
+            else
+            {
+                // Otherwise build the dependency invalidation call.
+                DLR.Expression dependencyManager = DLR.Expression.Property(scope.GetRuntimeExpression(), "DependencyManager");
+                dependencyCall = DLR.Expression.Call(
                     dependencyManager,
-                    typeof(DependencyManager).GetMethod("InvalidateDependencies"),
+                    typeof(DependencyManager).GetMethod("InvalidateDependencies", new Type[] { typeof(string) }),
                     DLR.Expression.Constant(target.BuildQualifiedName(runtime.CurrentContext))
-                ),
+                );
+            }
+
+            DLR.ParameterExpression valueParam = DLR.Expression.Parameter(typeof(object), "__VALUE__");
+
+            DLR.Expression result = DLR.Expression.Block(
+                new DLR.ParameterExpression[] { valueParam },
+                DLR.Expression.Assign(valueParam, value),
                 VariableHelper.SetVariable(
                     runtime,
                     variableContainer,
                     target.CreateContextNames(runtime.CurrentContext),
-                    value
-                )
+                    valueParam
+                ),
+                dependencyCall,
+                valueParam
             );
+
             return result;
         }
 
