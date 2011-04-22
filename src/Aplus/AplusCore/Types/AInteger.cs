@@ -52,7 +52,7 @@ namespace AplusCore.Types
 
         public override AType Clone()
         {
-            return AInteger.Create(this.value); ;
+            return new AInteger(this.value);
         }
 
         public override bool Equals(object obj)

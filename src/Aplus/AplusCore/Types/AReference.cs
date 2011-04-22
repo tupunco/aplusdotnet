@@ -200,7 +200,8 @@ namespace AplusCore.Types
 
         public AType Clone()
         {
-            return this.Data.Clone();
+            // The clone of the 'Data' is an AValue for sure.
+            return new AReference((AValue)this.Data.Clone());
         }
 
         public InfoResult CompareInfos(AType other)

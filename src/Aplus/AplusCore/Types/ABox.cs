@@ -72,7 +72,7 @@ namespace AplusCore.Types
 
         public override AType Clone()
         {
-            return ABox.Create(this.value.Clone());
+            return new ABox(this.value.Clone());
         }
 
         public override bool Equals(object obj)

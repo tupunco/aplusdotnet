@@ -87,7 +87,7 @@ namespace AplusCore.Types
 
         public override AType Clone()
         {
-            return new AReference(this);
+            return this;
         }
 
         public override string ToString()

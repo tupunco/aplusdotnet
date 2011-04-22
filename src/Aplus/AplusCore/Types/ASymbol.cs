@@ -50,7 +50,7 @@ namespace AplusCore.Types
 
         public override AType Clone()
         {
-            return ASymbol.Create(symbolName);
+            return new ASymbol(symbolName);
         }
 
         public override bool Equals(object obj)

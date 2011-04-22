@@ -60,7 +60,7 @@ namespace AplusCore.Types
 
         public override AType Clone()
         {
-            return AFloat.Create(value);
+            return new AFloat(this.value);
         }
 
         public override bool Equals(object obj)

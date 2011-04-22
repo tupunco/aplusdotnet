@@ -47,7 +47,7 @@ namespace AplusCore.Types
 
         public override AType Clone()
         {
-            return AChar.Create(this.value);
+            return new AChar(this.value);
         }
 
         public override bool Equals(object obj)

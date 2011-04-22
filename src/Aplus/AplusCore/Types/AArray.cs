@@ -218,7 +218,7 @@ namespace AplusCore.Types
                 result.AddWithNoUpdate(item.Clone());
             }
             result.UpdateInfo(this);
-            return new AReference(result);
+            return result;
         }
 
         public override bool Equals(object obj)
