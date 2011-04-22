@@ -164,6 +164,54 @@ namespace AplusCoreUnitTests.Dlr
         }
 
         [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestMethod]
+        [ExpectedException(typeof(Error.Value))]
+        public void FunctionScopeTestSimple()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("z:=20", scope);
+            this.engine.Execute<AType>("g{}: { z:=z }", scope);
+        }
+
+        [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestMethod]
+        [ExpectedException(typeof(Error.Value))]
+        [Description("Test local assignment inside function and variable lookup.")]
+        public void FunctionScopeTest()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("q:=20", scope);
+            this.engine.Execute<AType>("g{}: { q; q:=2 }", scope);
+        }
+
+        [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestMethod]
+        [Description("Test global assignment inside function and variable lookup.")]
+        public void FunctionGlobalScopeTest()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("q:=20", scope);
+            AType result = this.engine.Execute<AType>("g{}: { q; (q):=2 }", scope);
+
+            Assert.AreEqual<AType>(
+                AInteger.Create(2),
+                scope.GetVariable<AType>(".q"),
+                "Incorrect value was assigned to the '.q' global variable"
+            );
+        }
+
+        [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestMethod]
+        [Description("Test eval inside function and variable lookup.")]
+        public void FunctionEvalScopeTest()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+            AType result = this.engine.Execute<AType>("g{}: { eval 'q:=-2'; q }", scope);
+
+            Assert.AreEqual<AType>(
+                AInteger.Create(-2),
+                scope.GetVariable<AType>(".q"),
+                "Incorrect value was assigned to the '.q' global variable"
+            );
+        }
+
+        [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestMethod]
         public void FunctionGlobalScopeFallback()
         {
             ScriptScope scope = this.engine.CreateScope();
