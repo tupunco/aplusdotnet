@@ -140,7 +140,7 @@ namespace AplusCore.Runtime.Function.Dyadic
                     throw new Error.Length(this.LengthErrorText);
                 }
             }
-            else if (leftArgument.IsArray && rightArgument.Rank == 0)
+            else if (leftArgument.IsArray && !rightArgument.IsArray)
             {
                 if (rightArgument.Type == ATypes.ANull)
                 {
@@ -174,7 +174,7 @@ namespace AplusCore.Runtime.Function.Dyadic
 
                 return result;
             }
-            else if (leftArgument.Rank == 0 && rightArgument.IsArray)
+            else if (!leftArgument.IsArray && rightArgument.IsArray)
             {
                 if (leftArgument.Type == ATypes.ANull)
                 {
