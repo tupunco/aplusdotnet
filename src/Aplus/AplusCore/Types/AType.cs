@@ -42,7 +42,6 @@ namespace AplusCore.Types
         #region Helpers
 
         bool IsArray { get; }
-        bool IsPrimitive { get; }
         bool IsBox { get; }
         bool IsFunctionScalar { get; }
 

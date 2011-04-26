@@ -33,12 +33,6 @@ namespace AplusCore.Types
 
         #endregion
 
-        #region Properties
-
-        public override bool IsPrimitive { get { return true; } }
-
-        #endregion
-
         #region Converter Properties
 
         public override string asString { get { return this.symbolName; } }

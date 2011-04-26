@@ -39,11 +39,6 @@ namespace AplusCore.Types
             get { return this.Data.IsArray; }
         }
 
-        public bool IsPrimitive
-        {
-            get { return this.Data.IsPrimitive; }
-        }
-
         public bool IsBox
         {
             get { return this.Data.IsBox; }

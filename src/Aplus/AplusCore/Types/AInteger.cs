@@ -34,7 +34,6 @@ namespace AplusCore.Types
 
         #region Properties
 
-        public override bool IsPrimitive { get { return true; } }
         public override bool IsNumber { get { return true; } }
         public override bool IsTolerablyWholeNumber { get { return true; } }
 
