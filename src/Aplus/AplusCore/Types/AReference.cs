@@ -112,16 +112,6 @@ namespace AplusCore.Types
             }
         }
 
-        public string Infos
-        {
-            get { return this.Data.Infos; }
-        }
-
-        public string ShapeString
-        {
-            get { return this.Data.ShapeString; }
-        }
-
         public List<AType> Container
         {
             get { return this.Data.Container; }

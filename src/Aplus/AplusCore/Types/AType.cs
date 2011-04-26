@@ -25,8 +25,21 @@ namespace AplusCore.Types
     /// </summary>
     public interface AType : IComparable<AType>, IEnumerable<AType>
     {
-
         #region Properties
+
+        #region Base
+
+        ATypes Type { get; set; }
+        int Length { get; set; }
+        List<int> Shape { get; set; }
+        int Rank { get; set; }
+
+        AType NestedItem { get; }
+        AValue Data { get; set; }
+
+        #endregion
+
+        #region Helpers
 
         bool IsArray { get; }
         bool IsPrimitive { get; }
@@ -36,24 +49,17 @@ namespace AplusCore.Types
         bool IsNumber { get; }
         bool IsTolerablyWholeNumber { get; }
 
-        ATypes Type { get; set; }
-        int Length { get; set; }
-        List<int> Shape { get; set; }
-        int Rank { get; set; }
+        #endregion
 
-        string Infos { get; }
-        string ShapeString { get; }
-
-        List<AType> Container { get; }
+        #region Indexing
 
         AType this[int index] { get; set; }
         AType this[AType index] { get; set; }
-
         AType this[List<AType> indexers] { get; set; }
 
-        AValue Data { get; set; }
+        #endregion
 
-        AType NestedItem { get; }
+        List<AType> Container { get; }
 
         #endregion
 
@@ -93,6 +99,8 @@ namespace AplusCore.Types
         /// <returns>Cloned AType</returns>
         AType Clone();
 
+        // Remove...
+
         /// <summary>
         /// Compares the AType's information's to an other AType
         /// </summary>
@@ -113,32 +121,6 @@ namespace AplusCore.Types
         bool ComparisonToleranceCompareTo(AType other);
 
         #endregion
-
-        #region Operator Overloads
-
-        //public static bool operator ==(AType left, AType right)
-        //{
-        //    if (object.ReferenceEquals(left, right))
-        //    {
-        //        return true;
-        //    }
-
-        //    if(((object)left == null) || ((object)right == null))
-        //    {
-        //        return false;
-        //    }
-
-        //    return left.Equals(right);
-        //}
-
-        //public static bool operator !=(AType left, AType right)
-        //{
-
-        //    return !(left == right);
-        //}
-
-        #endregion
-
     }
 
     #region InfoResult

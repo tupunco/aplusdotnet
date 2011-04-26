@@ -70,29 +70,6 @@ namespace AplusCore.Types
             set { this.rank = value; }
         }
 
-        public virtual string Infos
-        {
-            get
-            {
-                return String.Format("Length: {0} Shape: {1} Rank: {2}",
-                    this.length, this.ShapeString, this.rank);
-            }
-        }
-
-        public virtual string ShapeString
-        {
-            get
-            {
-                if (this.shape.Count == 0)
-                {
-                    // this case the stored item is a scalar
-                    return "";
-                }
-
-                return String.Join(" ", this.shape.ToStringArray<int>());
-            }
-        }
-
         public virtual List<AType> Container
         {
             get { throw new InvalidOperationException(); }
