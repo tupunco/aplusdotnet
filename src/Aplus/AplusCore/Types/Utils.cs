@@ -341,13 +341,8 @@ namespace AplusCore.Types
             // calculate values' size
             int valueLength = CalculateLength(value, extended);
 
-            //symbol and value has same length!
-            if (symbolLength != valueLength)
-            {
-                return false;
-            }
-
-            if (symbol.Type != ATypes.ASymbol)
+            // symbol is not a Symbol or symbol and value has same length 
+            if (symbol.Type != ATypes.ASymbol || symbolLength != valueLength)
             {
                 return false;
             }
@@ -359,19 +354,17 @@ namespace AplusCore.Types
                     return false;
                 }
 
-                //If symbol is array, it must consist of distinct symbol.
                 if (symbol.IsArray)
                 {
+                    // If symbol is an array, it must contain distinct symbols.
                     for (int i = 0; i < symbol.Length; i++)
                     {
                         for (int j = 0; j < symbol.Length; j++)
                         {
-                            if (i != j)
+                            if (i != j && symbol[i].CompareTo(symbol[j]) == 0)
                             {
-                                if (symbol[i].CompareTo(symbol[j]) == 0)
-                                {
-                                    return false;
-                                }
+                                // Found a duplicate symbol
+                                return false;
                             }
                         }
                     }
