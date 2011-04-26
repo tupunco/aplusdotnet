@@ -87,11 +87,6 @@ namespace AplusCore.Types
 
         }
 
-        public override bool ComparisonToleranceCompareTo(AType other)
-        {
-            return Equals(other);
-        }
-
         public override int GetHashCode()
         {
             return this.value.GetHashCode() ^ 0x0B; // BOX reverseed :)

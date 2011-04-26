@@ -194,16 +194,6 @@ namespace AplusCore.Types
             return new AReference((AValue)this.Data.Clone());
         }
 
-        public bool ComparisonToleranceCompareTo(AType other)
-        {
-            if (other is AReference)
-            {
-                return this.Data.ComparisonToleranceCompareTo(((AReference)other).Data);
-            }
-
-            return false;
-        }
-
         #endregion
 
         #region IComparable<AType> Members

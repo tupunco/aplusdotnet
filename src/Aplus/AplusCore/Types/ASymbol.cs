@@ -79,16 +79,6 @@ namespace AplusCore.Types
             return this.symbolName.CompareTo(other.asString);
         }
 
-        public override bool ComparisonToleranceCompareTo(AType other)
-        {
-            if (other.Type != ATypes.ASymbol)
-            {
-                return false;
-            }
-
-            return this.symbolName.CompareTo(other.asString) == 0;
-        }
-
         #endregion
 
     }

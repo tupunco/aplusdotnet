@@ -76,16 +76,6 @@ namespace AplusCore.Types
             return this.value.CompareTo(other.asChar);
         }
 
-        public override bool ComparisonToleranceCompareTo(AType other)
-        {
-            if (other.Type != ATypes.AChar)
-            {
-                return false;
-            }
-
-            return this.value.CompareTo(other.asChar) == 0;
-        }
-
         #endregion
     }
 }

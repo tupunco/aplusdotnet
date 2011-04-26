@@ -116,11 +116,6 @@ namespace AplusCore.Types
             return this.method.GetHashCode() ^ this.name.GetHashCode() ^ this.valence.GetHashCode();
         }
 
-        public override bool ComparisonToleranceCompareTo(AType other)
-        {
-            return Equals(other);
-        }
-
         #endregion
     }
 }

@@ -99,9 +99,6 @@ namespace AplusCore.Types
         /// <returns>Cloned AType</returns>
         AType Clone();
 
-        // Remove...
-        bool ComparisonToleranceCompareTo(AType other);
-
         #endregion
     }
 }

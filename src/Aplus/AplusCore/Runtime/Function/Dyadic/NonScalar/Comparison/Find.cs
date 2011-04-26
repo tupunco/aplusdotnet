@@ -95,7 +95,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
                 // TODO: refactor remove 'i', use 'index' instead
                 for (int i = 0; i < this.y.Length; i++)
                 {
-                    if (this.y[i].ComparisonToleranceCompareTo(element))
+                    if(ComparisonToleranceCompareTo(this.y[i],element))
                     {
                         index = i;
                         break;
@@ -104,13 +104,50 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
             }
             else
             {
-                if (this.y.ComparisonToleranceCompareTo(element))
+                if (ComparisonToleranceCompareTo(this.y, element))
                 {
                     index = 0;
                 }
             }
 
             return AInteger.Create(index);
+        }
+
+        private bool ComparisonToleranceCompareTo(AType actual, AType other)
+        {
+            if (actual.Rank > 0)
+            {
+                for (int i = 0; i < actual.Length; i++)
+                {
+                    if (!ComparisonToleranceCompareTo(actual[i], other[i]))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            else
+            {
+                if(Util.TypeCorrect(actual.Type, other.Type, "II", "FF", "IF", "FI"))
+                {
+                    return Utils.ComparisonTolerance(actual.asFloat, other.asFloat);
+                }
+                else if(Util.TypeCorrect(actual.Type, other.Type, "CC"))
+                {
+                    return actual.asChar.CompareTo(other.asChar) == 0;
+                }
+                else if (Util.TypeCorrect(actual.Type, other.Type, "SS"))
+                {
+                    return actual.asString.CompareTo(other.asString) == 0;
+                }
+                else if (Util.TypeCorrect(actual.Type, other.Type, "UU") || actual.IsBox && other.IsBox)
+                {
+                    return actual.Equals(other);
+                }
+
+                return false;
+            }
         }
 
         #endregion

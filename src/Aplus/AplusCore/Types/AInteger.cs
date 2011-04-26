@@ -92,16 +92,6 @@ namespace AplusCore.Types
             return asFloat.CompareTo(other.asFloat);
         }
 
-        public override bool ComparisonToleranceCompareTo(AType other)
-        {
-            if (other.Type != ATypes.AFloat && other.Type != ATypes.AInteger)
-            {
-                return false;
-            }
-
-            return Utils.ComparisonTolerance(asFloat, other.asFloat);
-        }
-
         #endregion
     }
 }

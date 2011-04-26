@@ -279,19 +279,6 @@ namespace AplusCore.Types
             }
         }
 
-        public override bool ComparisonToleranceCompareTo(AType other)
-        {
-            for (int i = 0; i < this.length; i++)
-            {
-                if (!this.items[i].ComparisonToleranceCompareTo(other[i]))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         #endregion
     }
 }
