@@ -107,11 +107,6 @@ namespace AplusCore.Types
             }
         }
 
-        public List<AType> Container
-        {
-            get { return this.Data.Container; }
-        }
-
         public AType this[int index]
         {
             get { return this.Data[index]; }
@@ -159,6 +154,31 @@ namespace AplusCore.Types
 
         #region AType Methods
 
+        public void Add(AType item)
+        {
+            this.Data.Add(item);
+        }
+
+        public void AddWithNoUpdate(AType item)
+        {
+            this.Data.AddWithNoUpdate(item);
+        }
+
+        public void AddRange(IEnumerable<AType> items)
+        {
+            this.data.AddRange(items);
+        }
+
+        public void AddRangeWithNoUpdate(IEnumerable<AType> items)
+        {
+            this.data.AddRangeWithNoUpdate(items);
+        }
+
+        public void UpdateInfo()
+        {
+            this.Data.UpdateInfo();
+        }
+
         public bool TryFirstScalar(out AType result, bool strictLengthCheck = false)
         {
             if (this.Data.IsArray)
@@ -169,7 +189,7 @@ namespace AplusCore.Types
                     return false;
                 }
 
-                return this.Data.Container[0].TryFirstScalar(out result, strictLengthCheck);
+                return this.Data[0].TryFirstScalar(out result, strictLengthCheck);
             }
             else
             {

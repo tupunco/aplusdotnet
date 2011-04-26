@@ -39,8 +39,6 @@ namespace AplusCore.Types
             }
         }
 
-        public override List<AType> Container { get { return items; } }
-
         public override AType this[int index]
         {
             get
@@ -136,12 +134,6 @@ namespace AplusCore.Types
 
         #endregion
 
-        #region Methods
-
-        // TODO: temporarly moved to Utils..
-
-        #endregion
-
         #region IEnumerable<AType> methods
 
         public override IEnumerator<AType> GetEnumerator()
@@ -185,6 +177,50 @@ namespace AplusCore.Types
 
         #region Overrides
 
+        public override void Add(AType item)
+        {
+            this.items.Add(item);
+            UpdateInfo();
+        }
+
+        public override void AddWithNoUpdate(AType item)
+        {
+            this.items.Add(item);
+        }
+
+        public override void AddRange(IEnumerable<AType> items)
+        {
+            this.items.AddRange(items);
+            UpdateInfo();
+        }
+
+        public override void AddRangeWithNoUpdate(IEnumerable<AType> items)
+        {
+            this.items.AddRange(items);
+        }
+
+        public override void UpdateInfo()
+        {
+            this.Length = this.items.Count;
+
+            this.Shape.Clear();
+            this.Shape.Add(this.Length);
+
+            if (this.Length > 0)
+            {
+                // Update Type info from children
+                this.Type = this.items[0].Type;
+
+                // Update Shape info
+                if (this.items[0].IsArray)
+                {
+                    this.Shape.AddRange(this.items[0].Shape);
+                }
+            }
+
+            this.Rank = this.Shape.Count;
+        }
+
         public override AType Clone()
         {
             AArray result = new AArray(ATypes.AArray);
@@ -193,7 +229,13 @@ namespace AplusCore.Types
             {
                 result.AddWithNoUpdate(item.Clone());
             }
-            result.UpdateInfo(this);
+
+            result.Length = this.Length;
+            result.Shape.Clear();
+            result.Shape.AddRange(this.Shape);
+            result.Type = this.Type;
+            result.Rank = this.Rank;
+
             return result;
         }
 

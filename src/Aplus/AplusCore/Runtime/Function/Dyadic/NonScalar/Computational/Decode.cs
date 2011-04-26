@@ -205,7 +205,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
                     result.AddWithNoUpdate(Convert(item));
                 }
 
-                result.UpdateInfo(argumentArray);
+                result.UpdateInfo();
                 result.Type = ATypes.AInteger;
 
                 return result;

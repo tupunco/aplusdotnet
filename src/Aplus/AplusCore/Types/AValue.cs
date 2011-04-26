@@ -70,11 +70,6 @@ namespace AplusCore.Types
             set { this.rank = value; }
         }
 
-        public virtual List<AType> Container
-        {
-            get { throw new InvalidOperationException(); }
-        }
-
         public virtual AType this[int index]
         {
             get
@@ -148,6 +143,31 @@ namespace AplusCore.Types
         #endregion
 
         #region Methods
+
+        public virtual void Add(AType item)
+        {
+            throw new InvalidOperationException();
+        }
+
+        public virtual void AddWithNoUpdate(AType item)
+        {
+            throw new InvalidOperationException();
+        }
+
+        public virtual void AddRange(IEnumerable<AType> items)
+        {
+            throw new InvalidOperationException();
+        }
+
+        public virtual void AddRangeWithNoUpdate(IEnumerable<AType> items)
+        {
+            throw new InvalidOperationException();
+        }
+
+        public virtual void UpdateInfo()
+        {
+            throw new InvalidOperationException();
+        }
 
         /// <summary>
         /// Returns the first scalar from the AType.

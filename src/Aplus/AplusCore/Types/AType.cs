@@ -58,8 +58,6 @@ namespace AplusCore.Types
 
         #endregion
 
-        List<AType> Container { get; }
-
         #endregion
 
         #region Converter Properties
@@ -72,6 +70,33 @@ namespace AplusCore.Types
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Add AType to AArray.
+        /// Also updates length, shape, rank and type informations
+        /// </summary>
+        /// <param name="item"></param>
+        void Add(AType item);
+
+        /// <summary>
+        /// Updates the array's length, shape, rank and type informations
+        /// </summary>
+        void UpdateInfo();
+
+        /// <summary>
+        /// Add AType to AArray without updating length, shape, rank and type informations
+        /// </summary>
+        /// <param name="item"></param>
+        void AddWithNoUpdate(AType item);
+
+        /// <summary>
+        /// Add array of AType to AArray.
+        /// Also updates length, shape, rank and type informations
+        /// </summary>
+        /// <param name="items"></param>
+        void AddRange(IEnumerable<AType> items);
+
+        void AddRangeWithNoUpdate(IEnumerable<AType> items);
 
         /// <summary>
         /// Returns the first scalar from the AType.

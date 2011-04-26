@@ -24,19 +24,17 @@ namespace AplusCore.Types
             //AArray result = new AArray(this.type);
             AType result = AArray.Create(input.Type);
 
-            List<AType> items = currentIdx.Container;
-
-            if (items.Count == 0)
+            if (currentIdx.Length == 0)
             {
                 // A Null item found!, select all of the current items
                 for (int i = 0; i < input.Length; i++)
                 {
-                    items.Add(AInteger.Create(i));
+                    currentIdx.Add(AInteger.Create(i));
                 }
             }
 
             // Iterate over the indexes
-            foreach (AType index in items)
+            foreach (AType index in currentIdx)
             {
                 AType item =
                     index.IsArray ?
@@ -312,81 +310,6 @@ namespace AplusCore.Types
 
         #region AArray methods
 
-
-        /// <summary>
-        /// Add AType to AArray.
-        /// Also updates length, shape, rank and type informations
-        /// </summary>
-        /// <param name="item"></param>
-        public static void Add(this AType array, AType item)
-        {
-            array.Container.Add(item);
-            array.UpdateInfo();
-        }
-
-        /// <summary>
-        /// Add AType to AArray without updating length, shape, rank and type informations
-        /// </summary>
-        /// <param name="item"></param>
-        public static void AddWithNoUpdate(this AType array, AType item)
-        {
-            array.Container.Add(item);
-        }
-
-        /// <summary>
-        /// Add array of AType to AArray.
-        /// Also updates length, shape, rank and type informations
-        /// </summary>
-        /// <param name="items"></param>
-        public static void AddRange(this AType array, IEnumerable<AType> items)
-        {
-            array.Container.AddRange(items);
-            array.UpdateInfo();
-        }
-
-        public static void AddRangeWithNoUpdate(this AType array, IEnumerable<AType> items)
-        {
-            array.Container.AddRange(items);
-        }
-
-        /// <summary>
-        /// Updates the array's length, shape, rank and type informations
-        /// </summary>
-        public static void UpdateInfo(this AType array)
-        {
-            array.Length = array.Container.Count;
-
-            array.Shape.Clear();
-            array.Shape.Add(array.Container.Count);
-
-            if (array.Length > 0)
-            {
-                // Update Type info from children
-                array.Type = array.Container[0].Type;
-
-                // Update Shape info
-                if (array.Container[0].IsArray)
-                {
-                    array.Shape.AddRange(array.Container[0].Shape);
-                }
-            }
-
-            array.Rank = array.Shape.Count;
-        }
-
-        /// <summary>
-        /// Update AArray's infos from an other AArray
-        /// </summary>
-        /// <param name="argument">Input AArray</param>
-        public static void UpdateInfo(this AType array, AType argument)
-        {
-            array.Length = argument.Length;
-            array.Shape.Clear();
-            array.Shape.AddRange(argument.Shape);
-            array.Type = argument.Type;
-            array.Rank = argument.Rank;
-        }
-
         public static bool IsSlotFiller(this AType vector, bool extended = false)
         {
             //Vector must be box array.
@@ -439,11 +362,17 @@ namespace AplusCore.Types
                 //If symbol is array, it must consist of distinct symbol.
                 if (symbol.IsArray)
                 {
-                    foreach (AType item in symbol)
+                    for (int i = 0; i < symbol.Length; i++)
                     {
-                        if (symbol.Container.FindAll(a => { return a.CompareTo(item) == 0; }).Count != 1)
+                        for (int j = 0; j < symbol.Length; j++)
                         {
-                            return false;
+                            if (i != j)
+                            {
+                                if (symbol[i].CompareTo(symbol[j]) == 0)
+                                {
+                                    return false;
+                                }
+                            }
                         }
                     }
                 }
@@ -517,18 +446,18 @@ namespace AplusCore.Types
 
             for (int i = 0; i < array.Length; i++)
             {
-                if (array.Container[i].Type != ATypes.AInteger)
+                if (array[i].Type != ATypes.AInteger)
                 {
                     continue;
                 }
 
-                if (array.Container[i].IsArray)
+                if (array[i].IsArray)
                 {
-                    array.Container[i] = Utils.ConvertToFloat(array.Container[i]);
+                    array[i] = Utils.ConvertToFloat(array[i]);
                 }
                 else
                 {
-                    array.Container[i] = AFloat.Create(array.Container[i].asFloat);
+                    array[i] = AFloat.Create(array[i].asFloat);
                 }
             }
 
@@ -546,7 +475,7 @@ namespace AplusCore.Types
 
             bool numbers = left.IsNumber && right.IsNumber;
             // Check if the inner elem count matches and the type is the same
-            if ((left.Container.Count != right.Container.Count) ||
+            if ((left.Length != right.Length) ||
                 // We treat AInteger and AFloat as equal
                 (!numbers && (left.Type != right.Type)))
             {
@@ -554,26 +483,26 @@ namespace AplusCore.Types
             }
 
             // Check items one-by-one
-            for (int i = 0; i < left.Container.Count; i++)
+            for (int i = 0; i < left.Length; i++)
             {
 
                 if (numbers)
                 {
                     // both are arrays check them with tolerance
-                    if (left.Container[i].IsArray && right.Container[i].IsArray
-                        && !(Utils.EqualsWithTolerance(left.Container[i], right[i]))
+                    if (left[i].IsArray && right[i].IsArray
+                        && !(Utils.EqualsWithTolerance(left[i], right[i]))
                         )
                     {
                         return false;
                     }
                     // do a tolerance check if it is a number
-                    else if (!Utils.ComparisonTolerance(left.Container[i].asFloat, right[i].asFloat))
+                    else if (!Utils.ComparisonTolerance(left[i].asFloat, right[i].asFloat))
                     {
                         return false;
                     }
                 }
                 // Otherwise a simple equality check
-                else if (left.Container[i].Equals(right.Container[i]))
+                else if (left[i].Equals(right[i]))
                 {
                     return false;
                 }
