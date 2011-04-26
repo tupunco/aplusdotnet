@@ -100,61 +100,8 @@ namespace AplusCore.Types
         AType Clone();
 
         // Remove...
-
-        /// <summary>
-        /// Compares the AType's information's to an other AType
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns>value from InfoResult enum</returns>
-        InfoResult CompareInfos(AType other);
-
-        /// <summary>
-        /// Compare 2 Atype.
-        /// Result: -1 if the left AType is less than right.
-        ///         0 if the 2 AType equal.
-        ///         1 if the right AType is bigger than left.
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
-        //int CompareTo(AType other);
-
         bool ComparisonToleranceCompareTo(AType other);
 
         #endregion
     }
-
-    #region InfoResult
-
-    /// <summary>
-    /// Enum for representing errors between two ATypes
-    /// </summary>
-    public enum InfoResult
-    {
-        /// <summary>
-        /// No information error found while comparing ATypes
-        /// </summary>
-        OK,
-
-        /// <summary>
-        /// ATypes' length does not match
-        /// </summary>
-        LengthError,
-
-        /// <summary>
-        /// ATypes' shape does not match
-        /// </summary>
-        ShapeError,
-
-        /// <summary>
-        /// ATypes' rank does not match
-        /// </summary>
-        RankError,
-
-        /// <summary>
-        /// ATypes' type does not match
-        /// </summary>
-        TypeError
-    }
-
-    #endregion
 }

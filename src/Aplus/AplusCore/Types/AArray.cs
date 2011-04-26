@@ -185,30 +185,6 @@ namespace AplusCore.Types
 
         #region Overrides
 
-        /// <summary>
-        /// <see cref="AType.CompareInfos"/>
-        /// </summary>
-        public override InfoResult CompareInfos(AType other)
-        {
-            InfoResult result = base.CompareInfos(other);
-            if (result != InfoResult.OK)
-            {
-                return result;
-            }
-
-            for (int i = 0; i < this.length; i++)
-            {
-                result = this.items[i].CompareInfos(other[i]);
-                if (result != InfoResult.OK)
-                {
-                    return result;
-                }
-            }
-
-            return InfoResult.OK;
-        }
-
-
         public override AType Clone()
         {
             AArray result = new AArray(ATypes.AArray);
@@ -317,6 +293,5 @@ namespace AplusCore.Types
         }
 
         #endregion
-
     }
 }

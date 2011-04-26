@@ -194,16 +194,6 @@ namespace AplusCore.Types
             return new AReference((AValue)this.Data.Clone());
         }
 
-        public InfoResult CompareInfos(AType other)
-        {
-            if (other is AReference)
-            {
-                return this.Data.CompareInfos(((AReference)other).Data);
-            }
-
-            return InfoResult.TypeError;
-        }
-
         public bool ComparisonToleranceCompareTo(AType other)
         {
             if (other is AReference)

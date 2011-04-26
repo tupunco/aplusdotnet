@@ -185,36 +185,6 @@ namespace AplusCore.Types
         }
 
         /// <summary>
-        /// Compares the AType's information's to an other AType
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns>value from InfoResult enum</returns>
-        public virtual InfoResult CompareInfos(AType other)
-        {
-            if (this.Length != other.Length)
-            {
-                return InfoResult.LengthError;
-            }
-
-            if (!this.Shape.SequenceEqual<int>(other.Shape))
-            {
-                return InfoResult.ShapeError;
-            }
-
-            if (this.Rank != other.Rank)
-            {
-                return InfoResult.RankError;
-            }
-
-            if (this.Type != other.Type)
-            {
-                return InfoResult.TypeError;
-            }
-
-            return InfoResult.OK;
-        }
-
-        /// <summary>
         /// Compare 2 Atype.
         /// Result: -1 if the left AType is less than right.
         ///         0 if the 2 AType equal.
