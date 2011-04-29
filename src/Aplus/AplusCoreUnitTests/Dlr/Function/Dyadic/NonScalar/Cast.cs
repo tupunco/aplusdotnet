@@ -93,7 +93,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Cast"), TestMethod]
         public void CastInteger2Null()
         {
-            AType expected = AArray.ANull(ATypes.AInteger);
+            AType expected = Utils.ANull(ATypes.AInteger);
 
             AType result = this.engine.Execute<AType>("`int ? ()");
 
@@ -208,7 +208,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Cast"), TestMethod]
         public void CastFloat2Null()
         {
-            AType expected = AArray.ANull(ATypes.AFloat);
+            AType expected = Utils.ANull(ATypes.AFloat);
 
             AType result = this.engine.Execute<AType>("`float ? ()");
 
@@ -292,7 +292,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Cast"), TestMethod]
         public void CastSymbol2Null()
         {
-            AType expected = AArray.ANull();
+            AType expected = Utils.ANull();
 
             AType result = this.engine.Execute<AType>("`sym ? ()");
 
@@ -356,7 +356,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Cast"), TestMethod]
         public void CastChar2Null()
         {
-            AType expected = AArray.ANull(ATypes.AChar);
+            AType expected = Utils.ANull(ATypes.AChar);
 
             AType result = this.engine.Execute<AType>("`char ? ()");
 

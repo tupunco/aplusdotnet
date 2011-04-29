@@ -214,7 +214,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
 
                 case ATypes.ANull:
 
-                    return AArray.ANull(ATypes.AChar);
+                    return Utils.ANull(ATypes.AChar);
 
                 case ATypes.ASymbol:
 
@@ -271,7 +271,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
 
                 case ATypes.ANull:
 
-                    return AArray.ANull(ATypes.AFloat);
+                    return Utils.ANull(ATypes.AFloat);
 
                 case ATypes.AInteger:
 
@@ -322,7 +322,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
 
                 case ATypes.ANull:
 
-                    return AArray.ANull(ATypes.AInteger);
+                    return Utils.ANull(ATypes.AInteger);
 
                 case ATypes.AFloat:
 

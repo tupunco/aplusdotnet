@@ -236,8 +236,8 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         {
             AType expected = AArray.Create(
                 ATypes.ABox,
-                ABox.Create(AArray.ANull()),
-                ABox.Create(AArray.ANull())
+                ABox.Create(Utils.ANull()),
+                ABox.Create(Utils.ANull())
             );
 
             AType result = this.engine.Execute<AType>("2 take ()");

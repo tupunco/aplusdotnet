@@ -168,11 +168,6 @@ namespace AplusCore.Types
             return new AReference(array);
         }
 
-        public static AType ANull(ATypes type = ATypes.ANull)
-        {
-            return new AReference(new AArray(type));
-        }
-
         #endregion
 
         #region Overrides

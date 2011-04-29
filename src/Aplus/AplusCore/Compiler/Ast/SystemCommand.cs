@@ -43,7 +43,7 @@ namespace AplusCore.Compiler.AST
             Aplus runtime = scope.GetRuntime();
             // Default result
             LinkedList<DLR.Expression> codeBlock = new LinkedList<DLR.Expression>();
-            codeBlock.AddLast(DLR.Expression.Constant(AArray.ANull()));
+            codeBlock.AddLast(DLR.Expression.Constant(Utils.ANull()));
 
             switch (this.command)
             {

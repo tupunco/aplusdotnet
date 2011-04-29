@@ -275,7 +275,7 @@ namespace AplusCoreUnitTests.Dlr.Operator.Dyadic
             ScriptScope scope = this.engine.CreateScope();
             this.engine.Execute<AType>("y f x : x", scope);
 
-            AType expected = AArray.ANull(ATypes.AInteger);
+            AType expected = Utils.ANull(ATypes.AInteger);
 
             AType result = this.engine.Execute<AType>("2 f @ 1 iota 0", scope);
 
@@ -289,7 +289,7 @@ namespace AplusCoreUnitTests.Dlr.Operator.Dyadic
             ScriptScope scope = this.engine.CreateScope();
             this.engine.Execute<AType>("y f x : x", scope);
 
-            AType expected = AArray.ANull();
+            AType expected = Utils.ANull();
 
             AType result = this.engine.Execute<AType>("2 f @ 0 iota 0", scope);
 

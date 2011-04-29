@@ -48,7 +48,7 @@ namespace AplusCoreUnitTests.Dlr.Operator.Monadic.Scan
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("ScanMax"), TestMethod]
         public void ScanMaxNull()
         {
-            AType expected = AArray.ANull(ATypes.AInteger);
+            AType expected = Utils.ANull(ATypes.AInteger);
 
             AType result = this.engine.Execute<AType>(@"max\ ()");
 

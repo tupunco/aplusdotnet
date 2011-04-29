@@ -74,7 +74,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("PartitionCount"), TestMethod]
         public void PartitionCountNull()
         {
-            AType expected = AArray.ANull();
+            AType expected = Utils.ANull();
             AType result = this.engine.Execute<AType>("bag ()");
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));

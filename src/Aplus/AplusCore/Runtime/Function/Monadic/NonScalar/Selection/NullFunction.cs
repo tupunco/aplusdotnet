@@ -10,7 +10,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Selection
     {
         public override AType Execute(AType argument, AplusEnvironment environment = null)
         {
-            return AArray.ANull();
+            return Utils.ANull();
         }
     }
 }

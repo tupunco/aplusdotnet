@@ -146,7 +146,7 @@ namespace AplusCoreUnitTests.Dlr.Operator.Dyadic
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Each"), TestMethod]
         public void EachUseDyadicScalarFunctionScalar2Null()
         {
-            AType expected = AArray.ANull();
+            AType expected = Utils.ANull();
 
             AType result = this.engine.Execute<AType>("() * each ()");
 

@@ -48,7 +48,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Transpose"), TestMethod]
         public void TransposeNull()
         {
-            AType expected = AArray.ANull();
+            AType expected = Utils.ANull();
 
             AType result = this.engine.Execute<AType>("flip ()");
 

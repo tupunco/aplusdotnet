@@ -47,7 +47,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Rake"), TestMethod]
         public void RakeNull()
         {
-            AType expected = AArray.ANull();
+            AType expected = Utils.ANull();
 
             AType result = this.engine.Execute<AType>("in ()");
 
@@ -169,7 +169,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Rake"), TestMethod]
         public void RakeStrandWithOnlyNull()
         {
-            AType expected = AArray.ANull();
+            AType expected = Utils.ANull();
 
             AType result = this.engine.Execute<AType>("in (;<<();;<<())");
 

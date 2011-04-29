@@ -198,8 +198,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
             else //The matrix case.
             {
                 List<AType> indexes = new List<AType>();
-                indexes.Add(AArray.ANull());
-                indexes.Add(AArray.ANull());
+                indexes.Add(Utils.ANull());
+                indexes.Add(Utils.ANull());
 
                 result = AArray.Create(ATypes.AArray);
                 List<AType> columns = new List<AType>();

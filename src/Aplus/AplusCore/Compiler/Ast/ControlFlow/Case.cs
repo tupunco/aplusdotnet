@@ -50,7 +50,7 @@ namespace AplusCore.Compiler.AST
             else
             {
                 // No default case, set it to an ANull
-                defaultCase = DLR.Expression.Constant(AArray.ANull());
+                defaultCase = DLR.Expression.Constant(Utils.ANull());
             }
 
             List<DLR.SwitchCase> cases = new List<DLR.SwitchCase>();

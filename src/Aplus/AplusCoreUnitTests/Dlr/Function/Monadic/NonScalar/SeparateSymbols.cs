@@ -67,7 +67,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("SeparateSymbols"), TestMethod]
         public void SeparateSymbolsNull()
         {
-            AType expected = AArray.ANull();
+            AType expected = Utils.ANull();
 
             AType result = this.engine.Execute<AType>("dot ()");
             Assert.AreEqual(expected, result);

@@ -35,7 +35,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
         {
             if (argument.Type == ATypes.ANull)
             {
-                return AArray.ANull();
+                return Utils.ANull();
             }
             else
             {

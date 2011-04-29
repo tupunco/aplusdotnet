@@ -58,7 +58,7 @@ namespace AplusCore.Compiler.AST
                         ),
                         DLR.Expression.Assign(tempVariable, this.trueCase.Generate(scope)),
                         DLR.Expression.Assign(tempVariable,
-                            this.HaveFalseCase ? this.falseCase.Generate(scope) : DLR.Expression.Constant(AArray.ANull())
+                            this.HaveFalseCase ? this.falseCase.Generate(scope) : DLR.Expression.Constant(Utils.ANull())
                         )
                 ),
                 tempVariable

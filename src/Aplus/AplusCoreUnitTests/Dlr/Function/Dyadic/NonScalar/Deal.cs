@@ -30,7 +30,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Deal"), TestMethod]
         public void DealInteger2Integer3()
         {
-            AType expected = AArray.ANull(ATypes.AInteger);
+            AType expected = Utils.ANull(ATypes.AInteger);
 
             AType result = this.engine.Execute<AType>("0 rand 20");
 

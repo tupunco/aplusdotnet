@@ -94,7 +94,7 @@ namespace AplusCore.Runtime.Function.Operator.Monadic
                 }
                 else
                 {
-                    AType result = ExecuteFunction(function, AArray.ANull(), environment);
+                    AType result = ExecuteFunction(function, Utils.ANull(), environment);
 
                     if (result.Type == ATypes.ABox || result.Type == ATypes.ASymbol)
                     {
@@ -111,7 +111,7 @@ namespace AplusCore.Runtime.Function.Operator.Monadic
                 result.Length = argument.Length;
                 result.Shape = new List<int>(argument.Shape.GetRange(0, argument.Rank));
                 result.Rank = argument.Rank;
-                result.Type = ExecuteFunction(function, AArray.ANull(argument.Type), environment).Type;
+                result.Type = ExecuteFunction(function, Utils.ANull(argument.Type), environment).Type;
 
                 return result;
             }

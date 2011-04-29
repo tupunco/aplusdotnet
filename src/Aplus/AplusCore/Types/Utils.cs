@@ -229,7 +229,7 @@ namespace AplusCore.Types
             {
                 case ATypes.ABox:
                 case ATypes.AFunc:
-                    filler = ABox.Create(AArray.ANull());
+                    filler = ABox.Create(ANull());
                     break;
                 case ATypes.AChar:
                     filler = AChar.Create(' ');
@@ -309,6 +309,11 @@ namespace AplusCore.Types
         #endregion
 
         #region AArray methods
+
+        public static AType ANull(ATypes type = ATypes.ANull)
+        {
+            return AArray.Create(type);
+        }
 
         public static bool IsSlotFiller(this AType vector, bool extended = false)
         {

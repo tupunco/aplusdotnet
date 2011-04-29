@@ -204,7 +204,7 @@
     <Compile Include="Dlr\SlotFiller.cs" />
     <Compile Include="Dlr\SystemCommand.cs" />
     <Compile Include="Dlr\UserDefinedFunction.cs" />
-    <Compile Include="Dlr\Utils.cs" />
+    <Compile Include="Dlr\TestUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AstNode\UserDefinedFunctions.cs" />
   </ItemGroup>

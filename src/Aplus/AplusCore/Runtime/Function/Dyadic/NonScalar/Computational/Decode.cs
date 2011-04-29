@@ -156,7 +156,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
         /// <returns></returns>
         private AType DecodeArray(AType argument)
         {
-            List<AType> indexes = new List<AType>() { AArray.ANull() };
+            List<AType> indexes = new List<AType>() { Utils.ANull() };
             AType index;
 
             if (argument.Rank > 1)

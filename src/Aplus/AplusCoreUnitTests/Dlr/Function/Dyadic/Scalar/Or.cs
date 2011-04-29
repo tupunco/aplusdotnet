@@ -29,7 +29,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Or"), TestMethod]
         public void OrNull2Integer()
         {
-            AType expected = AArray.ANull(ATypes.AInteger);
+            AType expected = Utils.ANull(ATypes.AInteger);
 
             AType result = this.engine.Execute<AType>("() ? 1");
 

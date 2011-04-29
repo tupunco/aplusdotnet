@@ -28,7 +28,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Unpack"), TestMethod]
         public void UnpackSymbolConstant2()
         {
-            AType expected = AArray.ANull(ATypes.AChar);
+            AType expected = Utils.ANull(ATypes.AChar);
 
             AType result = this.engine.Execute<AType>("unpack `");
 

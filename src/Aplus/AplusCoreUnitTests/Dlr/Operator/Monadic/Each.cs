@@ -48,7 +48,7 @@ namespace AplusCoreUnitTests.Dlr.Operator.Monadic
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Each"), TestMethod]
         public void EachUsePrimitiveFunctionToNull()
         {
-            AType expected = AArray.ANull();
+            AType expected = Utils.ANull();
 
             AType result = this.engine.Execute<AType>("| each ()");
 

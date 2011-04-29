@@ -41,7 +41,7 @@ namespace AplusCoreUnitTests.Dlr
 
     #endregion
 
-    public static class Utils
+    public static class TestUtils
     {
         /// <summary>
         /// Compares the AType's information's to an other AType

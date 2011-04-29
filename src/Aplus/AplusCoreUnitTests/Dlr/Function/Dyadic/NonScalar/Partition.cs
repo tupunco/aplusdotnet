@@ -210,7 +210,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
                         f
                     )
                 ),
-                ABox.Create(AArray.ANull())
+                ABox.Create(Utils.ANull())
             );
 
             AType result = this.engine.Execute<AType>("2 2 1 bag `a , (< 4) , f", scope);

@@ -122,7 +122,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Find"), TestMethod]
         public void FindIntegerList2Null()
         {
-            AType expected = AArray.ANull(ATypes.AInteger);
+            AType expected = Utils.ANull(ATypes.AInteger);
 
             AType result = this.engine.Execute<AType>("12 2 3 iota ()");
 
@@ -133,7 +133,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Find"), TestMethod]
         public void FindNull2Null()
         {
-            AType expected = AArray.ANull(ATypes.AInteger);
+            AType expected = Utils.ANull(ATypes.AInteger);
 
             AType result = this.engine.Execute<AType>("() iota ()");
 

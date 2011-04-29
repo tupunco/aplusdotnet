@@ -57,7 +57,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("TransposeAxes"), TestMethod]
         public void TransposeAxisNumber2Null()
         {
-            AType expected = AArray.ANull();
+            AType expected = Utils.ANull();
 
             AType result = this.engine.Execute<AType>("0 flip ()");
 

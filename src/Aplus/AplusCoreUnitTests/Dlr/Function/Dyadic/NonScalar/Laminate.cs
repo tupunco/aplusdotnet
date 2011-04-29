@@ -155,8 +155,8 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         {
             AType expected = AArray.Create(
                 ATypes.AInteger,
-                AArray.ANull(ATypes.AInteger),
-                AArray.ANull(ATypes.AInteger)
+                Utils.ANull(ATypes.AInteger),
+                Utils.ANull(ATypes.AInteger)
             );
 
             AType result = this.engine.Execute<AType>("4 ~ ()");
@@ -170,8 +170,8 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         {
             AType expected = AArray.Create(
                 ATypes.AFloat,
-                AArray.ANull(ATypes.AFloat),
-                AArray.ANull(ATypes.AFloat)
+                Utils.ANull(ATypes.AFloat),
+                Utils.ANull(ATypes.AFloat)
             );
 
             AType result = this.engine.Execute<AType>("() ~ 5.7");
@@ -185,8 +185,8 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         {
             AType expected = AArray.Create(
                 ATypes.ANull,
-                AArray.ANull(),
-                AArray.ANull()
+                Utils.ANull(),
+                Utils.ANull()
             );
 
             AType result = this.engine.Execute<AType>("() ~ `a");
@@ -200,8 +200,8 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         {
             AType expected = AArray.Create(
                 ATypes.AInteger,
-                AArray.ANull(ATypes.AInteger),
-                AArray.ANull(ATypes.AInteger)
+                Utils.ANull(ATypes.AInteger),
+                Utils.ANull(ATypes.AInteger)
             );
 
             AType result = this.engine.Execute<AType>("() ~ 4");

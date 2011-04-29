@@ -64,7 +64,7 @@ namespace AplusCoreUnitTests.Dlr.Operator.Monadic.Scan
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("ScanMultiply"), TestMethod]
         public void ScanMultiplyNull()
         {
-            AType expected = AArray.ANull(ATypes.AInteger);
+            AType expected = Utils.ANull(ATypes.AInteger);
 
             AType result = this.engine.Execute<AType>(@"*\ ()");
 

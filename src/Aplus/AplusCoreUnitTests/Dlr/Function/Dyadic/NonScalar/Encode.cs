@@ -169,7 +169,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Encode"), TestMethod]
         public void EncodeInteger2Null()
         {
-            AType expected = AArray.ANull(ATypes.AFloat);
+            AType expected = Utils.ANull(ATypes.AFloat);
 
             AType result = this.engine.Execute<AType>(" 3 unpack ()");
 

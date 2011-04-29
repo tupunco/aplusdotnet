@@ -186,13 +186,13 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
                 AArray.Create(
                     ATypes.AFunc,
                     f,
-                    ABox.Create(AArray.ANull()),
+                    ABox.Create(Utils.ANull()),
                     ASymbol.Create("b")
                 ),
                 AArray.Create(
                     ATypes.ABox,
                     ABox.Create(AInteger.Create(2)),
-                    ABox.Create(AArray.ANull()),
+                    ABox.Create(Utils.ANull()),
                     f
                 )
             );

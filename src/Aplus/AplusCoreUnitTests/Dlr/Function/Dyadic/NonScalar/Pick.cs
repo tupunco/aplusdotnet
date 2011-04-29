@@ -338,7 +338,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         {
             AType expected = Helpers.BuildStrand(
                 new AType[]{
-                    AArray.ANull(),
+                    Utils.ANull(),
                     AInteger.Create(4),
                     AInteger.Create(2)
                 }

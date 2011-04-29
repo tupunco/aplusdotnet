@@ -30,7 +30,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
             }
             else if (left.Type == ATypes.ANull)
             {
-                return AArray.ANull();
+                return Utils.ANull();
             }
 
             // Convert the right argument to an array (make life easier..)

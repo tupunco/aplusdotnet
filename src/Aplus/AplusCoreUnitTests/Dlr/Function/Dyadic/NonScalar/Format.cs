@@ -36,7 +36,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Format"), TestMethod]
         public void FormatFloat2Float3()
         {
-            AType expected = AArray.ANull(ATypes.AChar);
+            AType expected = Utils.ANull(ATypes.AChar);
 
             AType result = this.engine.Execute<AType>(".7 form 123");
 
@@ -221,7 +221,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Format"), TestMethod]
         public void FormatInteger2Null()
         {
-            AType expected = AArray.ANull(ATypes.AChar);
+            AType expected = Utils.ANull(ATypes.AChar);
 
             AType result = this.engine.Execute<AType>("4 form ()");
 
