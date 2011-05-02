@@ -15,11 +15,23 @@ namespace AplusCoreUnitTests.Dlr.Assignments
         [TestCategory("DLR"), TestCategory("Assign"), TestCategory("Append"), TestMethod]
         public void VectorAppendScalar()
         {
-            AType expected = AArray.FromIntegerList(new int[] { 1, 2, 3 });
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(1),
+                AInteger.Create(2),
+                AInteger.Create(3)
+            );
 
             ScriptScope scope = this.engine.CreateScope();
 
-            scope.SetVariable(".a", AArray.FromIntegerList(new int[] { 1, 2 }));
+            scope.SetVariable(
+                ".a",
+                AArray.Create(
+                    ATypes.AInteger,
+                    AInteger.Create(1),
+                    AInteger.Create(2)
+                )
+            );
 
             this.engine.Execute<AType>("a[,] := 3", scope);
 
@@ -29,7 +41,11 @@ namespace AplusCoreUnitTests.Dlr.Assignments
         [TestCategory("DLR"), TestCategory("Assign"), TestCategory("Append"), TestMethod]
         public void EmptyVectorAppendVector()
         {
-            AType expected = AArray.FromIntegerList(new int[] { 3, 4 });
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(3),
+                AInteger.Create(4)
+            );
 
             ScriptScope scope = this.engine.CreateScope();
 
@@ -41,11 +57,24 @@ namespace AplusCoreUnitTests.Dlr.Assignments
         [TestCategory("DLR"), TestCategory("Assign"), TestCategory("Append"), TestMethod]
         public void VectorAppendVector()
         {
-            AType expected = AArray.FromIntegerList(new int[] { 1, 2, 3, 4});
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(1),
+                AInteger.Create(2),
+                AInteger.Create(3),
+                AInteger.Create(4)
+            );
 
             ScriptScope scope = this.engine.CreateScope();
 
-            scope.SetVariable(".a", AArray.FromIntegerList(new int[] { 1, 2 }));
+            scope.SetVariable(
+                ".a",
+                AArray.Create(
+                    ATypes.AInteger,
+                    AInteger.Create(1),
+                    AInteger.Create(2)
+                )
+            );
 
             this.engine.Execute<AType>("a[,] := 3 4", scope);
 
@@ -56,17 +85,18 @@ namespace AplusCoreUnitTests.Dlr.Assignments
         public void MatrixAppendScalar()
         {
             AType expected = AArray.Create(ATypes.AInteger,
-                AArray.FromIntegerList(new int[] { 0, 0, 0 }),
-                AArray.FromIntegerList(new int[] { 0, 0, 0 }),
-                AArray.FromIntegerList(new int[] { 3, 3, 3 })
-            );
+                AArray.Create(ATypes.AInteger, AInteger.Create(0), AInteger.Create(0), AInteger.Create(0)),
+                AArray.Create(ATypes.AInteger, AInteger.Create(0), AInteger.Create(0), AInteger.Create(0)),
+                AArray.Create(ATypes.AInteger, AInteger.Create(3), AInteger.Create(3), AInteger.Create(3))
+           );
 
             ScriptScope scope = this.engine.CreateScope();
 
-            scope.SetVariable(".a",
+            scope.SetVariable(
+                ".a",
                 AArray.Create(ATypes.AInteger,
-                    AArray.FromIntegerList(new int[] { 0, 0, 0 }),
-                    AArray.FromIntegerList(new int[] { 0, 0, 0 })
+                AArray.Create(ATypes.AInteger, AInteger.Create(0), AInteger.Create(0), AInteger.Create(0)),
+                AArray.Create(ATypes.AInteger, AInteger.Create(0), AInteger.Create(0), AInteger.Create(0))
                 )
             );
 
@@ -81,10 +111,11 @@ namespace AplusCoreUnitTests.Dlr.Assignments
         {
             ScriptScope scope = this.engine.CreateScope();
 
-            scope.SetVariable(".a",
+            scope.SetVariable(
+                ".a",
                 AArray.Create(ATypes.AInteger,
-                    AArray.FromIntegerList(new int[] { 0, 0, 0 }),
-                    AArray.FromIntegerList(new int[] { 0, 0, 0 })
+                AArray.Create(ATypes.AInteger, AInteger.Create(0), AInteger.Create(0), AInteger.Create(0)),
+                AArray.Create(ATypes.AInteger, AInteger.Create(0), AInteger.Create(0), AInteger.Create(0))
                 )
             );
 
@@ -95,16 +126,21 @@ namespace AplusCoreUnitTests.Dlr.Assignments
         public void ComplexAppendScalar()
         {
             AType expected = AArray.Create(ATypes.ABox,
-                ABox.Create(AArray.FromIntegerList(new int[] { 0, 0, -3 })),
-                ABox.Create(AArray.FromIntegerList(new int[] { 2, 2 }))
+                ABox.Create(
+                    AArray.Create(ATypes.AInteger, AInteger.Create(0), AInteger.Create(0), AInteger.Create(-3))
+                ),
+                ABox.Create(
+                     AArray.Create(ATypes.AInteger, AInteger.Create(2), AInteger.Create(2))
+                )
             );
 
             ScriptScope scope = this.engine.CreateScope();
 
             scope.SetVariable(".a",
-                AArray.Create(ATypes.ABox,
-                    ABox.Create(AArray.FromIntegerList(new int[] { 0, 0 })),
-                    ABox.Create(AArray.FromIntegerList(new int[] { 2, 2 }))
+                AArray.Create(
+                    ATypes.ABox,
+                    ABox.Create(AArray.Create(ATypes.AInteger, AInteger.Create(0), AInteger.Create(0))),
+                    ABox.Create(AArray.Create(ATypes.AInteger, AInteger.Create(2), AInteger.Create(2)))
                 )
             );
 
@@ -127,7 +163,12 @@ namespace AplusCoreUnitTests.Dlr.Assignments
         public void AppendTypeError()
         {
             ScriptScope scope = this.engine.CreateScope();
-            scope.SetVariable(".a", AArray.FromIntegerList(new int[] { 1, 2 }));
+
+            scope.SetVariable(
+                ".a",
+                AArray.Create(ATypes.AInteger, AInteger.Create(1), AInteger.Create(2))
+            );
+            
             this.engine.Execute<AType>("a[,] := 'd'", scope);
         }
     }

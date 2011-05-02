@@ -22,9 +22,22 @@ namespace AplusCore
             return list.ToList().ToStringArray<T>();
         }
 
+        /// <summary>
+        /// Creates an AArray with type AInteger from the input list of integers
+        /// </summary>
+        /// <param name="list">List of Integers</param>
+        /// <returns></returns>
         public static AType ToAArray(this IEnumerable<int> list)
         {
-            return AArray.FromIntegerList(list);
+            AType array = AArray.Create(ATypes.AInteger);
+
+            foreach (int item in list)
+            {
+                array.AddWithNoUpdate(AInteger.Create(item));
+            }
+            array.UpdateInfo();
+
+            return array;
         }
 
         /// <summary>

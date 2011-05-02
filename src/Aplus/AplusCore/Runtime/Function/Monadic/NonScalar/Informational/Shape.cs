@@ -17,8 +17,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Informational
         /// </remarks>
         public override AType Execute(AType argument, AplusEnvironment environment = null)
         {
-            return AArray.FromIntegerList(argument.Shape);
+            return argument.Shape.ToAArray();
         }
-
     }
 }

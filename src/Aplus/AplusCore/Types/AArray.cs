@@ -148,28 +148,6 @@ namespace AplusCore.Types
 
         #endregion
 
-        #region Static methods
-
-        /// <summary>
-        /// Creates an AArray with type AInteger from the input list of integers
-        /// </summary>
-        /// <param name="list">List of Integers</param>
-        /// <returns></returns>
-        public static AType FromIntegerList(IEnumerable<int> list)
-        {
-            AArray array = new AArray(ATypes.AInteger);
-
-            foreach (int item in list)
-            {
-                array.AddWithNoUpdate(AInteger.Create(item));
-            }
-            array.UpdateInfo();
-
-            return new AReference(array);
-        }
-
-        #endregion
-
         #region Overrides
 
         public override void Add(AType item)

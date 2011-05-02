@@ -20,13 +20,29 @@ namespace AplusCoreUnitTests.Dlr.Assignments
         [TestCategory("DLR"), TestCategory("Assign"), TestCategory("User Defined"), TestMethod]
         public void UserDefined1()
         {
-            AType expected = AArray.FromIntegerList(new int[] { -10, 1, 2, 3 });
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(-10),
+                AInteger.Create(1),
+                AInteger.Create(2),
+                AInteger.Create(3)
+            );
 
             AType function = AFunc.Create("T", (Func<AplusEnvironment, AType, AType, AType, AType>)TestMethod, 4, "Test method");
 
             var scope = this.engine.CreateScope();
             scope.SetVariable(".T", function);
-            scope.SetVariable(".a", AArray.FromIntegerList(new int[] { 0, 1, 2, 3 }));
+
+            scope.SetVariable(
+                ".a",
+                AArray.Create(
+                    ATypes.AInteger,
+                    AInteger.Create(0),
+                    AInteger.Create(1),
+                    AInteger.Create(2),
+                    AInteger.Create(3)
+                )
+            );
 
             this.engine.Execute<AType>("T{0;1;a} := -10", scope);
 
@@ -37,7 +53,15 @@ namespace AplusCoreUnitTests.Dlr.Assignments
         public void UserDefined2()
         {
             AType expected = AArray.Create(ATypes.ABox,
-                    ABox.Create(AArray.FromIntegerList(new int[] { -10, 1, 2, 3 })),
+                    ABox.Create(
+                        AArray.Create(
+                            ATypes.AInteger,
+                            AInteger.Create(-10),
+                            AInteger.Create(1),
+                            AInteger.Create(2),
+                            AInteger.Create(3)
+                        )
+                    ),
                     ABox.Create(AInteger.Create(0))
                 );
 
@@ -47,7 +71,15 @@ namespace AplusCoreUnitTests.Dlr.Assignments
             scope.SetVariable(".T", function);
             scope.SetVariable(".a", 
                 AArray.Create(ATypes.ABox,
-                    ABox.Create(AArray.FromIntegerList(new int[] { 0, 1, 2, 3 })),
+                    ABox.Create(
+                        AArray.Create(
+                            ATypes.AInteger,
+                            AInteger.Create(0),
+                            AInteger.Create(1),
+                            AInteger.Create(2),
+                            AInteger.Create(3)
+                        )
+                    ),
                     ABox.Create(AInteger.Create(0))
                 )
             );
