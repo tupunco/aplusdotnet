@@ -248,17 +248,13 @@ namespace AplusCore.Types
         }
 
         #endregion
-        
-        #region IEnumerable<AType> Members
+
+        #region Enumerator
 
         public IEnumerator<AType> GetEnumerator()
         {
             return this.Data.GetEnumerator();
         }
-
-        #endregion
-
-        #region IEnumerable Members
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {

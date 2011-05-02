@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace AplusCore.Types
 {
-    public class AArray : AValue, IEnumerable<AType>
+    public class AArray : AValue
     {
         #region Variables
 
@@ -134,21 +134,16 @@ namespace AplusCore.Types
 
         #endregion
 
-        #region IEnumerable<AType> methods
+        #region Enumerator
 
         public override IEnumerator<AType> GetEnumerator()
         {
             return this.items.GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.items.GetEnumerator();
-        }
-
         #endregion
 
-        #region Overrides
+        #region Methods
 
         public override void Add(AType item)
         {

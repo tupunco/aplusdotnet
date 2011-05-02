@@ -249,21 +249,16 @@ namespace AplusCore.Types
 
         #endregion
 
-
-        #region IEnumerable<AType> Members
+        #region Enumerator
 
         public virtual IEnumerator<AType> GetEnumerator()
         {
             throw new InvalidOperationException();
         }
 
-        #endregion
-
-        #region IEnumerable Members
-
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            throw new InvalidOperationException();
+            return GetEnumerator();
         }
 
         #endregion
