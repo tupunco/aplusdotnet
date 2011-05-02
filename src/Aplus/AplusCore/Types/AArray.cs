@@ -20,7 +20,7 @@ namespace AplusCore.Types
         public override bool IsArray { get { return true; } }
         public override bool IsNumber
         {
-            get { return (this.type == ATypes.AInteger) || (this.type == ATypes.AFloat); }
+            get { return (this.Type == ATypes.AInteger) || (this.Type == ATypes.AFloat); }
         }
 
         public override bool IsBox
@@ -38,6 +38,10 @@ namespace AplusCore.Types
                 //return this.type == ATypes.ABox || (this.length > 0 && this.items[0].IsBox);
             }
         }
+
+        #endregion
+
+        #region Indexing
 
         public override AType this[int index]
         {
@@ -91,7 +95,7 @@ namespace AplusCore.Types
                 }
 
                 // No negative indexing or over-indexing
-                if (idx < 0 || this.length < idx)
+                if (idx < 0 || this.Length < idx)
                 {
                     throw new Error.Index("[]");
                 }
@@ -216,15 +220,15 @@ namespace AplusCore.Types
             AArray other = (AArray)obj;
 
             // Check if the inner elem count matches and the type is the same
-            if (this.items.Count != other.items.Count || this.type != other.type)
+            if (this.Length != other.Length || this.Type != other.Type)
             {
                 return false;
             }
 
             // Check items one-by-one
-            for (int i = 0; i < this.items.Count; i++)
+            for (int i = 0; i < this.Length; i++)
             {
-                if (!this.items[i].Equals(other.items[i]))
+                if (!this[i].Equals(other[i]))
                 {
                     return false;
                 }
@@ -240,10 +244,10 @@ namespace AplusCore.Types
 
         public override string ToString()
         {
-            if (this.items.Count > 0 && this.items[0].IsArray)
+            if (this.Length > 0 && this[0].IsArray)
             {
                 StringBuilder str = new StringBuilder();
-                foreach (AType item in this.items)
+                foreach (AType item in this)
                 {
                     str.AppendFormat("{0}\n", item);
                 }
@@ -252,7 +256,7 @@ namespace AplusCore.Types
             else
             {
                 string separator;
-                switch (this.type)
+                switch (this.Type)
                 {
                     case ATypes.AChar:
                         separator = "";
@@ -264,22 +268,23 @@ namespace AplusCore.Types
                         separator = " ";
                         break;
                 }
-                return String.Join(separator, this.items.ToStringArray<AType>());
+
+                return String.Join(separator, this.ToStringArray<AType>());
             }
         }
 
         public override int CompareTo(AType other)
         {
-            if (this.length != other.Length)
+            if (this.Length != other.Length)
             {
                 throw new Error.Length("[]");
             }
             else
             {
                 int result;
-                for (int i = 0; i < this.length; i++)
+                for (int i = 0; i < this.Length; i++)
                 {
-                    result = this.items[i].CompareTo(other[i]);
+                    result = this[i].CompareTo(other[i]);
                     if (result != 0)
                     {
                         return result;

@@ -12,14 +12,9 @@ namespace AplusCore
 {
     public static class ExtensionMethods
     {
-        public static string[] ToStringArray<T>(this List<T> list)
+        public static IEnumerable<string> ToStringArray<T>(this IEnumerable<T> list)
         {
-            return list.ConvertAll<string>(item => item.ToString()).ToArray();
-        }
-
-        public static string[] ToStringArray<T>(this LinkedList<T> list)
-        {
-            return list.ToList().ToStringArray<T>();
+            return list.Select<T, string>(item => item.ToString());
         }
 
         /// <summary>
