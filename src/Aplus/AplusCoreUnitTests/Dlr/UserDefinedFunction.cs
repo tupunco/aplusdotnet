@@ -170,6 +170,8 @@ namespace AplusCoreUnitTests.Dlr
             ScriptScope scope = this.engine.CreateScope();
             this.engine.Execute<AType>("z:=20", scope);
             this.engine.Execute<AType>("g{}: { z:=z }", scope);
+
+            this.engine.Execute<AType>("g{}", scope);
         }
 
         [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestMethod]
@@ -180,6 +182,8 @@ namespace AplusCoreUnitTests.Dlr
             ScriptScope scope = this.engine.CreateScope();
             this.engine.Execute<AType>("q:=20", scope);
             this.engine.Execute<AType>("g{}: { q; q:=2 }", scope);
+
+            this.engine.Execute<AType>("g{}", scope);
         }
 
         [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestMethod]
@@ -188,7 +192,8 @@ namespace AplusCoreUnitTests.Dlr
         {
             ScriptScope scope = this.engine.CreateScope();
             this.engine.Execute<AType>("q:=20", scope);
-            AType result = this.engine.Execute<AType>("g{}: { q; (q):=2 }", scope);
+            this.engine.Execute<AType>("g{}: { q; (q):=2 }", scope);
+            AType result = this.engine.Execute<AType>("g{}", scope);
 
             Assert.AreEqual<AType>(
                 AInteger.Create(2),
@@ -201,8 +206,10 @@ namespace AplusCoreUnitTests.Dlr
         [Description("Test eval inside function and variable lookup.")]
         public void FunctionEvalScopeTest()
         {
+            // inside an eval: there are global assignments
             ScriptScope scope = this.engine.CreateScope();
-            AType result = this.engine.Execute<AType>("g{}: { eval 'q:=-2'; q }", scope);
+            this.engine.Execute<AType>("g{}: { eval 'q:=-2'; q }", scope);
+            AType result = this.engine.Execute<AType>("g{}", scope);
 
             Assert.AreEqual<AType>(
                 AInteger.Create(-2),
