@@ -49,6 +49,12 @@ namespace AplusCore.Types
             get { return this.Data.IsFunctionScalar; }
         }
 
+        public string MemoryMappedFile
+        {
+            get { return this.Data.MemoryMappedFile; }
+            set { this.Data.MemoryMappedFile = value; }
+        }
+
         public bool IsNumber
         {
             get { return this.Data.IsNumber; }
@@ -203,10 +209,10 @@ namespace AplusCore.Types
             return this.Data.ConvertToRestrictedWholeNumber(out result);
         }
 
-        public AType Clone()
+        public AType Clone(bool isMemmoryMapped = false)
         {
             // The clone of the 'Data' is an AValue for sure.
-            return new AReference((AValue)this.Data.Clone());
+            return new AReference((AValue)this.Data.Clone(isMemmoryMapped));
         }
 
         #endregion

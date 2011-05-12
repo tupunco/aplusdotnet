@@ -206,6 +206,7 @@
     <Compile Include="Runtime\Function\Dyadic\Scalar\Relational\LessThan.cs" />
     <Compile Include="Runtime\Function\Dyadic\Scalar\Relational\LessThanOrEqualTo.cs" />
     <Compile Include="Runtime\Function\Dyadic\Scalar\Relational\NotEqualTo.cs" />
+    <Compile Include="Runtime\MappedFile.cs" />
     <Compile Include="Runtime\Function\Monadic\MonadicFunctionInstance.cs" />
     <Compile Include="Runtime\Function\Monadic\NonScalar\Comprasion\GradeDown.cs" />
     <Compile Include="Runtime\Function\Monadic\NonScalar\Comprasion\GradeUp.cs" />
@@ -274,6 +275,7 @@
     <Compile Include="Runtime\Function\Operator\Monadic\MonadicOperatorInstance.cs" />
     <Compile Include="Runtime\Function\Operator\Monadic\Rank.cs" />
     <Compile Include="Runtime\Helpers.cs" />
+    <Compile Include="Runtime\MemoryMappedFileManager.cs" />
     <Compile Include="Runtime\StopException.cs" />
     <Compile Include="Runtime\SystemCommands.cs" />
     <Compile Include="Runtime\SystemVariables.cs" />
@@ -289,6 +291,9 @@
     <Compile Include="Types\AInteger.cs" />
     <Compile Include="Types\AFloat.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Types\MemoryMapped\MMAArray.cs" />
+    <Compile Include="Types\MemoryMapped\MMAArrayIterator.cs" />
+    <Compile Include="Types\MemoryMapped\MMAInteger.cs" />
     <Compile Include="Types\Utils.cs" />
   </ItemGroup>
   <ItemGroup>

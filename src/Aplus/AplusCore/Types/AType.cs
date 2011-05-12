@@ -8,15 +8,15 @@ namespace AplusCore.Types
     #region A+ Types
     public enum ATypes : byte
     {
-        AType,
         AInteger,
         AFloat,
-        ASymbol,
         AChar,
+        ASymbol,
         AArray,
         ANull,
         ABox,
-        AFunc
+        AFunc,
+        AType
     }
     #endregion
 
@@ -47,6 +47,7 @@ namespace AplusCore.Types
 
         bool IsNumber { get; }
         bool IsTolerablyWholeNumber { get; }
+        string MemoryMappedFile { get; set; }
 
         #endregion
 
@@ -121,7 +122,7 @@ namespace AplusCore.Types
         /// Clones the AType, returning a new instance containing the same values
         /// </summary>
         /// <returns>Cloned AType</returns>
-        AType Clone();
+        AType Clone(bool isMemoryMapped = false);
 
         #endregion
     }

@@ -34,6 +34,8 @@ namespace AplusCore.Types
         /// <see cref="ATypes"/>
         protected ATypes type;
 
+        protected string memoryMappedFile;
+
         #endregion
 
         #region AType Properties
@@ -42,6 +44,12 @@ namespace AplusCore.Types
         public virtual bool IsPrimitive { get { return false; } }
         public virtual bool IsBox { get { return false; } }
         public virtual bool IsFunctionScalar { get { return false; } }
+
+        public virtual string MemoryMappedFile
+        {
+            get { return this.memoryMappedFile; }
+            set { this.memoryMappedFile = value; }
+        }
 
         public virtual bool IsNumber { get { return false; } }
         public virtual bool IsTolerablyWholeNumber { get { return false; } }
@@ -199,7 +207,7 @@ namespace AplusCore.Types
         /// Clones the AType, returning a new instance containing the same values
         /// </summary>
         /// <returns>Cloned AType</returns>
-        public virtual AType Clone()
+        public virtual AType Clone(bool isMemoryMapped = false)
         {
             throw new NotImplementedException("Invalid use-case");
         }

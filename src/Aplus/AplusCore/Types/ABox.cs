@@ -31,6 +31,11 @@ namespace AplusCore.Types
             }*/
 
             this.type = item.Data is AFunc ? ATypes.AFunc : type;
+
+            if (!String.IsNullOrEmpty(item.MemoryMappedFile))
+            {
+                this.MemoryMappedFile = item.MemoryMappedFile;
+            }
         }
 
         public static AType Create(AType item, ATypes type = ATypes.ABox)
@@ -70,9 +75,9 @@ namespace AplusCore.Types
 
         #region Overrides
 
-        public override AType Clone()
+        public override AType Clone(bool isMemmoryMapped = false)
         {
-            return new ABox(this.value.Clone());
+            return new ABox(this.value.Clone(isMemmoryMapped));
         }
 
         public override bool Equals(object obj)

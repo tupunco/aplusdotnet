@@ -193,13 +193,13 @@ namespace AplusCore.Types
             this.Rank = this.Shape.Count;
         }
 
-        public override AType Clone()
+        public override AType Clone(bool isMemmoryMapped = false)
         {
             AArray result = new AArray(ATypes.AArray);
 
             foreach (AType item in items)
             {
-                result.AddWithNoUpdate(item.Clone());
+                result.AddWithNoUpdate(item.Clone(isMemmoryMapped));
             }
 
             result.Length = this.Length;

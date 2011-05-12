@@ -15,7 +15,7 @@ namespace AplusCore.Types
 
         #region Constructor
 
-        private AInteger(int number)
+        protected AInteger(int number)
         {
             this.value = number;
             this.length = 1;
@@ -49,7 +49,7 @@ namespace AplusCore.Types
 
         #region Overrides
 
-        public override AType Clone()
+        public override AType Clone(bool isMemmoryMapped = false)
         {
             return new AInteger(this.value);
         }
@@ -59,7 +59,7 @@ namespace AplusCore.Types
             if (obj is AInteger)
             {
                 AInteger other = (AInteger)obj;
-                return this.value == other.value;
+                return this.asInteger == other.asInteger;
             }
             else if (obj is AFloat)
             {

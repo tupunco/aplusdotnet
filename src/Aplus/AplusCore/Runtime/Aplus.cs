@@ -18,11 +18,17 @@ namespace AplusCore.Runtime
         private Scope dlrglobals;
 
         private SystemVariables sysvars;
+        private MemoryMappedFileManager mmfmanager;
         private DependencyManager dependencies;
 
         #endregion
 
         #region Properties
+
+        public MemoryMappedFileManager MemoryMappedFileManager
+        {
+            get { return this.mmfmanager; }
+        }
 
         public SystemVariables SystemVariables
         {
@@ -59,6 +65,8 @@ namespace AplusCore.Runtime
             this.globals = new ExpandoObject();
 
             this.sysvars["mode"] = ASymbol.Create(parsemode.ToString().ToLower());
+
+            this.mmfmanager = new MemoryMappedFileManager();
         }
 
         #endregion
