@@ -4,7 +4,7 @@ options {
 	language = CSharp2;
 	tokenVocab=AplusLexer;
 	backtrack = true;
-	
+	memoize = true;
 }
 	
 @parser::namespace { AplusCore.Compiler.Grammar }

@@ -90,7 +90,7 @@ namespace AplusCoreUnitTests.AstNode
         }
 
         [TestCategory("AstNode"), TestCategory("Complex AST Node tests"), TestMethod]
-        [Ignore] // TODO: This test runs really really slow!! fix?
+        //[Ignore] // TODO: This test runs really really slow!! fix?
         public void VeryComplexTest()
         {
             string input = "3;c:={ {10[10][11][12]} + 1 6 -2 +. 4 10 3 +. 4 5 6 + 11 + c:=(+5;1);1+2};{(;;2;;);1;}";
