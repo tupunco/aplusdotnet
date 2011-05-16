@@ -9,6 +9,7 @@ using AplusCore.Runtime.Function.Monadic;
 using AplusCore.Runtime.Function.Dyadic;
 using AplusCore.Runtime.Function.Monadic.NonScalar.Other;
 using AplusCore.Runtime.Function.Dyadic.NonScalar.Other;
+using System.Reflection;
 
 namespace AplusCore.Compiler.AST
 {
@@ -40,12 +41,29 @@ namespace AplusCore.Compiler.AST
 
         public override DLR.Expression Generate(AplusScope scope)
         {
-            DLR.Expression result = null;
+            DLR.ParameterExpression temp = DLR.Expression.Parameter(typeof(AType), "__TEMP__");
+
             // Clone the rhs value of the assignment to ensure correct results
             // in case of: a:=b:=[...:=] [rhs]  assignments
-            DLR.Expression value = DLR.Expression.Call(
-                this.expression.Generate(scope), typeof(AType).GetMethod("Clone")
-            );
+
+            DLR.Expression value =
+                DLR.Expression.Block(
+                    new DLR.ParameterExpression[] { temp },
+                    DLR.Expression.Assign(temp, this.expression.Generate(scope)),
+                    DLR.Expression.Call(
+                        temp,
+                        typeof(AType).GetMethod("Clone"),
+                        DLR.Expression.Not(
+                            DLR.Expression.Call(
+                                null,
+                                typeof(String).GetMethod("IsNullOrEmpty", BindingFlags.Public | BindingFlags.Static),
+                                DLR.Expression.Property(temp, "MemoryMappedFile")
+                            )
+                        )
+                    )
+                );
+
+            DLR.Expression result = null;
 
             if (this.target is Identifier)
             {
@@ -73,7 +91,8 @@ namespace AplusCore.Compiler.AST
                     result = DLR.Expression.Call(
                         typeof(Assign).GetMethod("AppendItem", flags),
                         value,
-                        target.Item.Generate(scope)
+                        target.Item.Generate(scope),
+                        scope.AplusEnvironment
                     );
                 }
                 else
@@ -197,7 +216,7 @@ namespace AplusCore.Compiler.AST
 
         #region DLR: append
 
-        private static AType AppendItem(AType value, AType target)
+        private static AType AppendItem(AType value, AType target, AplusEnvironment environment)
         {
             if (target.Rank == 0)
             {
@@ -371,7 +390,14 @@ namespace AplusCore.Compiler.AST
                         id,
                         DLR.Expression.Call(
                             valuesParam,
-                            typeof(AType).GetMethod("Clone")
+                            typeof(AType).GetMethod("Clone"),
+                            DLR.Expression.Not(
+                                DLR.Expression.Call(
+                                    null,
+                                    typeof(String).GetMethod("IsNullOrEmpty", BindingFlags.Public | BindingFlags.Static),
+                                    DLR.Expression.Property(valuesParam, "MemoryMappedFile")
+                                )
+                            )
                         ),
                         isStrand: true
                     )
