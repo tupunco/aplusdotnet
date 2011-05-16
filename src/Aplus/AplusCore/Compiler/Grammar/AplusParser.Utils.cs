@@ -8,15 +8,12 @@ namespace AplusCore.Compiler.Grammar
 {
     partial class AplusParser
     {
-        private Dictionary<string, List<AST.Identifier>> localAssignments = null;
-        private Dictionary<string, List<AST.Identifier>> globalAssignments = null;
-
-
         /// <summary>
         /// Describes if the current parsing state is inside a function.
         /// </summary>
         private bool isfunction = false;
         private AST.Node function;
+        private Assignments assignments;
 
         /// <summary>
         /// Describes if the current parsing state is inside a function.
@@ -58,18 +55,16 @@ namespace AplusCore.Compiler.Grammar
 
         private void SetupUserDefFunction()
         {
-            this.localAssignments = new Dictionary<string, List<AST.Identifier>>();
-            this.globalAssignments = new Dictionary<string, List<AST.Identifier>>();
             this.isfunction = true;
             this.function = null;
+            this.assignments = new Assignments();
         }
 
         private void TearDownUserDefFunction()
         {
-            this.localAssignments = null;
-            this.globalAssignments = null;
             this.isfunction = false;
             this.function = null;
+            this.assignments = null;
         }
 
         private AST.Node BuildMonadic(AST.Token symbol, AST.Node argument)
@@ -111,45 +106,45 @@ namespace AplusCore.Compiler.Grammar
 
             if (target.IsEnclosed)
             {
-                if (this.localAssignments.ContainsKey(target.Name))
+                if (this.assignments.Local.ContainsKey(target.Name))
                 {
                     // Found the variable already used in a local assignment
                     target.IsEnclosed = false;
-                    this.localAssignments[target.Name].Add(target);
+                    this.assignments.Local[target.Name].Add(target);
                 }
                 else
                 {
-                    if (!this.globalAssignments.ContainsKey(target.Name))
+                    if (!this.assignments.Global.ContainsKey(target.Name))
                     {
                         // variable did not exists currently as global assignment
-                        this.globalAssignments[target.Name] = new List<AST.Identifier>();
+                        this.assignments.Global[target.Name] = new List<AST.Identifier>();
                     }
                     // add the target as a global assignment target
-                    this.globalAssignments[target.Name].Add(target);
+                    this.assignments.Global[target.Name].Add(target);
                 }
             }
             else
             {
-                if (!this.localAssignments.ContainsKey(target.Name))
+                if (!this.assignments.Local.ContainsKey(target.Name))
                 {
-                    this.localAssignments[target.Name] = new List<AST.Identifier>();
+                    this.assignments.Local[target.Name] = new List<AST.Identifier>();
                 }
 
-                if (this.globalAssignments.ContainsKey(target.Name))
+                if (this.assignments.Global.ContainsKey(target.Name))
                 {
                     // found the same variable as a global assignment target
                     //  move it to the local assignments
-                    foreach (AST.Identifier item in this.globalAssignments[target.Name])
+                    foreach (AST.Identifier item in this.assignments.Global[target.Name])
                     {
                         item.IsEnclosed = false;
-                        this.localAssignments[target.Name].Add(item);
+                        this.assignments.Local[target.Name].Add(item);
                     }
 
                     // remove from the global assignments' list
-                    this.globalAssignments.Remove(target.Name);
+                    this.assignments.Global.Remove(target.Name);
                 }
 
-                this.localAssignments[target.Name].Add(target);
+                this.assignments.Local[target.Name].Add(target);
             }
 
         }

@@ -53,7 +53,10 @@ dependencyDefinition returns [AST.Dependency node]
 		(LSBracket indexer=variableName RSBracket)?
 		Colon functionBody
 		{ 
-			AST.Dependency.UpdateDependantSet(this.localAssignments, this.globalAssignments, this.variableAccessing);
+			AST.Dependency.UpdateDependantSet(
+				this.assignments.Local,
+				this.assignments.Global,
+				this.variableAccessing);
 			$node = AST.Node.Dependency($name.node, $functionBody.node, $text, this.variableAccessing);
 			if($indexer.node != null)
 			{
@@ -62,9 +65,12 @@ dependencyDefinition returns [AST.Dependency node]
 		}
 	;
 
-userDefinedFunction  returns [AST.Node node]
+userDefinedFunction  returns [AST.UserDefFunction node]
 	@init { SetupUserDefFunction(); }
-	@after { TearDownUserDefFunction(); }
+	@after { 
+		$node.Assignments = this.assignments;
+		TearDownUserDefFunction();
+	}
 	:	variableName										{ this.function = $variableName.node; }
 		expressionGroup Colon functionBody
 			{ $node = AST.Node.UserDefFunction($variableName.node, $expressionGroup.node, $functionBody.node, $text); }

@@ -6,6 +6,7 @@ using DLR = System.Linq.Expressions;
 using DYN = System.Dynamic;
 using AplusCore.Runtime;
 using AplusCore.Types;
+using AplusCore.Compiler.Grammar;
 
 namespace AplusCore.Compiler.AST
 {
@@ -17,6 +18,12 @@ namespace AplusCore.Compiler.AST
         private ExpressionList parameters;
         private Node codeblock;
         private string code;
+
+        #endregion
+
+        #region Properties
+
+        public Assignments Assignments { get; set; }
 
         #endregion
 
@@ -46,7 +53,7 @@ namespace AplusCore.Compiler.AST
                 moduleParam: DLR.Expression.Parameter(typeof(DYN.ExpandoObject), scopename),
                 returnTarget: DLR.Expression.Label(typeof(AType), "RETURN"),
                 enviromentParam: DLR.Expression.Parameter(typeof(AplusEnvironment), "_EXTERNAL_EVN_"),
-				isMethod: true
+                isMethod: true
             );
 
             // 1.5 Create a result parameter
@@ -59,7 +66,7 @@ namespace AplusCore.Compiler.AST
             {
                 string parameterName = ((Identifier)parameter).Name;
                 DLR.ParameterExpression parameterExpression = DLR.Expression.Parameter(typeof(AType), parameterName);
-                
+
                 // Add parameter to the scope's variable list
                 methodScope.Variables[parameterName] = parameterExpression;
 
@@ -77,30 +84,30 @@ namespace AplusCore.Compiler.AST
             DLR.LambdaExpression method = DLR.Expression.Lambda(
                 DLR.Expression.Block(
                     new DLR.ParameterExpression[] { methodScope.ModuleExpression, resultParameter },
-                    // Add the local scope's store
+                // Add the local scope's store
                     DLR.Expression.Assign(methodScope.ModuleExpression, DLR.Expression.Constant(new DYN.ExpandoObject())),
-                    // set AplusEnviroment's function scope reference
+                // set AplusEnviroment's function scope reference
                     DLR.Expression.Assign(
                         DLR.Expression.Property(methodScope.AplusEnvironment, "FunctionScope"),
                         methodScope.ModuleExpression
                     ),
-                    // Calculate the result of the defined function
+                // Calculate the result of the defined function
                     DLR.Expression.Assign(
                         resultParameter,
                         DLR.Expression.Label(methodScope.ReturnTarget, this.codeblock.Generate(methodScope))
                     ),
-                    // reset  AplusEnviroment's function scope reference
+                // reset  AplusEnviroment's function scope reference
                     DLR.Expression.Assign(
                         DLR.Expression.Property(methodScope.AplusEnvironment, "FunctionScope"),
                         DLR.Expression.Constant(null, typeof(DYN.ExpandoObject))
                     ),
-                    // Return the result
+                // Return the result
                     resultParameter
                 ),
                 methodName,
                 methodParameters
             );
-            
+
             // 3.5. Wrap the lambda method inside an AFunc
             DLR.Expression wrappedLambda = DLR.Expression.Call(
                 typeof(AFunc).GetMethod("Create", new Type[] { typeof(string), typeof(object), typeof(int), typeof(string) }),
