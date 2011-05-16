@@ -236,7 +236,7 @@ systemCommand returns [AST.SystemCommand node]
 		)?
 	;
 	
-dependencyDefinition returns [AST.Node node]
+dependencyDefinition returns [AST.Dependency node]
 	@init{	this.variableAccessing = new HashSet<AST.Identifier>();
 			this.isdependency = false; 
 			SetupUserDefFunction(); 
@@ -245,11 +245,17 @@ dependencyDefinition returns [AST.Node node]
 			this.isdependency = false;
 			TearDownUserDefFunction();
 		}
-	:	variableName { this.isdependency = true; }	Colon  functionBody
-			{ 
-				AST.Dependency.UpdateDependantSet(this.localAssignments, this.globalAssignments, this.variableAccessing);
-				$node = AST.Node.Dependency($variableName.node, $functionBody.node, $text, this.variableAccessing);
+	:	name=variableName { this.isdependency = true; }
+		(LSBracket indexer=variableName RSBracket)?
+		Colon functionBody
+		{ 
+			AST.Dependency.UpdateDependantSet(this.localAssignments, this.globalAssignments, this.variableAccessing);
+			$node = AST.Node.Dependency($name.node, $functionBody.node, $text, this.variableAccessing);
+			if($indexer.node != null)
+			{
+				$node.Indexer = $indexer.node;
 			}
+		}
 	;
 
 userDefinedFunction  returns [AST.Node node]

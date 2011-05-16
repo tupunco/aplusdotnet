@@ -20,6 +20,17 @@ namespace AplusCore.Compiler.AST
         private Node functionBody;
         private string codeText;
         private HashSet<Identifier> dependantSet;
+        private Identifier indexer;
+
+        #endregion
+
+        #region Properties
+
+        internal Identifier Indexer
+        {
+            get { return this.indexer; }
+            set { this.indexer = value; }
+        }
 
         #endregion
 
