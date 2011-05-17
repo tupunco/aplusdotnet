@@ -51,35 +51,32 @@ namespace AplusCore.Compiler.AST
 
             if (scope.IsAssignment && TokenUtils.AllowedPrimitiveFunction(this.token.Type))
             {
-                if (this.token.Type == Tokens.VALUEINCONTEXT || this.token.Type == Tokens.CHOOSE ||
-                    this.token.Type == Tokens.PICK)
-                {
-                    DLR.Expression left = this.leftExpression.Generate(scope);
-                    DLR.Expression right = this.rightExpression.Generate(scope);
-                    result = GenerateDyadic(scope, right, left);
-                }
-                else
-                {
-                    /*
-                     * input: y -> left side, x -> right side, value
-                     * Perform the function like this:
-                     * 
-                     * i := f{y; iota rho x}
-                     * (,x)[i] := value
-                     * 
-                     * where 'f' is the dyadic function
-                     */
-                    DLR.Expression left = this.leftExpression.Generate(scope);
-                    DLR.Expression right = Node.TestMonadicToken(this.rightExpression, Tokens.RAVEL)
-                        ? ((MonadicFunction)this.rightExpression).Expression.Generate(scope)
-                        : this.rightExpression.Generate(scope)
-                    ;
+                /*
+                 * input: y -> left side, x -> right side, value
+                 * Perform the function like this:
+                 * 
+                 * i := f{y; iota rho x}
+                 * (,x)[i] := value
+                 * 
+                 * where 'f' is the dyadic function
+                 */
+                DLR.Expression left = this.leftExpression.Generate(scope);
+                DLR.Expression right = Node.TestMonadicToken(this.rightExpression, Tokens.RAVEL)
+                    ? ((MonadicFunction)this.rightExpression).Expression.Generate(scope)
+                    : this.rightExpression.Generate(scope)
+                ;
 
-                    // i:=(iota rho x)
-                    DLR.Expression indices = AST.Assign.BuildIndicesList(scope, right);
-                    // (,x)[f{a;i}]
-                    result = AST.Assign.BuildIndexing(scope, right, GenerateDyadic(scope, indices, left));
-                }
+                // i:=(iota rho x)
+                DLR.Expression indices = AST.Assign.BuildIndicesList(scope, right);
+                // (,x)[f{a;i}]
+                result = AST.Assign.BuildIndexing(scope, right, GenerateDyadic(scope, indices, left));
+            }
+            else if (scope.IsAssignment && this.token.Type == Tokens.CHOOSE)
+            {
+                DLR.Expression left = this.leftExpression.Generate(scope);
+                DLR.Expression right = this.rightExpression.Generate(scope);
+                // TODO: fix call for correct choose assignment.
+                result = GenerateDyadic(scope, right, left);
             }
             else
             {
