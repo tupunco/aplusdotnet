@@ -23,74 +23,7 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
-        #region overrides
-        public override string ToString()
-        {
-            if (isDyadic)
-            {
-                return String.Format("Each({0} {1} {2}", this.function, this.leftarg, this.rightarg);
-            }
-            else
-            {
-                return String.Format("Each({0} {1}", this.function, this.rightarg);
-            }
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is EachOperator)
-            {
-                EachOperator other = (EachOperator)obj;
-                bool result = (this.function == other.function) && (this.rightarg == other.rightarg);
-                if (isDyadic)
-                {
-                    result = result && (this.leftarg == other.leftarg);
-                }
-                return result;
-            }
-
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            int value = this.function.GetHashCode() ^ this.rightarg.GetHashCode();
-            if (isDyadic)
-            {
-                value ^= this.leftarg.GetHashCode();
-            }
-
-            return value;
-        }
-
-        #endregion
-
-        #region GraphViz output (Only in DEBUG)
-#if DEBUG
-        static int counter = 0;
-        internal override string ToDot(string parent, System.Text.StringBuilder text)
-        {
-            string name = String.Format("EachOP{0}", counter++);
-            string funcDot = this.function.ToDot(name, text);
-            text.AppendFormat(" {0} -> {1};\n", name, funcDot);
-
-            if (isDyadic)
-            {
-                string leftArg = this.leftarg.ToDot(name, text);
-                text.AppendFormat("  {0} -> {1};\n", name, leftArg);
-            }
-
-            if (rightarg != null)
-            {
-                string rightArg = this.rightarg.ToDot(name, text);
-                text.AppendFormat(" {0} -> {1};\n", name, rightArg);
-                text.AppendFormat(" {0} [label=\"{1} Each\"]", name, this.function);
-            }
-
-            return name;
-        }
-#endif
-        #endregion
+        #region DLR generator
 
         public override DLR.Expression Generate(AplusScope scope)
         {
@@ -180,6 +113,77 @@ namespace AplusCore.Compiler.AST
 
             return result;
         }
+
+        #endregion
+
+        #region overrides
+        public override string ToString()
+        {
+            if (isDyadic)
+            {
+                return String.Format("Each({0} {1} {2}", this.function, this.leftarg, this.rightarg);
+            }
+            else
+            {
+                return String.Format("Each({0} {1}", this.function, this.rightarg);
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is EachOperator)
+            {
+                EachOperator other = (EachOperator)obj;
+                bool result = (this.function == other.function) && (this.rightarg == other.rightarg);
+                if (isDyadic)
+                {
+                    result = result && (this.leftarg == other.leftarg);
+                }
+                return result;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            int value = this.function.GetHashCode() ^ this.rightarg.GetHashCode();
+            if (isDyadic)
+            {
+                value ^= this.leftarg.GetHashCode();
+            }
+
+            return value;
+        }
+
+        #endregion
+
+        #region GraphViz output (Only in DEBUG)
+#if DEBUG
+        static int counter = 0;
+        internal override string ToDot(string parent, System.Text.StringBuilder text)
+        {
+            string name = String.Format("EachOP{0}", counter++);
+            string funcDot = this.function.ToDot(name, text);
+            text.AppendFormat(" {0} -> {1};\n", name, funcDot);
+
+            if (isDyadic)
+            {
+                string leftArg = this.leftarg.ToDot(name, text);
+                text.AppendFormat("  {0} -> {1};\n", name, leftArg);
+            }
+
+            if (rightarg != null)
+            {
+                string rightArg = this.rightarg.ToDot(name, text);
+                text.AppendFormat(" {0} -> {1};\n", name, rightArg);
+                text.AppendFormat(" {0} [label=\"{1} Each\"]", name, this.function);
+            }
+
+            return name;
+        }
+#endif
+        #endregion
     }
 
     #region Construction helper

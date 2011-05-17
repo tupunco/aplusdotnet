@@ -37,6 +37,54 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
+        #region DLR generator
+
+        public override DLR.Expression Generate(AplusScope scope)
+        {
+            DLR.Expression func;
+
+            if (this.function is Token)
+            {
+                Node wrappedFunction = new BuiltInFunction((Token)this.function);
+                func = wrappedFunction.Generate(scope);
+            }
+            else
+            {
+                func = this.function.Generate(scope);
+            }
+
+            DLR.Expression result;
+
+            if (isDyadic)
+            {
+                result = DLR.Expression.Call(
+                    DLR.Expression.Constant(DyadicOperatorInstance.Rank),
+                    DyadicOperatorInstance.Rank.GetType().GetMethod("Execute"),
+                    func,
+                    this.condition.Generate(scope),
+                    this.rightarg.Generate(scope),
+                    this.leftarg.Generate(scope),
+                    scope.GetAplusEnvironment()
+                );
+            }
+            else
+            {
+                result = DLR.Expression.Call(
+                DLR.Expression.Constant(MonadicOperatorInstance.Rank),
+                MonadicOperatorInstance.Rank.GetType().GetMethod("Execute"),
+                func,
+                this.condition.Generate(scope),
+                this.rightarg.Generate(scope),
+                scope.GetAplusEnvironment()
+            );
+            }
+
+            return result;
+        }
+
+
+        #endregion
+
         #region overrides
 
         public override string ToString()
@@ -107,54 +155,6 @@ namespace AplusCore.Compiler.AST
             return name;
         }
 #endif
-        #endregion
-
-        #region DLR generator
-
-        public override DLR.Expression Generate(AplusScope scope)
-        {
-            DLR.Expression func;
-
-            if (this.function is Token)
-            {
-                Node wrappedFunction = new BuiltInFunction((Token)this.function);
-                func = wrappedFunction.Generate(scope);
-            }
-            else
-            {
-                func = this.function.Generate(scope);
-            }
-
-            DLR.Expression result;
-
-            if (isDyadic)
-            {
-                result = DLR.Expression.Call(
-                    DLR.Expression.Constant(DyadicOperatorInstance.Rank),
-                    DyadicOperatorInstance.Rank.GetType().GetMethod("Execute"),
-                    func,
-                    this.condition.Generate(scope),
-                    this.rightarg.Generate(scope),
-                    this.leftarg.Generate(scope),
-                    scope.GetAplusEnvironment()
-                );
-            }
-            else
-            {
-                result = DLR.Expression.Call(
-                DLR.Expression.Constant(MonadicOperatorInstance.Rank),
-                MonadicOperatorInstance.Rank.GetType().GetMethod("Execute"),
-                func,
-                this.condition.Generate(scope),
-                this.rightarg.Generate(scope),
-                scope.GetAplusEnvironment()
-            );
-            }
-
-            return result;
-        }
-
-
         #endregion
     }
 

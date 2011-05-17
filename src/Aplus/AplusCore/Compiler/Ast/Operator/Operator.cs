@@ -45,10 +45,6 @@ namespace AplusCore.Compiler.AST
             set { this.opToken = value; }
         }
 
-        #endregion
-
-        #region Methods
-
         public Node LeftArgument
         {
             get { return this.leftarg; }
@@ -60,10 +56,6 @@ namespace AplusCore.Compiler.AST
             get { return this.rightarg; }
             set { this.rightarg = value; }
         }
-
-        #endregion
-
-        #region overrides
 
         #endregion
     }
