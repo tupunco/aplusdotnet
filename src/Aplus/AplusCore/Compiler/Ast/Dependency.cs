@@ -142,10 +142,11 @@ namespace AplusCore.Compiler.AST
             );
 
             // 3.5 Build dependant set
+            // filter out the variables from the dependant set if it is a local variable
             HashSet<string> dependents = new HashSet<string>(
-                this.variables.Accessing.Select(
-                    list => { return list.Value[0].BuildQualifiedName(runtime.CurrentContext); }
-                )
+                from pair in this.variables.Accessing                           // get all variables
+                where !this.variables.LocalAssignment.ContainsKey(pair.Key)     // but skip the local variables 
+                select pair.Value[0].BuildQualifiedName(runtime.CurrentContext) // then build the correct name
             );
 
             // 4. Register the method for the Dependency manager
