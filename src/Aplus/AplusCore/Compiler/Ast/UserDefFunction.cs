@@ -23,7 +23,7 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
-        public Assignments Assignments { get; set; }
+        public Variables Variables { get; set; }
 
         #endregion
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AplusCore.Types;
+using Microsoft.Scripting.Hosting;
 
 namespace AplusCoreUnitTests.Dlr
 {
@@ -60,6 +61,36 @@ namespace AplusCoreUnitTests.Dlr
             this.engine.Execute<AType>("(u;s):= (0.08; 0.005)", scope);
 
             AType result = this.engine.Execute<AType>("y", scope);
+
+            Assert.AreEqual<AType>(expected, result, "Incorrect dependency evaluation");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dependencies"), TestMethod]
+        public void DependencyDependantModificationEvaluation()
+        {
+            AType expected = AFloat.Create(111);
+            ScriptScope scope = this.engine.CreateScope();
+
+            this.engine.Execute<AType>("m: { m:=m+n; (n):=10*n; m+n }", scope);
+            this.engine.Execute<AType>("m:=100", scope);
+            this.engine.Execute<AType>("n:=1", scope);
+
+            AType result = this.engine.Execute<AType>("m", scope);
+
+            Assert.AreEqual<AType>(expected, result, "Incorrect dependency evaluation");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dependencies"), TestMethod]
+        public void DependencyDependantEvalModificationEvaluation()
+        {
+            AType expected = AFloat.Create(2);
+            ScriptScope scope = this.engine.CreateScope();
+
+            this.engine.Execute<AType>("m: { m:=m+n; eval 'm:n'; m+n }", scope);
+            this.engine.Execute<AType>("m:=100", scope);
+            this.engine.Execute<AType>("n:=1", scope);
+
+            AType result = this.engine.Execute<AType>("m", scope);
 
             Assert.AreEqual<AType>(expected, result, "Incorrect dependency evaluation");
         }

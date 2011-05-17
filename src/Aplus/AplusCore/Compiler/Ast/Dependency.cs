@@ -9,6 +9,7 @@ using DYN = System.Dynamic;
 
 using AplusCore.Runtime;
 using AplusCore.Types;
+using AplusCore.Compiler.Grammar;
 
 namespace AplusCore.Compiler.AST
 {
@@ -19,7 +20,7 @@ namespace AplusCore.Compiler.AST
         private Identifier variable;
         private Node functionBody;
         private string codeText;
-        private HashSet<Identifier> dependantSet;
+        private Variables variables;
         private Identifier indexer;
 
         #endregion
@@ -36,12 +37,12 @@ namespace AplusCore.Compiler.AST
 
         #region Constructors
 
-        public Dependency(AST.Identifier variable, Node functionBody, string codeText, HashSet<Identifier> dependantSet)
+        public Dependency(Identifier variable, Node functionBody, string codeText, Variables variables)
         {
             this.variable = variable;
             this.functionBody = functionBody;
             this.codeText = codeText;
-            this.dependantSet = dependantSet;
+            this.variables = variables;
         }
 
         #endregion
@@ -50,9 +51,25 @@ namespace AplusCore.Compiler.AST
 
         public override DLR.Expression Generate(AplusScope scope)
         {
+            PreprocessVariables(scope);
+
             DLR.Expression result = null;
             Aplus runtime = scope.GetRuntime();
-   
+
+            if (scope.IsEval && scope.IsMethod)
+            {
+                // override the original scope
+                // create a top level scope
+                scope = new AplusScope(null, "_EVAL_DEP_SCOPE_",
+                    scope.GetRuntime(),
+                    scope.GetRuntimeExpression(),
+                    scope.Parent.GetModuleExpression(),
+                    scope.GetAplusEnvironment(),
+                    scope.ReturnTarget,
+                    isEval: true
+                );
+            }
+
             // 1. Create a function scope
             string dependencyName = this.variable.BuildQualifiedName(runtime.CurrentContext);
             string scopename = String.Format("__dependency_{0}_scope__", this.variable.Name);
@@ -126,7 +143,9 @@ namespace AplusCore.Compiler.AST
 
             // 3.5 Build dependant set
             HashSet<string> dependents = new HashSet<string>(
-                this.dependantSet.Select(item => { return item.BuildQualifiedName(runtime.CurrentContext); })
+                this.variables.Accessing.Select(
+                    list => { return list.Value[0].BuildQualifiedName(runtime.CurrentContext); }
+                )
             );
 
             // 4. Register the method for the Dependency manager
@@ -148,17 +167,34 @@ namespace AplusCore.Compiler.AST
             return result;
         }
 
-        #endregion
-
-        #region Dependency calculation
-
-        internal static void UpdateDependantSet(
-            Dictionary<string, List<Identifier>> localAssignments,
-            Dictionary<string, List<Identifier>> globalAssignments,
-            HashSet<Identifier> variableAccessing)
+        private void PreprocessVariables(AplusScope scope)
         {
-            // FIX: currently we treat every variable as a global variable. 
-            // TODO: Remove the local variables from the set.
+            if (this.variables.LocalAssignment.ContainsKey(this.variable.Name))
+            {
+                if (!this.variables.GlobalAssignment.ContainsKey(this.variable.Name))
+                {
+                    this.variables.GlobalAssignment[this.variable.Name] = new List<Identifier>();
+                }
+
+                foreach (Identifier variable in this.variables.LocalAssignment[this.variable.Name])
+                {
+                    variable.Name = variable.BuildQualifiedName(scope.GetRuntime().CurrentContext);
+                    variable.Type = IdentifierType.QualifiedName;
+
+                    this.variables.GlobalAssignment[this.variable.Name].Add(variable);
+                }
+
+                this.variables.LocalAssignment.Remove(this.variable.Name);    
+            }
+
+            if (this.variables.Accessing.ContainsKey(this.variable.Name))
+            {
+                foreach (Identifier variable in this.variables.Accessing[this.variable.Name])
+                {
+                    variable.Name = variable.BuildQualifiedName(scope.GetRuntime().CurrentContext);
+                    variable.Type = IdentifierType.QualifiedName;
+                }
+            }
         }
 
         #endregion
@@ -167,12 +203,11 @@ namespace AplusCore.Compiler.AST
     #region Construction helper
     partial class Node
     {
-        public static Dependency Dependency(
-            Node variable, Node functionBody, string codeText, HashSet<Identifier> dependantSet)
+        public static Dependency Dependency(Node variable, Node functionBody, string codeText, Variables variables)
         {
             Debug.Assert(variable is Identifier);
 
-            return new Dependency((Identifier)variable, functionBody, codeText, dependantSet);
+            return new Dependency((Identifier)variable, functionBody, codeText, variables);
         }
     }
     #endregion

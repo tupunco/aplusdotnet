@@ -98,7 +98,7 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Compiler\Grammar\Assignments.cs" />
+    <Compile Include="Compiler\Grammar\Variables.cs" />
     <Compile Include="Compiler\Grammar\StringProcessor.cs" />
     <Compile Include="Compiler\Grammar\Tokens.cs" />
     <Compile Include="Compiler\Parse.cs" />

@@ -41,23 +41,13 @@ systemCommand returns [AST.SystemCommand node]
 	;
 	
 dependencyDefinition returns [AST.Dependency node]
-	@init{	this.variableAccessing = new HashSet<AST.Identifier>();
-			this.isdependency = false; 
-			SetupUserDefFunction(); 
-		}
-	@after{ this.variableAccessing = null;
-			this.isdependency = false;
-			TearDownUserDefFunction();
-		}
+	@init{ this.isdependency = false; SetupUserDefFunction(); }
+	@after{ this.isdependency = false; TearDownUserDefFunction(); }
 	:	name=variableName { this.isdependency = true; }
 		(LSBracket indexer=variableName RSBracket)?
 		Colon functionBody
 		{ 
-			AST.Dependency.UpdateDependantSet(
-				this.assignments.Local,
-				this.assignments.Global,
-				this.variableAccessing);
-			$node = AST.Node.Dependency($name.node, $functionBody.node, $text, this.variableAccessing);
+			$node = AST.Node.Dependency($name.node, $functionBody.node, $text, this.variables);
 			if($indexer.node != null)
 			{
 				$node.Indexer = $indexer.node;
@@ -67,10 +57,7 @@ dependencyDefinition returns [AST.Dependency node]
 
 userDefinedFunction  returns [AST.UserDefFunction node]
 	@init { SetupUserDefFunction(); }
-	@after { 
-		$node.Assignments = this.assignments;
-		TearDownUserDefFunction();
-	}
+	@after { $node.Variables = this.variables; TearDownUserDefFunction(); }
 	:	variableName										{ this.function = $variableName.node; }
 		expressionGroup Colon functionBody
 			{ $node = AST.Node.UserDefFunction($variableName.node, $expressionGroup.node, $functionBody.node, $text); }
@@ -431,7 +418,7 @@ variableName returns [AST.Identifier node]
 
 												if(this.isdependency)
 												{
-													this.variableAccessing.Add(node);
+													this.variables.AddAccess(node);
 												}
 											}
 	|	UnqualifiedName						{ 
@@ -439,7 +426,7 @@ variableName returns [AST.Identifier node]
 
 												if(this.isdependency)
 												{
-													this.variableAccessing.Add(node);
+													this.variables.AddAccess(node);
 												}
 											}
 	;

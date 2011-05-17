@@ -13,13 +13,12 @@ namespace AplusCore.Compiler.Grammar
         /// </summary>
         private bool isfunction = false;
         private AST.Node function;
-        private Assignments assignments;
+        private Variables variables;
 
         /// <summary>
         /// Describes if the current parsing state is inside a function.
         /// </summary>
         private bool isdependency = false;
-        private HashSet<AST.Identifier> variableAccessing = null;
 
         public AST.Node tree;
 
@@ -57,14 +56,14 @@ namespace AplusCore.Compiler.Grammar
         {
             this.isfunction = true;
             this.function = null;
-            this.assignments = new Assignments();
+            this.variables = new Variables();
         }
 
         private void TearDownUserDefFunction()
         {
             this.isfunction = false;
             this.function = null;
-            this.assignments = null;
+            this.variables = null;
         }
 
         private AST.Node BuildMonadic(AST.Token symbol, AST.Node argument)
@@ -106,45 +105,45 @@ namespace AplusCore.Compiler.Grammar
 
             if (target.IsEnclosed)
             {
-                if (this.assignments.Local.ContainsKey(target.Name))
+                if (this.variables.LocalAssignment.ContainsKey(target.Name))
                 {
                     // Found the variable already used in a local assignment
                     target.IsEnclosed = false;
-                    this.assignments.Local[target.Name].Add(target);
+                    this.variables.LocalAssignment[target.Name].Add(target);
                 }
                 else
                 {
-                    if (!this.assignments.Global.ContainsKey(target.Name))
+                    if (!this.variables.GlobalAssignment.ContainsKey(target.Name))
                     {
                         // variable did not exists currently as global assignment
-                        this.assignments.Global[target.Name] = new List<AST.Identifier>();
+                        this.variables.GlobalAssignment[target.Name] = new List<AST.Identifier>();
                     }
                     // add the target as a global assignment target
-                    this.assignments.Global[target.Name].Add(target);
+                    this.variables.GlobalAssignment[target.Name].Add(target);
                 }
             }
             else
             {
-                if (!this.assignments.Local.ContainsKey(target.Name))
+                if (!this.variables.LocalAssignment.ContainsKey(target.Name))
                 {
-                    this.assignments.Local[target.Name] = new List<AST.Identifier>();
+                    this.variables.LocalAssignment[target.Name] = new List<AST.Identifier>();
                 }
 
-                if (this.assignments.Global.ContainsKey(target.Name))
+                if (this.variables.GlobalAssignment.ContainsKey(target.Name))
                 {
                     // found the same variable as a global assignment target
                     //  move it to the local assignments
-                    foreach (AST.Identifier item in this.assignments.Global[target.Name])
+                    foreach (AST.Identifier item in this.variables.GlobalAssignment[target.Name])
                     {
                         item.IsEnclosed = false;
-                        this.assignments.Local[target.Name].Add(item);
+                        this.variables.LocalAssignment[target.Name].Add(item);
                     }
 
                     // remove from the global assignments' list
-                    this.assignments.Global.Remove(target.Name);
+                    this.variables.GlobalAssignment.Remove(target.Name);
                 }
 
-                this.assignments.Local[target.Name].Add(target);
+                this.variables.LocalAssignment[target.Name].Add(target);
             }
 
         }
