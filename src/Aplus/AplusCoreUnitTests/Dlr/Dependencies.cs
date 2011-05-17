@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AplusCore.Types;
 using Microsoft.Scripting.Hosting;
+using AplusCore.Runtime;
 
 namespace AplusCoreUnitTests.Dlr
 {
@@ -24,12 +25,17 @@ namespace AplusCoreUnitTests.Dlr
             var expected = AInteger.Create(5);
             var scope = this.engine.CreateScope();
 
+            Aplus runtime = this.engine.GetService<Aplus>();
+
             this.engine.Execute<AType>("a: b + 2", scope);
             this.engine.Execute<AType>("b:=3", scope);
+
+            Assert.IsTrue(runtime.DependencyManager.IsInvalid(".a"), "Dependency '.a' marked valid");
 
             AType result = this.engine.Execute<AType>("a", scope);
 
             Assert.AreEqual<AType>(expected, result, "Incorrect dependency evaluation");
+            Assert.IsFalse(runtime.DependencyManager.IsInvalid(".a"), "Dependency '.a' marked invalid");
         }
 
         [TestCategory("DLR"), TestCategory("Dependencies"), TestMethod]
@@ -46,6 +52,11 @@ namespace AplusCoreUnitTests.Dlr
             AType result = this.engine.Execute<AType>("df", scope);
 
             Assert.AreEqual<AType>(expected, result, "Incorrect dependency evaluation");
+
+            Aplus runtime = this.engine.GetService<Aplus>();
+            Assert.IsFalse(runtime.DependencyManager.IsInvalid(".a"), "Dependency '.a' marked invalid");
+            Assert.IsFalse(runtime.DependencyManager.IsInvalid(".b"), "Dependency '.b' marked invalid");
+            Assert.IsFalse(runtime.DependencyManager.IsInvalid(".df"), "Dependency '.bf' marked invalid");
         }
 
 
@@ -63,6 +74,11 @@ namespace AplusCoreUnitTests.Dlr
             AType result = this.engine.Execute<AType>("y", scope);
 
             Assert.AreEqual<AType>(expected, result, "Incorrect dependency evaluation");
+
+            Aplus runtime = this.engine.GetService<Aplus>();
+            Assert.IsFalse(runtime.DependencyManager.IsInvalid(".y"), "Dependency '.y' marked invalid");
+            Assert.IsFalse(runtime.DependencyManager.IsInvalid(".u"), "Dependency '.u' marked invalid");
+            Assert.IsFalse(runtime.DependencyManager.IsInvalid(".s"), "Dependency '.s' marked invalid");
         }
 
         [TestCategory("DLR"), TestCategory("Dependencies"), TestMethod]
@@ -93,6 +109,26 @@ namespace AplusCoreUnitTests.Dlr
             AType result = this.engine.Execute<AType>("m", scope);
 
             Assert.AreEqual<AType>(expected, result, "Incorrect dependency evaluation");
+
+            Aplus runtime = this.engine.GetService<Aplus>();
+            Assert.IsFalse(runtime.DependencyManager.IsInvalid(".m"), "Dependency marked invalid");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dependencies"), TestMethod]
+        public void DependencyDependantCheck()
+        {
+            AType expected = AFloat.Create(40);
+            ScriptScope scope = this.engine.CreateScope();
+
+            this.engine.Execute<AType>("m: { a:=20; a + a }", scope);
+            AType result = this.engine.Execute<AType>("m", scope);
+
+            Assert.AreEqual<AType>(expected, result, "Incorrect dependency evaluation");
+
+            this.engine.Execute<AType>("a := -100", scope);
+
+            Aplus runtime = this.engine.GetService<Aplus>();
+            Assert.IsFalse(runtime.DependencyManager.IsInvalid(".m"), "Dependency marked invalid");
         }
     }
 }
