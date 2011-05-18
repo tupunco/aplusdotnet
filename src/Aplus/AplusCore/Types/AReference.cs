@@ -49,12 +49,6 @@ namespace AplusCore.Types
             get { return this.Data.IsFunctionScalar; }
         }
 
-        public string MemoryMappedFile
-        {
-            get { return this.Data.MemoryMappedFile; }
-            set { this.Data.MemoryMappedFile = value; }
-        }
-
         public bool IsNumber
         {
             get { return this.Data.IsNumber; }
@@ -63,6 +57,11 @@ namespace AplusCore.Types
         public bool IsTolerablyWholeNumber
         {
             get { return this.Data.IsTolerablyWholeNumber; }
+        }
+
+        public bool IsMemoryMappedFile
+        {
+            get { return this.Data.IsMemoryMappedFile; }
         }
 
         public ATypes Type

@@ -18,17 +18,16 @@ namespace AplusCore.Types.MemoryMapped
 
         #region Constructor
 
-        private MMAInteger(long position, MappedFile mappedFile, string memoryMappedFileName)
+        private MMAInteger(long position, MappedFile mappedFile)
             : base(0)
         {
             this.position = position;
             this.mappedFile = mappedFile;
-            this.memoryMappedFile = memoryMappedFileName;
         }
 
-        public static AType Create(long position, MappedFile mappedFile, string memoryMappedFileName)
+        public static AType Create(long position, MappedFile mappedFile)
         {
-            return new AReference(new MMAInteger(position, mappedFile, memoryMappedFileName));
+            return new AReference(new MMAInteger(position, mappedFile));
         }
 
         #endregion
@@ -42,7 +41,7 @@ namespace AplusCore.Types.MemoryMapped
 
         #endregion
 
-        #region Converter Properties
+        #region Properties
 
         public override int asInteger
         {
@@ -59,9 +58,9 @@ namespace AplusCore.Types.MemoryMapped
             get { return this.asInteger.ToString(); }
         }
 
-        public override string MemoryMappedFile
+        public override bool IsMemoryMappedFile
         {
-            get { return this.mappedFile.Name; }
+            get { return true; }
         }
 
         #endregion

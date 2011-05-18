@@ -18,7 +18,6 @@ namespace AplusCore.Runtime
 
         private MemoryMappedFile memoryMappedFile;
         private MemoryMappedViewAccessor accessor;
-        private string name;
         private long cursor;
 
         private static readonly byte TypePosition = 4;
@@ -133,29 +132,23 @@ namespace AplusCore.Runtime
             }
         }
 
-        public string Name
-        {
-            get { return this.name; }
-        }
-
         #endregion
 
         #region Construction
 
-        public MappedFile(MemoryMappedFile memoryMappedFile, string memoryMappedFileName)
+        public MappedFile(MemoryMappedFile memoryMappedFile)
         {
             this.memoryMappedFile = memoryMappedFile;
-            this.name = memoryMappedFileName;
             this.accessor = memoryMappedFile.CreateViewAccessor();
         }
 
-        public static AType Read(MemoryMappedFile memoryMappedFile, string memoryMappedFileName)
+        public static AType Read(MemoryMappedFile memoryMappedFile)
         {
-            MappedFile mappedFile = new MappedFile(memoryMappedFile, memoryMappedFileName);
+            MappedFile mappedFile = new MappedFile(memoryMappedFile);
 
             return mappedFile.Rank > 0 ?
                 MMAArray.Create(mappedFile) :
-                MMAInteger.Create(ItemPosition, mappedFile, memoryMappedFileName);
+                MMAInteger.Create(ItemPosition, mappedFile);
         }
 
         #endregion
@@ -255,13 +248,12 @@ namespace AplusCore.Runtime
                 }
 
                 result.UpdateInfo();
-                result.MemoryMappedFile = this.name;
 
                 return result;
             }
             else
             {
-                AType result = MMAInteger.Create(position, this, this.name);
+                AType result = MMAInteger.Create(position, this);
                 position += IntSize;
                 return result;
             }

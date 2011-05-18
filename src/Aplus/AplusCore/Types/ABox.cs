@@ -58,9 +58,9 @@ namespace AplusCore.Types
         public override AType Clone()
         {
             return new ABox(
-                String.IsNullOrEmpty(this.value.MemoryMappedFile) ?
-                this.value.Clone() :
-                this.value
+                this.value.IsMemoryMappedFile ?
+                this.value :
+                this.value.Clone()
             );
         }
 

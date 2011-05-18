@@ -34,8 +34,6 @@ namespace AplusCore.Types
         /// <see cref="ATypes"/>
         protected ATypes type;
 
-        protected string memoryMappedFile;
-
         #endregion
 
         #region AType Properties
@@ -45,14 +43,9 @@ namespace AplusCore.Types
         public virtual bool IsBox { get { return false; } }
         public virtual bool IsFunctionScalar { get { return false; } }
 
-        public virtual string MemoryMappedFile
-        {
-            get { return this.memoryMappedFile; }
-            set { this.memoryMappedFile = value; }
-        }
-
         public virtual bool IsNumber { get { return false; } }
         public virtual bool IsTolerablyWholeNumber { get { return false; } }
+        public virtual bool IsMemoryMappedFile { get { return false; } }
 
         public virtual ATypes Type
         {

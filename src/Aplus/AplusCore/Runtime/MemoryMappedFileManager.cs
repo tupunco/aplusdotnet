@@ -63,7 +63,7 @@ namespace AplusCore.Runtime
                 false
             );
 
-            MappedFile mappedFile = new MappedFile(memoryMappedFile, memoryMappedFileName);
+            MappedFile mappedFile = new MappedFile(memoryMappedFile);
 
             mappedFile.Create(argument);
             mappedFile.Dispose();
@@ -87,7 +87,7 @@ namespace AplusCore.Runtime
                 memoryMappedFile = MemoryMappedFile.CreateFromFile(memoryMappadFilePath, FileMode.Open, memoryMappedFileName);
             }
 
-            return MappedFile.Read(memoryMappedFile, memoryMappedFileName);
+            return MappedFile.Read(memoryMappedFile);
         }
 
         #endregion

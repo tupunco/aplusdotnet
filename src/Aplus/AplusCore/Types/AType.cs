@@ -47,7 +47,7 @@ namespace AplusCore.Types
 
         bool IsNumber { get; }
         bool IsTolerablyWholeNumber { get; }
-        string MemoryMappedFile { get; set; }
+        bool IsMemoryMappedFile { get; }
 
         #endregion
 

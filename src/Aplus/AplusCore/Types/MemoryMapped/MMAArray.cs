@@ -59,9 +59,9 @@ namespace AplusCore.Types.MemoryMapped
             get { return false; }
         }
 
-        public override string MemoryMappedFile
+        public override bool IsMemoryMappedFile
         {
-            get { return this.mappedFile.Name; }
+            get { return true; }
         }
 
         #endregion

@@ -74,7 +74,7 @@ namespace AplusCore.Types
         {
             get
             {
-                if (indexers.Count == 1 && indexers[0].Length == 0 && !String.IsNullOrEmpty(this.MemoryMappedFile))
+                if (indexers.Count == 1 && indexers[0].Length == 0 && this.IsMemoryMappedFile)
                 {
                     return this;
                 }

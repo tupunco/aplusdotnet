@@ -30,9 +30,9 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
         {
             if (argument.SimpleArray())
             {
-                return String.IsNullOrEmpty(argument.MemoryMappedFile) ?
-                    argument.Clone() :
-                    argument;
+                return argument.IsMemoryMappedFile ?
+                    argument :
+                    argument.Clone();
             }
             else
             {

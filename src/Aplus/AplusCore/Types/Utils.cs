@@ -78,7 +78,7 @@ namespace AplusCore.Types
             }
             else
             {
-                return !isAssign && !String.IsNullOrEmpty(input.MemoryMappedFile) ? item.Clone() : item;
+                return !isAssign && input.IsMemoryMappedFile ? item.Clone() : item;
             }
         }
 
@@ -141,7 +141,7 @@ namespace AplusCore.Types
             {
                 if (target.Type == value.Type)
                 {
-                    if (target.MemoryMappedFile != null)
+                    if (target.IsMemoryMappedFile)
                     {
                         ((MMAInteger)target.Data).SetValue(value.asInteger);
                     }

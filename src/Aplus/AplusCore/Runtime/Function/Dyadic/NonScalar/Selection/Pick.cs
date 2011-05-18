@@ -99,10 +99,10 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
             {
                 rightArray = AArray.Create(
                     right.Type,
-                    !String.IsNullOrEmpty(right.MemoryMappedFile) ?
-                        right.Clone() :
-                        right
-                    );
+                    right.IsMemoryMappedFile ?
+                    right.Clone() :
+                    right
+                );
             }
 
             if (left.IsBox)                         // Case 6

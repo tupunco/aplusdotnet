@@ -51,16 +51,12 @@ namespace AplusCore.Compiler.AST
                     new DLR.ParameterExpression[] { temp },
                     DLR.Expression.Assign(temp, this.expression.Generate(scope)),
                     DLR.Expression.Condition(
-                        DLR.Expression.Call(
-                            null,
-                            typeof(String).GetMethod("IsNullOrEmpty", BindingFlags.Public | BindingFlags.Static),
-                            DLR.Expression.Property(temp, "MemoryMappedFile")
-                        ),
+                        DLR.Expression.Property(temp, "IsMemoryMappedFile"),
+                        temp,
                         DLR.Expression.Call(
                             temp,
                             typeof(AType).GetMethod("Clone")
-                        ),
-                        temp
+                        )
                     )
                 );
 
@@ -390,17 +386,13 @@ namespace AplusCore.Compiler.AST
                         scope,
                         id,
                         DLR.Expression.Condition(
-                        DLR.Expression.Call(
-                            null,
-                            typeof(String).GetMethod("IsNullOrEmpty", BindingFlags.Public | BindingFlags.Static),
-                            DLR.Expression.Property(valuesParam, "MemoryMappedFile")
-                        ),
-                        DLR.Expression.Call(
+                            DLR.Expression.Property(valuesParam, "IsMemoryMappedFile"),
                             valuesParam,
-                            typeof(AType).GetMethod("Clone")
+                            DLR.Expression.Call(
+                                valuesParam,
+                                typeof(AType).GetMethod("Clone")
+                            )
                         ),
-                        valuesParam
-                    ),
                         isStrand: true
                     )
                 );

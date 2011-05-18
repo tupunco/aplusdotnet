@@ -15,10 +15,10 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
         {
             if (argument.SimpleArray())
             {
-                //The argument is simple array/scalar we clone it! 
-                return String.IsNullOrEmpty(argument.MemoryMappedFile) ?
-                    argument.Clone() :
-                    argument;
+                //The argument is simple array/scalar and not mapped we clone it! 
+                return argument.IsMemoryMappedFile ?
+                    argument :
+                    argument.Clone();
             }
             else
             {
