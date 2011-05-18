@@ -1,9 +1,10 @@
 ﻿using System;
 using System.IO;
-using Antlr.Runtime;
 #if DEBUG
 using System.Text;
 #endif
+
+using Antlr.Runtime;
 
 namespace AplusCore.Compiler
 {
