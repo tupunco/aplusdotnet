@@ -101,14 +101,10 @@ namespace AplusCore.Types
                 throw new Error.Rank("assign");
             }
 
-            if (value.Length == 1)
-            {
-                AType result;
-                if (!value.TryFirstScalar(out result, true))
-                {
-                    throw new Error.Rank("assign");
-                }
+            AType result;
 
+            if (value.Length == 1 && value.TryFirstScalar(out result, true))
+            {
                 if (target.Length == 1)
                 {
                     PerformIndexAssign(target, result);
@@ -120,7 +116,6 @@ namespace AplusCore.Types
                         PerformIndexAssign(item, result);
                     }
                 }
-
             }
             else if (target.Length == value.Length)
             {
