@@ -45,6 +45,22 @@ namespace AplusCore.Compiler.AST
         {
             Aplus runtime = scope.GetRuntime();
 
+            if (scope.IsEval && scope.IsMethod)
+            {
+                // we are inside a function and an eval block.
+
+                // override the original eval scope
+                // create a top level scope
+                scope = new AplusScope(null, "_EVAL_FUNC_SCOPE_",
+                    scope.GetRuntime(),
+                    scope.GetRuntimeExpression(),
+                    scope.Parent.GetModuleExpression(),
+                    scope.GetAplusEnvironment(),
+                    scope.ReturnTarget,
+                    isEval: true
+                );
+            }
+
             string methodName = this.name.BuildQualifiedName(runtime.CurrentContext);
 
             // 1. Create a new scope for the function
@@ -127,7 +143,7 @@ namespace AplusCore.Compiler.AST
 
             // ensure the result type to be an AType
             DLR.Expression result = DLR.Expression.Convert(setMethod, typeof(AType));
-
+            
             return result;
         }
 

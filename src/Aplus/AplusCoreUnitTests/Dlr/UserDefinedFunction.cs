@@ -155,6 +155,24 @@ namespace AplusCoreUnitTests.Dlr
         }
 
         [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestMethod]
+        public void FunctionInsideEval()
+        {
+            AType expected = AInteger.Create(101);
+
+            ScriptScope scope = this.engine.CreateScope();
+            scope.SetVariable(".h", 100);
+
+            this.engine.Execute<AType>("f{}: { h:=-10; eval 'g{}: h + 1'; -2 }", scope);
+            this.engine.Execute<AType>("f{}", scope);
+
+            Assert.IsTrue(scope.ContainsVariable(".g"), "Function '.g' not defined");
+
+            AType result = this.engine.Execute<AType>("g{}", scope);
+
+            Assert.AreEqual<AType>(expected, result, "Function call made incorrect calculation");
+        }
+
+        [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestMethod]
         [ExpectedException(typeof(Error.Valence))]
         public void FunctionValenceError()
         {
