@@ -57,7 +57,7 @@ namespace AplusCore.Types
 
         #region Overrides
 
-        public override AType Clone(bool isMemmoryMapped = false)
+        public override AType Clone()
         {
             return new AFloat(this.value);
         }

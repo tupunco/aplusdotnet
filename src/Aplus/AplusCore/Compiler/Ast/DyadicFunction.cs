@@ -75,8 +75,12 @@ namespace AplusCore.Compiler.AST
             {
                 DLR.Expression left = this.leftExpression.Generate(scope);
                 DLR.Expression right = this.rightExpression.Generate(scope);
-                // TODO: fix call for correct choose assignment.
-                result = GenerateDyadic(scope, right, left);
+
+                result = DLR.Expression.Call(
+                    DLR.Expression.Constant(DyadicFunctionInstance.Choose),
+                    DyadicFunctionInstance.Choose.GetType().GetMethod("Assign"),
+                    right, left, scope.GetAplusEnvironment()
+                );
             }
             else
             {

@@ -50,16 +50,17 @@ namespace AplusCore.Compiler.AST
                 DLR.Expression.Block(
                     new DLR.ParameterExpression[] { temp },
                     DLR.Expression.Assign(temp, this.expression.Generate(scope)),
-                    DLR.Expression.Call(
-                        temp,
-                        typeof(AType).GetMethod("Clone"),
-                        DLR.Expression.Not(
-                            DLR.Expression.Call(
-                                null,
-                                typeof(String).GetMethod("IsNullOrEmpty", BindingFlags.Public | BindingFlags.Static),
-                                DLR.Expression.Property(temp, "MemoryMappedFile")
-                            )
-                        )
+                    DLR.Expression.Condition(
+                        DLR.Expression.Call(
+                            null,
+                            typeof(String).GetMethod("IsNullOrEmpty", BindingFlags.Public | BindingFlags.Static),
+                            DLR.Expression.Property(temp, "MemoryMappedFile")
+                        ),
+                        DLR.Expression.Call(
+                            temp,
+                            typeof(AType).GetMethod("Clone")
+                        ),
+                        temp
                     )
                 );
 
@@ -388,22 +389,22 @@ namespace AplusCore.Compiler.AST
                     GenerateIdentifierAssign(
                         scope,
                         id,
+                        DLR.Expression.Condition(
+                        DLR.Expression.Call(
+                            null,
+                            typeof(String).GetMethod("IsNullOrEmpty", BindingFlags.Public | BindingFlags.Static),
+                            DLR.Expression.Property(valuesParam, "MemoryMappedFile")
+                        ),
                         DLR.Expression.Call(
                             valuesParam,
-                            typeof(AType).GetMethod("Clone"),
-                            DLR.Expression.Not(
-                                DLR.Expression.Call(
-                                    null,
-                                    typeof(String).GetMethod("IsNullOrEmpty", BindingFlags.Public | BindingFlags.Static),
-                                    DLR.Expression.Property(valuesParam, "MemoryMappedFile")
-                                )
-                            )
+                            typeof(AType).GetMethod("Clone")
                         ),
+                        valuesParam
+                    ),
                         isStrand: true
                     )
                 );
-
-
+                
                 // gather the global variables for dependency validation/invalidation. 
                 if((scope.IsMethod && id.IsEnclosed) || !scope.IsMethod)
                 {

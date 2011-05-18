@@ -9,22 +9,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
 {
     class Choose : AbstractDyadicFunction
     {
-        #region Variables
-
-        private List<AType> indexes;
-
-        #endregion
-
         #region Entry point
-
-        public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
-        {
-            return Compute(left, right);
-        }
-
-        #endregion
-
-        #region Computation
 
         /// <summary>
         /// Reconduct Choose to Bracket indexing.
@@ -32,7 +17,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        private AType Compute(AType left, AType right)
+        public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
         {
             //If the left side is Null then we clone the right side.
             if (left.Type == ATypes.ANull)
@@ -40,7 +25,16 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
                 return right;
             }
 
-            indexes = new List<AType>();
+            return right[GetIndexes(left, right)];
+        }
+
+        #endregion
+
+        #region Indexing
+
+        private List<AType> GetIndexes(AType left, AType right)
+        {
+            List<AType> indexes = new List<AType>();
 
             if (left.IsBox)
             {
@@ -65,7 +59,22 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
                 indexes.Add(left);
             }
 
-            return right[indexes];
+            return indexes;
+        }
+
+        #endregion
+
+        #region Assign
+
+        public AType Assign(AType right, AType left, AplusEnvironment environment)
+        {
+            //If the left side is Null then we clone the right side.
+            if (left.Type == ATypes.ANull)
+            {
+                return right;
+            }
+
+            return right.Indexing(GetIndexes(left,right),0, true);
         }
 
         #endregion

@@ -209,10 +209,10 @@ namespace AplusCore.Types
             return this.Data.ConvertToRestrictedWholeNumber(out result);
         }
 
-        public AType Clone(bool isMemmoryMapped = false)
+        public AType Clone()
         {
             // The clone of the 'Data' is an AValue for sure.
-            return new AReference((AValue)this.Data.Clone(isMemmoryMapped));
+            return new AReference((AValue)this.Data.Clone());
         }
 
         #endregion

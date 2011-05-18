@@ -71,9 +71,9 @@ namespace AplusCore.Types.MemoryMapped
 
         #region Overrides
 
-        public override AType Clone(bool isMemmoryMapped = false)
+        public override AType Clone()
         {
-            return isMemmoryMapped ? this : AInteger.Create(this.asInteger).Data;
+            return AInteger.Create(this.asInteger).Data;
         }
 
         public override bool Equals(object obj)

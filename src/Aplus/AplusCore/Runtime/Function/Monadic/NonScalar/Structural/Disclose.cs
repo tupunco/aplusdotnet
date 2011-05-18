@@ -16,7 +16,9 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
             if (argument.SimpleArray())
             {
                 //The argument is simple array/scalar we clone it! 
-                return argument.Clone();
+                return String.IsNullOrEmpty(argument.MemoryMappedFile) ?
+                    argument.Clone() :
+                    argument;
             }
             else
             {
@@ -35,7 +37,9 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
 
         private AType DiscloseNestedVector(AType argument, out List<int> shape)
         {
-            AType item = argument[0].NestedItem;
+            //TODO: Is Clone method correct here?
+            AType item = argument[0].NestedItem.Clone();
+
             ATypes type = item.Type;
             shape = item.Shape;
             int rank = item.Rank;
@@ -59,8 +63,8 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
 
             for (int i = 1; i < argument.Length; i++)
             {
-                // Get the nested item
-                item = argument[i].NestedItem;
+                //TODO: Is Clone method correct here?
+                item = argument[i].NestedItem.Clone();
 
                 // Uniform rules!
                 if (item.Type != type)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using AplusCore.Runtime;
 using AplusCore.Runtime.Function.Monadic;
+using AplusCore.Types.MemoryMapped;
 
 namespace AplusCore.Types
 {
@@ -18,12 +19,8 @@ namespace AplusCore.Types
         /// <param name="indexpos"></param>
         /// <param name="currentIdx">Array containing the current indexes</param>
         /// <returns></returns>
-        public static AType VectorIndexing(this AType input, List<AType> indexers, int indexpos, AType currentIdx)
+        public static AType VectorIndexing(this AType input, List<AType> indexers, int indexpos, AType currentIdx, bool isAssign)
         {
-            // Create an array for the results
-            //AArray result = new AArray(this.type);
-            AType result = AArray.Create(input.Type);
-
             if (currentIdx.Length == 0)
             {
                 // A Null item found!, select all of the current items
@@ -33,13 +30,16 @@ namespace AplusCore.Types
                 }
             }
 
+            // Create an array for the results
+            AType result = AArray.Create(input.Type);
+
             // Iterate over the indexes
             foreach (AType index in currentIdx)
             {
                 AType item =
                     index.IsArray ?
-                    input.VectorIndexing(indexers, indexpos, index) :
-                    input.SimpleIndex(indexers, indexpos, index);
+                    input.VectorIndexing(indexers, indexpos, index, isAssign) :
+                    input.SimpleIndex(indexers, indexpos, index, isAssign);
 
                 result.AddWithNoUpdate(item);
             }
@@ -48,7 +48,7 @@ namespace AplusCore.Types
             return result;
         }
 
-        public static AType Indexing(this AType input, List<AType> indexers, int indexpos)
+        public static AType Indexing(this AType input, List<AType> indexers, int indexpos, bool isAssign)
         {
             // Select the current indexer element
             AType currentIdx = indexers[indexpos];
@@ -56,18 +56,18 @@ namespace AplusCore.Types
             if (currentIdx.IsArray)
             {
                 // The indexer element is an Array handle that way
-                return input.VectorIndexing(indexers, indexpos, currentIdx);
+                return input.VectorIndexing(indexers, indexpos, currentIdx, isAssign);
             }
             else
             {
                 // The indexer element is a simple AType
-                return input.SimpleIndex(indexers, indexpos, currentIdx);
+                return input.SimpleIndex(indexers, indexpos, currentIdx, isAssign);
             }
 
         }
 
 
-        public static AType SimpleIndex(this AType input, List<AType> indexers, int indexpos, AType currentIdx)
+        public static AType SimpleIndex(this AType input, List<AType> indexers, int indexpos, AType currentIdx, bool isAssign)
         {
             // Get the current item, specified by the currentIdx
             AType item = input[currentIdx];
@@ -75,12 +75,11 @@ namespace AplusCore.Types
             if (item.IsArray && indexpos < indexers.Count - 1)
             {
                 // If it is an array and we can index further, then do so
-                return item.Indexing(indexers, indexpos + 1);
+                return item.Indexing(indexers, indexpos + 1, isAssign);
             }
             else
             {
-                // Simply return the item
-                return item;
+                return !isAssign && !String.IsNullOrEmpty(input.MemoryMappedFile) ? item.Clone() : item;
             }
         }
 
@@ -132,7 +131,7 @@ namespace AplusCore.Types
 
         private static void PerformIndexAssign(AType target, AType value)
         {
-            if (target.Shape.Count > 0)
+            if (target.Rank > 0)
             {
                 for (int i = 0; i < target.Length; i++)
                 {
@@ -143,7 +142,14 @@ namespace AplusCore.Types
             {
                 if (target.Type == value.Type)
                 {
-                    target.Data = value.Clone().Data;
+                    if (target.MemoryMappedFile != null)
+                    {
+                        ((MMAInteger)target.Data).SetValue(value.asInteger);
+                    }
+                    else
+                    {
+                        target.Data = value.Clone().Data;
+                    }
                 }
                 else if (target.Type == ATypes.AInteger && value.Type == ATypes.AFloat)
                 {

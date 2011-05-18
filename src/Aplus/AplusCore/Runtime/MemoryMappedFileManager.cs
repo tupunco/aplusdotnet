@@ -41,12 +41,6 @@ namespace AplusCore.Runtime
 
         #region Create
 
-        private void Collect()
-        {
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-        }
-
         public static long ComputeSize(AType argument)
         {
             return 1024 * 1024;
@@ -54,7 +48,8 @@ namespace AplusCore.Runtime
 
         public void CreateMemmoryMappedFile(string path, AType argument)
         {
-            Collect();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
 
             string memoryMappedFileName = EncodeName(path);
 

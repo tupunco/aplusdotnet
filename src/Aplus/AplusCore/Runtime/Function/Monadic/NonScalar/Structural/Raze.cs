@@ -30,7 +30,9 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
         {
             if (argument.SimpleArray())
             {
-                return argument.Clone();
+                return String.IsNullOrEmpty(argument.MemoryMappedFile) ?
+                    argument.Clone() :
+                    argument;
             }
             else
             {
@@ -173,7 +175,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
         {
             for (int i = 0; i < argument.Length; i++)
             {
-                this.result.AddWithNoUpdate(argument[i]);
+                this.result.AddWithNoUpdate(argument[i].Clone());
             }
 
             this.length += argument.Length;

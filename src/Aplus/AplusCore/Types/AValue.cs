@@ -207,7 +207,7 @@ namespace AplusCore.Types
         /// Clones the AType, returning a new instance containing the same values
         /// </summary>
         /// <returns>Cloned AType</returns>
-        public virtual AType Clone(bool isMemoryMapped = false)
+        public virtual AType Clone()
         {
             throw new NotImplementedException("Invalid use-case");
         }

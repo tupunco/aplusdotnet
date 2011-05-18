@@ -90,7 +90,7 @@ namespace AplusCore.Runtime.Function.Dyadic
 
         #region Selection
 
-        internal static readonly AbstractDyadicFunction Choose = new Choose();
+        internal static readonly Choose Choose = new Choose();
         internal static readonly AbstractDyadicFunction Left = new Left();
         internal static readonly Pick Pick = new Pick();
 

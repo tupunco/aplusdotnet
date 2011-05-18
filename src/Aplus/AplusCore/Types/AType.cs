@@ -122,7 +122,7 @@ namespace AplusCore.Types
         /// Clones the AType, returning a new instance containing the same values
         /// </summary>
         /// <returns>Cloned AType</returns>
-        AType Clone(bool isMemoryMapped = false);
+        AType Clone();
 
         #endregion
     }

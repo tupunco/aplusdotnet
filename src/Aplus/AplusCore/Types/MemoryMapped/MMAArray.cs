@@ -108,13 +108,8 @@ namespace AplusCore.Types.MemoryMapped
             this.mappedFile.Add(item);
         }
 
-        public override AType Clone(bool isMemmoryMapped = false)
+        public override AType Clone()
         {
-            if (isMemmoryMapped)
-            {
-                return this;
-            }
-
             AType result = AArray.Create(this.Type);
 
             for (int i = 0; i < this.Length; i++)

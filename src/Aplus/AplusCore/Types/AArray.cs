@@ -74,11 +74,16 @@ namespace AplusCore.Types
         {
             get
             {
-                return this.Indexing(indexers, 0);
+                if (indexers.Count == 1 && indexers[0].Length == 0 && !String.IsNullOrEmpty(this.MemoryMappedFile))
+                {
+                    return this;
+                }
+
+                return this.Indexing(indexers, 0, false);
             }
             set
             {
-                AType target = this.Indexing(indexers, 0);
+                AType target = this.Indexing(indexers, 0, true);
                 Utils.PerformAssign(target, value);
             }
         }
@@ -193,13 +198,13 @@ namespace AplusCore.Types
             this.Rank = this.Shape.Count;
         }
 
-        public override AType Clone(bool isMemmoryMapped = false)
+        public override AType Clone()
         {
             AArray result = new AArray(ATypes.AArray);
 
             foreach (AType item in items)
             {
-                result.AddWithNoUpdate(item.Clone(isMemmoryMapped));
+                result.AddWithNoUpdate(item.Clone());
             }
 
             result.Length = this.Length;

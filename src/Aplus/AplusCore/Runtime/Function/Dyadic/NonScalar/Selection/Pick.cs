@@ -87,8 +87,23 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
                 throw new Error.Type(TypeErrorText);
             }
 
+
             // Case 2: If the right argument is scalar than we wrap it to one-element vector.
-            AType rightArray = right.IsArray ? right : AArray.Create(right.Type, right);
+            AType rightArray;
+
+            if(right.IsArray)
+            {
+                rightArray = right;
+            }
+            else
+            {
+                rightArray = AArray.Create(
+                    right.Type,
+                    !String.IsNullOrEmpty(right.MemoryMappedFile) ?
+                        right.Clone() :
+                        right
+                    );
+            }
 
             if (left.IsBox)                         // Case 6
             {

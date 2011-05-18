@@ -10,7 +10,9 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Selection
     {
         public override AType Execute(AType argument, AplusEnvironment environment = null)
         {
-            return argument;
+            return !String.IsNullOrEmpty(argument.MemoryMappedFile) ?
+                argument.Clone() :
+                argument;
         }
     }
 }
