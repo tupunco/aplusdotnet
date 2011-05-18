@@ -112,13 +112,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
         public static string CreatePath(string name)
         {
-            StringBuilder builder = new StringBuilder();
-
-            builder.Append(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName);
-            builder.Append(@"\AplusCoreUnitTests\Dlr\MemoryMappedFile\Files\");
-            builder.Append(name);
-
-            return builder.ToString();
+            return Path.Combine(Directory.GetCurrentDirectory(), name);
         }
     }
 }
