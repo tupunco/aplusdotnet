@@ -18,7 +18,8 @@ namespace AplusCore.Types.MemoryMapped
 
         #region Construction
 
-        private MMAArray(MappedFile mappedFile) : base(ATypes.AArray)
+        private MMAArray(MappedFile mappedFile)
+            : base(ATypes.AArray)
         {
             this.mappedFile = mappedFile;
             this.items = new Dictionary<int, AType>();
@@ -60,10 +61,7 @@ namespace AplusCore.Types.MemoryMapped
 
         public override string MemoryMappedFile
         {
-            get
-            {
-                return this.mappedFile.Name;
-            }
+            get { return this.mappedFile.Name; }
         }
 
         #endregion
@@ -113,9 +111,9 @@ namespace AplusCore.Types.MemoryMapped
             AType result = AArray.Create(this.Type);
 
             for (int i = 0; i < this.Length; i++)
-			{
+            {
                 result.AddWithNoUpdate(this[i].Clone());
-			}
+            }
 
             result.Length = this.Length;
             result.Shape.Clear();

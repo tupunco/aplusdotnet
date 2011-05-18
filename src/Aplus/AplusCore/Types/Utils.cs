@@ -10,7 +10,6 @@ namespace AplusCore.Types
 {
     public static class Utils
     {
-        
         #region Indexing
         /// <summary>
         /// 
@@ -86,7 +85,7 @@ namespace AplusCore.Types
         #endregion
 
         #region Indexed Assign
-        
+
         internal static void PerformAssign(AType target, AType value)
         {
             if (!Utils.DifferentNumberType(target, value) && target.Type != value.Type)
@@ -183,7 +182,6 @@ namespace AplusCore.Types
         {
             return (left.Type == ATypes.AFloat && right.Type == ATypes.AInteger) ||
                    (right.Type == ATypes.AFloat && left.Type == ATypes.AInteger);
-
         }
 
 
@@ -258,9 +256,9 @@ namespace AplusCore.Types
             }
         }
 
-        ///<summary>
-        ///If the input paramter range of integer repressentation, we give back AInteger.
-        ///</summary>
+        /// <summary>
+        /// If the input paramter range of integer repressentation, we give back AInteger.
+        /// </summary>
         public static bool ConvertDoubleToInteger(double number, out int result)
         {
             if (Int32.MinValue <= number && number <= Int32.MaxValue && number % 1 == 0)
@@ -318,7 +316,7 @@ namespace AplusCore.Types
 
         public static bool IsSlotFiller(this AType vector, bool extended = false)
         {
-            //Vector must be box array.
+            // Vector must be box array.
             if (!vector.IsArray)
             {
                 return false;
@@ -326,20 +324,20 @@ namespace AplusCore.Types
 
             AType ravelVector = vector.Rank > 1 ? MonadicFunctionInstance.Ravel.Execute(vector) : vector;
 
-            //Form (symbol;value)
+            // Form (symbol;value)
             if (vector.Length != 2)
             {
                 return false;
             }
 
-            //Symbol and value must be box.
+            // Symbol and value must be box.
             if (!ravelVector[0].IsBox || !ravelVector[0].IsBox)
             {
                 return false;
             }
 
             AType symbol = MonadicFunctionInstance.Disclose.Execute(ravelVector[0]);
-            AType value =  MonadicFunctionInstance.Disclose.Execute(ravelVector[1]); 
+            AType value = MonadicFunctionInstance.Disclose.Execute(ravelVector[1]);
 
             // calculate symbols' size
             int symbolLength = CalculateLength(symbol, extended);
@@ -390,7 +388,7 @@ namespace AplusCore.Types
 
                 if (value.IsArray)
                 {
-                    //Value is a vector.
+                    // Value is a vector.
                     for (int i = 0; i < value.Length; i++)
                     {
                         if (value[i].IsPrimitiveFunction())
@@ -560,7 +558,7 @@ namespace AplusCore.Types
         /// <returns></returns>
         public static bool NestedArray(this AType argument)
         {
-           if (argument.IsArray)
+            if (argument.IsArray)
             {
                 foreach (AType item in argument)
                 {

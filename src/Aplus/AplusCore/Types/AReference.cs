@@ -67,50 +67,26 @@ namespace AplusCore.Types
 
         public ATypes Type
         {
-            get
-            {
-                return this.Data.Type;
-            }
-            set
-            {
-                this.Data.Type = value;
-            }
+            get { return this.Data.Type; }
+            set { this.Data.Type = value; }
         }
 
         public int Length
         {
-            get
-            {
-                return this.Data.Length;
-            }
-            set
-            {
-                this.Data.Length = value;
-            }
+            get { return this.Data.Length; }
+            set { this.Data.Length = value; }
         }
 
         public List<int> Shape
         {
-            get
-            {
-                return this.Data.Shape;
-            }
-            set
-            {
-                this.Data.Shape = value;
-            }
+            get { return this.Data.Shape; }
+            set { this.Data.Shape = value; }
         }
 
         public int Rank
         {
-            get
-            {
-                return this.Data.Rank;
-            }
-            set
-            {
-                this.Data.Rank = value;
-            }
+            get { return this.Data.Rank; }
+            set { this.Data.Rank = value; }
         }
 
         public AType this[int index]

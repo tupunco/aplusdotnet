@@ -41,7 +41,6 @@ namespace AplusCore.Types
 
         #region Overrides
 
-
         public override AType Clone()
         {
             return new ASymbol(symbolName);
@@ -74,6 +73,5 @@ namespace AplusCore.Types
         }
 
         #endregion
-
     }
 }

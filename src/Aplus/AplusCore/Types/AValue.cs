@@ -80,38 +80,20 @@ namespace AplusCore.Types
 
         public virtual AType this[int index]
         {
-            get
-            {
-                throw new Error.Rank("[]");
-            }
-            set
-            {
-                throw new Error.Rank("[]");
-            }
+            get { throw new Error.Rank("[]"); }
+            set { throw new Error.Rank("[]"); }
         }
 
         public virtual AType this[AType index]
         {
-            get
-            {
-                throw new Error.Rank("[]");
-            }
-            set
-            {
-                throw new Error.Rank("[]");
-            }
+            get { throw new Error.Rank("[]"); }
+            set { throw new Error.Rank("[]"); }
         }
 
         public virtual AType this[List<AType> indexers]
         {
-            get
-            {
-                throw new Error.Rank("[]");
-            }
-            set
-            {
-                throw new Error.Rank("[]");
-            }
+            get { throw new Error.Rank("[]"); }
+            set { throw new Error.Rank("[]"); }
         }
 
         public virtual AValue Data
@@ -199,8 +181,8 @@ namespace AplusCore.Types
         /// <returns>True if the item can be converted to integer otherwise False</returns>
         public virtual bool ConvertToRestrictedWholeNumber(out int result)
         {
-           result = -1; 
-           return false;
+            result = -1;
+            return false;
         }
 
         /// <summary>

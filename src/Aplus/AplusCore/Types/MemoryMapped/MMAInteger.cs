@@ -61,10 +61,7 @@ namespace AplusCore.Types.MemoryMapped
 
         public override string MemoryMappedFile
         {
-            get
-            {
-                return this.mappedFile.Name;
-            }
+            get { return this.mappedFile.Name; }
         }
 
         #endregion

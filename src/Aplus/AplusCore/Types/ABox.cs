@@ -21,15 +21,6 @@ namespace AplusCore.Types
             this.shape = new List<int>();
             this.rank = 0;
 
-            /*if (!item.IsBox && item.Type == ATypes.AFunc)
-            {
-                this.type = ATypes.AFunc;
-            }
-            else
-            {
-                this.type = type;
-            }*/
-
             this.type = item.Data is AFunc ? ATypes.AFunc : type;
         }
 
@@ -41,11 +32,6 @@ namespace AplusCore.Types
         #endregion
 
         #region Properties
-
-        //public override AValue Data
-        //{
-        //    get { return this; }
-        //}
 
         public override AType NestedItem
         {
@@ -61,7 +47,6 @@ namespace AplusCore.Types
         {
             get
             {
-                //return this.value.Type == ATypes.AFunc && !this.value.IsBox;
                 return this.value.Data is AFunc;
             }
         }
@@ -93,7 +78,7 @@ namespace AplusCore.Types
 
         public override int GetHashCode()
         {
-            return this.value.GetHashCode() ^ 0x0B; // BOX reverseed :)
+            return this.value.GetHashCode() ^ 0x0B; // BOX reversed :)
         }
 
         public override string ToString()
@@ -102,6 +87,5 @@ namespace AplusCore.Types
         }
 
         #endregion
-
     }
 }
