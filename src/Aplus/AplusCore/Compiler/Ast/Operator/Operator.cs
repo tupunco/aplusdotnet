@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace AplusCore.Compiler.AST
+﻿namespace AplusCore.Compiler.AST
 {
     public abstract class Operator : Node
     {

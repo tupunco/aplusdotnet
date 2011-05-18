@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using AplusCore.Runtime;
+using AplusCore.Runtime.Function.Dyadic;
+using AplusCore.Runtime.Function.Dyadic.NonScalar.Other;
+using AplusCore.Runtime.Function.Monadic;
+using AplusCore.Runtime.Function.Monadic.NonScalar.Other;
+using AplusCore.Types;
+
 using DLR = System.Linq.Expressions;
 using DYN = System.Dynamic;
-using AplusCore.Runtime;
-using AplusCore.Types;
-using AplusCore.Runtime.Function.Monadic;
-using AplusCore.Runtime.Function.Dyadic;
-using AplusCore.Runtime.Function.Monadic.NonScalar.Other;
-using AplusCore.Runtime.Function.Dyadic.NonScalar.Other;
-using System.Reflection;
 
 namespace AplusCore.Compiler.AST
 {
@@ -29,6 +30,7 @@ namespace AplusCore.Compiler.AST
         #endregion
 
         #region Constructor
+
         public Assign(Node target, Node expression)
         {
             this.target = target;
@@ -282,7 +284,6 @@ namespace AplusCore.Compiler.AST
 
             return result;
         }
-
 
         #endregion
 
@@ -697,6 +698,7 @@ namespace AplusCore.Compiler.AST
         #endregion
 
         #region GraphViz output (Only in DEBUG)
+
 #if DEBUG
         static int counter = 0;
         internal override string ToDot(string parent, System.Text.StringBuilder text)
@@ -713,6 +715,7 @@ namespace AplusCore.Compiler.AST
             return thisID;
         }
 #endif
+
         #endregion
     }
 

@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using DLR = System.Linq.Expressions;
-using DYN = System.Dynamic;
-using System.Text;
+
 using AplusCore.Runtime;
-using AplusCore.Runtime.Function.Operator.Monadic;
 using AplusCore.Runtime.Function.Operator.Dyadic;
+using AplusCore.Runtime.Function.Operator.Monadic;
+
+using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
@@ -82,7 +81,6 @@ namespace AplusCore.Compiler.AST
             return result;
         }
 
-
         #endregion
 
         #region overrides
@@ -129,6 +127,7 @@ namespace AplusCore.Compiler.AST
         #endregion
 
         #region GraphViz output (Only in DEBUG)
+
 #if DEBUG
         static int counter = 0;
         internal override string ToDot(string parent, System.Text.StringBuilder text)
@@ -155,6 +154,7 @@ namespace AplusCore.Compiler.AST
             return name;
         }
 #endif
+
         #endregion
     }
 

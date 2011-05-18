@@ -1,30 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
+using System.Text;
+
 using AplusCore.Runtime;
-using DLR = System.Linq.Expressions;
 using AplusCore.Types;
+
+using DLR = System.Linq.Expressions;
 using DYN = System.Dynamic;
-using Microsoft.Scripting;
-using AplusCore.Runtime.Function.Monadic;
 
 namespace AplusCore.Compiler.AST
 {
     public class UserDefInvoke : Node
     {
         #region Variables
+
         private ExpressionList arguments;
         private Identifier method;
+
         #endregion
 
         #region Constructor
+
         public UserDefInvoke(Identifier method, ExpressionList arguments)
         {
             this.method = method;
             this.arguments = arguments;
         }
+
         #endregion
 
         #region DLR Generator
@@ -139,6 +142,7 @@ namespace AplusCore.Compiler.AST
         #endregion
 
         #region GraphViz output (Only in DEBUG)
+
 #if DEBUG
         private static int counter = 0;
         internal override string ToDot(string parent, StringBuilder textBuilder)
@@ -156,8 +160,8 @@ namespace AplusCore.Compiler.AST
             return name;
         }
 #endif
-        #endregion
 
+        #endregion
     }
 
     #region Construction helper

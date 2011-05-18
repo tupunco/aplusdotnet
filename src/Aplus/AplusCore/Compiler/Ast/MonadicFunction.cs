@@ -1,10 +1,11 @@
 ﻿using System;
+
 using AplusCore.Compiler.Grammar;
-using DLR = System.Linq.Expressions;
 using AplusCore.Runtime;
-using AplusCore.Types;
-using DYN = System.Dynamic;
 using AplusCore.Runtime.Function.Monadic;
+using AplusCore.Types;
+
+using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
@@ -129,6 +130,7 @@ namespace AplusCore.Compiler.AST
         #endregion
 
         #region GraphViz output (Only in DEBUG)
+
 #if DEBUG
         static int counter = 0;
         internal override string ToDot(string parent, System.Text.StringBuilder textBuilder)
@@ -142,11 +144,13 @@ namespace AplusCore.Compiler.AST
             return name;
         }
 #endif
+
         #endregion
 
     }
 
     #region Construction helper
+
     public partial class Node
     {
 
@@ -156,5 +160,6 @@ namespace AplusCore.Compiler.AST
         }
 
     }
+
     #endregion
 }

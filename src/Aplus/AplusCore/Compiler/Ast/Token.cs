@@ -1,4 +1,5 @@
 ﻿using System;
+
 using AplusCore.Compiler.Grammar;
 
 namespace AplusCore.Compiler.AST
@@ -60,6 +61,7 @@ namespace AplusCore.Compiler.AST
         #endregion
 
         #region GraphViz output (Only in DEBUG)
+
 #if DEBUG
         static int counter = 0;
         internal override string ToDot(string parent, System.Text.StringBuilder text)
@@ -69,10 +71,12 @@ namespace AplusCore.Compiler.AST
             return this.ToString();
         }
 #endif
+
         #endregion
     }
 
     #region Construction helper
+
     public partial class Node
     {
         public static Token Token(Tokens tokentype, string text = null)
@@ -81,5 +85,6 @@ namespace AplusCore.Compiler.AST
         }
 
     }
+
     #endregion
 }

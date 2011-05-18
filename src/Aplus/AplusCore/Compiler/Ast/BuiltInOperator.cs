@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using DLR = System.Linq.Expressions;
-using DYN = System.Dynamic;
+
 using AplusCore.Runtime;
-using AplusCore.Types;
-using AplusCore.Runtime.Function.Operator.Monadic;
 using AplusCore.Runtime.Function.Operator.Dyadic;
+using AplusCore.Runtime.Function.Operator.Monadic;
+using AplusCore.Types;
+
+using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {

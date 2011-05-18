@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
+
 using AplusCore.Compiler.Grammar;
-using DLR = System.Linq.Expressions;
-using DYN = System.Dynamic;
 using AplusCore.Runtime;
-using AplusCore.Types;
 using AplusCore.Runtime.Function.Dyadic;
-using AplusCore.Runtime.Function.Monadic;
-using AplusCore.Runtime.Function.Dyadic.NonScalar.Selection;
+using AplusCore.Types;
+
+using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
     public class DyadicFunction : Node
     {
-
         #region Variables
 
         private Token token;
@@ -193,6 +190,7 @@ namespace AplusCore.Compiler.AST
         #endregion
 
         #region GraphViz output (Only in DEBUG)
+
 #if DEBUG
         private static int counter = 0;
         internal override string ToDot(string parent, System.Text.StringBuilder textBuilder)
@@ -208,10 +206,12 @@ namespace AplusCore.Compiler.AST
             return name;
         }
 #endif
+
         #endregion
     }
 
     #region Construction helper
+
     public partial class Node
     {
         public static Node DyadicFunction(Token token, Node leftExpression, Node rightExpression)
@@ -219,5 +219,6 @@ namespace AplusCore.Compiler.AST
             return new DyadicFunction(token, leftExpression, rightExpression);
         }
     }
+
     #endregion
 }
