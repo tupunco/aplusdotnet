@@ -156,6 +156,8 @@
     <Compile Include="Dlr\Function\Monadic\NonScalar\Type.cs" />
     <Compile Include="Dlr\Function\Monadic\NonScalar\Unpack.cs" />
     <Compile Include="Dlr\Function\Monadic\NonScalar\Value.cs" />
+    <Compile Include="Dlr\MemoryMappedFile\Map.cs" />
+    <Compile Include="Dlr\MemoryMappedFile\Operations.cs" />
     <Compile Include="Dlr\Operator\Dyadic\Apply.cs" />
     <Compile Include="Dlr\Operator\Dyadic\Each.cs" />
     <Compile Include="Dlr\Operator\Dyadic\InnerProduct\IPAddMultiply.cs" />
@@ -214,7 +216,9 @@
       <Name>AplusCore</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Dlr\MemoryMappedFile\Files\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
