@@ -1,17 +1,7 @@
 ﻿using System;
-using AplusCore.Types;
-using System.Globalization;
-using System.Threading;
-using Microsoft.Scripting.Hosting;
-using AplusCore.Runtime;
-using System.Reflection;
-using AplusCore.Compiler;
-using Microsoft.Scripting.Runtime;
-using System.Text;
 
 namespace Aplus
 {
-
     class Program
     {
         static void Main(string[] args)

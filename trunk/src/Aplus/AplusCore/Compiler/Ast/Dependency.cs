@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
+using System.Linq;
+
+using AplusCore.Compiler.Grammar;
+using AplusCore.Runtime;
+using AplusCore.Types;
 
 using DLR = System.Linq.Expressions;
 using DYN = System.Dynamic;
-
-using AplusCore.Runtime;
-using AplusCore.Types;
-using AplusCore.Compiler.Grammar;
 
 namespace AplusCore.Compiler.AST
 {
@@ -202,6 +201,7 @@ namespace AplusCore.Compiler.AST
     }
 
     #region Construction helper
+
     partial class Node
     {
         public static Dependency Dependency(Node variable, Node functionBody, string codeText, Variables variables)
@@ -211,5 +211,6 @@ namespace AplusCore.Compiler.AST
             return new Dependency((Identifier)variable, functionBody, codeText, variables);
         }
     }
+
     #endregion
 }

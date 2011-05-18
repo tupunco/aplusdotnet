@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+
 using AplusCore.Runtime;
 
 using DLR = System.Linq.Expressions;
@@ -120,6 +121,7 @@ namespace AplusCore.Compiler.AST
         #endregion
 
         #region GraphViz output (Only in DEBUG)
+
 #if DEBUG
         private static int counter = 0;
         internal override string ToDot(string parent, System.Text.StringBuilder textBuilder)
@@ -135,11 +137,12 @@ namespace AplusCore.Compiler.AST
             return name;
         }
 #endif
-        #endregion
 
+        #endregion
     }
 
     #region Construction helper
+
     public partial class Node
     {
         /// <summary>
@@ -171,5 +174,6 @@ namespace AplusCore.Compiler.AST
             return list;
         }
     }
+
     #endregion
 }

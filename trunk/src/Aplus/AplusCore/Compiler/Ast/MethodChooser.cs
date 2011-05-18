@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AplusCore.Runtime.Function.Monadic;
-using AplusCore.Compiler.AST;
+﻿using System.Collections.Generic;
+
 using AplusCore.Compiler.Grammar;
-using AplusCore.Runtime;
 using AplusCore.Runtime.Function.Dyadic;
+using AplusCore.Runtime.Function.Monadic;
 
 namespace AplusCore.Compiler.AST
 {

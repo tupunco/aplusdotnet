@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+
 using AplusCore.Compiler.Grammar;
 using AplusCore.Runtime;
 
@@ -96,6 +96,7 @@ namespace AplusCore.Compiler.AST
         #endregion
 
         #region DLR Generator
+
         /// <summary>
         /// Generate the DLR expression tree for the AST node
         /// </summary>
@@ -105,6 +106,7 @@ namespace AplusCore.Compiler.AST
         {
             throw new NotImplementedException("Should !NEVER! reach this point. If this shown, then not all AST Nodes overridden this method!");
         }
+
         #endregion
 
         #region overrides
@@ -127,12 +129,14 @@ namespace AplusCore.Compiler.AST
         #endregion
 
         #region GraphViz output (Only in DEBUG)
+
 #if DEBUG
         internal virtual string ToDot(string parent, System.Text.StringBuilder text)
         {
             throw new NotImplementedException("Should !NEVER! reach this point. ONLY for DEBUG!");
         }
 #endif
+
         #endregion
 
         #region Operator overloads

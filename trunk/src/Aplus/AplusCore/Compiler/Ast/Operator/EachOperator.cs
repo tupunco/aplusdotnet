@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using DLR = System.Linq.Expressions;
-using DYN = System.Dynamic;
-using System.Text;
+
 using AplusCore.Runtime;
-using AplusCore.Runtime.Function.Monadic.Operator;
-using AplusCore.Runtime.Function.Monadic;
-using AplusCore.Types;
-using AplusCore.Runtime.Function.Operator.Monadic;
 using AplusCore.Runtime.Function.Operator.Dyadic;
+using AplusCore.Runtime.Function.Operator.Monadic;
+using AplusCore.Types;
+
+using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
@@ -117,6 +114,7 @@ namespace AplusCore.Compiler.AST
         #endregion
 
         #region overrides
+
         public override string ToString()
         {
             if (isDyadic)
@@ -159,6 +157,7 @@ namespace AplusCore.Compiler.AST
         #endregion
 
         #region GraphViz output (Only in DEBUG)
+
 #if DEBUG
         static int counter = 0;
         internal override string ToDot(string parent, System.Text.StringBuilder text)
@@ -183,6 +182,7 @@ namespace AplusCore.Compiler.AST
             return name;
         }
 #endif
+
         #endregion
     }
 
@@ -190,7 +190,6 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
-
         public static EachOperator EachOperator(Node function)
         {
             return new EachOperator(function);
@@ -217,7 +216,6 @@ namespace AplusCore.Compiler.AST
             op.OperatorToken = opToken;
             return op;
         }
-
     }
 
     #endregion
