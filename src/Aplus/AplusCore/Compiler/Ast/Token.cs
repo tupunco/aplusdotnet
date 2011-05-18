@@ -6,27 +6,31 @@ namespace AplusCore.Compiler.AST
     public class Token : Node
     {
         #region Private Fields
+
         private string text;
         private Tokens tokenType;
+
         #endregion
 
         #region Constructor
+
         public Token(Tokens tokenType, string text = null)
         {
             this.tokenType = tokenType;
             this.text = text;
-
-            //Console.WriteLine("{0}", this);
         }
+
         #endregion
 
         #region Properties
+
         public Tokens Type
         {
             get { return this.tokenType; }
             set { this.tokenType = value; }
         }
         public string Text { get { return this.text; } }
+
         #endregion
 
         #region Overridden

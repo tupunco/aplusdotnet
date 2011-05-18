@@ -82,7 +82,8 @@ namespace AplusCore.Compiler.AST
         /// <summary>
         /// Method to use for comparing target value and case values
         /// </summary>
-        private static MethodInfo comparisonMethod = typeof(Case).GetMethod("CaseCheck", BindingFlags.Static | BindingFlags.NonPublic);
+        private static MethodInfo comparisonMethod = 
+            typeof(Case).GetMethod("CaseCheck", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// This is the expected result of the case check if there is a match

@@ -60,7 +60,6 @@ namespace AplusCore.Compiler
             {
                 return Parse.String(file.ReadToEnd(), mode);
             }
-
         }
 
 #if DEBUG

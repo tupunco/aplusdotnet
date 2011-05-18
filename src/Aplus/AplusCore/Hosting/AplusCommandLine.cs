@@ -15,10 +15,8 @@ using System.Diagnostics;
 
 namespace AplusCore.Hosting
 {
-
     public class AplusCommandLine : CommandLine
     {
-
         #region Properties
 
         public AplusLanguageContext AplusLanguageContext { get { return (AplusLanguageContext)this.Language; } }
@@ -60,7 +58,6 @@ namespace AplusCore.Hosting
         #endregion
 
         #region Methods
-
 
         private ScriptCodeParseResult GetCommandPropertiesAndParse(string code, out ScriptSource source)
         {

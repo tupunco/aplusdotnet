@@ -164,7 +164,7 @@ namespace AplusCore.Runtime
 
         public string Write(AType result)
         {
-            return AplusLanguageContext.FromatAType(result, this.Runtime);
+            return AplusLanguageContext.FormatAType(result, this.Runtime);
         }
 
         #endregion
@@ -172,7 +172,7 @@ namespace AplusCore.Runtime
         #region Static Methods
 
         // Todo: extend it to correctly return the values like the original a+ interpreter
-        public static string FromatAType(AType value, Aplus runtime)
+        public static string FormatAType(AType value, Aplus runtime)
         {
             if (value.IsBox || ((value is AReference) && ((AReference)value).Data is AFunc))
             {

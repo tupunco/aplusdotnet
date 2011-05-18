@@ -115,9 +115,7 @@ namespace AplusCore.Compiler.AST
                 throw new Error.Parse(String.Format("Unknow ConstantType({0}) in current context", this.type));
             }
 
-            DLR.Expression result = DLR.Expression.Constant(
-                    items, typeof(AType)
-                );
+            DLR.Expression result = DLR.Expression.Constant(items, typeof(AType));
             // Example: .Constant<AplusCore.Types.AArray`1[AplusCore.Types.AInteger]>(1 2)
             return result;
 

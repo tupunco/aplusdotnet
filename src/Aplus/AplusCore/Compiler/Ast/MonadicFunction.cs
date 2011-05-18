@@ -99,17 +99,12 @@ namespace AplusCore.Compiler.AST
             // Handle the result monadic function a little differently:
             if (this.token.Type == Tokens.RESULT)
             {
-                result = scope.ReturnTarget != null ?
+                result = scope.ReturnTarget != null 
                     // If inside of a function create a return expression Tree
-                    DLR.Expression.Return(
-                        scope.ReturnTarget,
-                        argument,
-                        typeof(AType)
-                        )
+                    ? DLR.Expression.Return(scope.ReturnTarget, argument, typeof(AType))
                     // Otherwise just return the value
                     : argument
                 ;
-
             }
             else
             {
