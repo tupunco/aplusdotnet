@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace AplusCore.Compiler
 {
@@ -20,6 +17,7 @@ namespace AplusCore.Compiler
         #endregion
 
         #region Constructors
+
         public ParseException(string message)
             : base(message)
         {
@@ -37,6 +35,7 @@ namespace AplusCore.Compiler
         {
             this.cancontinue = canContinue;
         }
+
         #endregion
     }
 }

@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 using Microsoft.Scripting;
 using Microsoft.Scripting.Runtime;
-using DYN = System.Dynamic;
-using DLR = System.Linq.Expressions;
-using AplusCore.Types;
-using AplusCore.Runtime;
 
+using AplusCore.Runtime;
+using AplusCore.Types;
+
+using DLR = System.Linq.Expressions;
+using DYN = System.Dynamic;
 
 namespace AplusCore.Compiler
 {
