@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AplusCore.Types;
-using System.IO.MemoryMappedFiles;
 using System.IO;
-using System.Runtime.InteropServices;
-using AplusCore.Types.MemoryMapped;
+using System.IO.MemoryMappedFiles;
+
+using AplusCore.Types;
 
 namespace AplusCore.Runtime
 {

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+
 using AplusCore.Types;
 
 namespace AplusCore.Runtime
 {
     public class SystemVariables
     {
-
         #region Variables
 
         /// <summary>
@@ -53,6 +50,5 @@ namespace AplusCore.Runtime
         }
 
         #endregion
-
     }
 }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace AplusCore.Runtime
 {
@@ -10,7 +7,6 @@ namespace AplusCore.Runtime
     /// </summary>
     class StopException : Exception
     {
-
         #region Constructors
 
         public StopException()
