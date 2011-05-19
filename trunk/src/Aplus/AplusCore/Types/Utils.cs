@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 using AplusCore.Runtime;
 using AplusCore.Runtime.Function.Monadic;
 using AplusCore.Types.MemoryMapped;
