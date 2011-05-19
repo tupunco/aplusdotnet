@@ -1,6 +1,4 @@
-﻿using System;
-
-using DYN = System.Dynamic;
+﻿using DYN = System.Dynamic;
 
 namespace AplusCore.Runtime.Binder
 {

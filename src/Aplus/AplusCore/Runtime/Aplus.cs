@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Dynamic;
-using DLR = System.Linq.Expressions;
+
 using Microsoft.Scripting.Runtime;
+
 using AplusCore.Compiler;
 using AplusCore.Types;
+
+using DYN = System.Dynamic;
 
 namespace AplusCore.Runtime
 {
@@ -14,7 +14,7 @@ namespace AplusCore.Runtime
     {
         #region Variables
 
-        private ExpandoObject globals;
+        private DYN.ExpandoObject globals;
         private Scope dlrglobals;
 
         private SystemVariables sysvars;
@@ -62,7 +62,7 @@ namespace AplusCore.Runtime
             this.dependencies = new DependencyManager();
 
             this.dlrglobals = dlrglobals;
-            this.globals = new ExpandoObject();
+            this.globals = new DYN.ExpandoObject();
 
             this.sysvars["mode"] = ASymbol.Create(parsemode.ToString().ToLower());
 
@@ -149,9 +149,9 @@ namespace AplusCore.Runtime
             }
         }
 
-        private Dictionary<CallInfo, Binder.InvokeBinder> _invokeBinders =
-            new Dictionary<CallInfo, Binder.InvokeBinder>();
-        internal Binder.InvokeBinder InvokeBinder(CallInfo callInfo)
+        private Dictionary<DYN.CallInfo, Binder.InvokeBinder> _invokeBinders =
+            new Dictionary<DYN.CallInfo, Binder.InvokeBinder>();
+        internal Binder.InvokeBinder InvokeBinder(DYN.CallInfo callInfo)
         {
             lock (this._invokeBinders)
             {
@@ -166,9 +166,9 @@ namespace AplusCore.Runtime
             }
         }
 
-        private Dictionary<CallInfo, Binder.GetIndexBinder> _getIndexBinders =
-            new Dictionary<CallInfo, Binder.GetIndexBinder>();
-        internal Binder.GetIndexBinder GetIndexBinder(CallInfo callInfo)
+        private Dictionary<DYN.CallInfo, Binder.GetIndexBinder> _getIndexBinders =
+            new Dictionary<DYN.CallInfo, Binder.GetIndexBinder>();
+        internal Binder.GetIndexBinder GetIndexBinder(DYN.CallInfo callInfo)
         {
             lock (this._getIndexBinders)
             {
@@ -183,9 +183,9 @@ namespace AplusCore.Runtime
             }
         }
 
-        private Dictionary<CallInfo, Binder.SetIndexBinder> _setIndexBinders =
-            new Dictionary<CallInfo, Binder.SetIndexBinder>();
-        internal Binder.SetIndexBinder SetIndexBinder(CallInfo callInfo)
+        private Dictionary<DYN.CallInfo, Binder.SetIndexBinder> _setIndexBinders =
+            new Dictionary<DYN.CallInfo, Binder.SetIndexBinder>();
+        internal Binder.SetIndexBinder SetIndexBinder(DYN.CallInfo callInfo)
         {
             lock (this._setIndexBinders)
             {
