@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace AplusCore.Types
+﻿namespace AplusCore.Types
 {
     public class AFunc : AValue
     {
