@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 using AplusCore.Types;
-using AplusCore.Runtime.Function.Monadic.Scalar.Miscellaneous;
 
 namespace AplusCore.Runtime.Function.Dyadic.Scalar.Miscellaneous
 {

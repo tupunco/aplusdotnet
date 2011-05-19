@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace AplusCore.Runtime.Function.Operator.Monadic
+﻿namespace AplusCore.Runtime.Function.Operator.Monadic
 {
     class MonadicOperatorInstance
     {

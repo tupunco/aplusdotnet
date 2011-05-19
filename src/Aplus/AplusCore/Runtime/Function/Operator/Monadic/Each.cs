@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AplusCore.Types;
-using DLR = System.Linq.Expressions;
-using DYN = System.Dynamic;
+
 using AplusCore.Runtime.Function.Monadic;
+using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.Operator.Monadic
 {

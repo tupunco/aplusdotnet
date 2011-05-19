@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AplusCore.Types;
-using AplusCore.Runtime.Function.Dyadic.Scalar;
+﻿using AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison;
+using AplusCore.Runtime.Function.Dyadic.NonScalar.Computational;
+using AplusCore.Runtime.Function.Dyadic.NonScalar.Other;
+using AplusCore.Runtime.Function.Dyadic.NonScalar.Selection;
+using AplusCore.Runtime.Function.Dyadic.NonScalar.Structural;
+using AplusCore.Runtime.Function.Dyadic.Product;
 using AplusCore.Runtime.Function.Dyadic.Scalar.Arithmetic;
+using AplusCore.Runtime.Function.Dyadic.Scalar.Bitwise;
+using AplusCore.Runtime.Function.Dyadic.Scalar.Elementary;
 using AplusCore.Runtime.Function.Dyadic.Scalar.Logical;
 using AplusCore.Runtime.Function.Dyadic.Scalar.Miscellaneous;
 using AplusCore.Runtime.Function.Dyadic.Scalar.Relational;
-using AplusCore.Runtime.Function.Dyadic.Scalar.Elementary;
-using AplusCore.Runtime.Function.Dyadic.NonScalar.Structural;
-using AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison;
-using AplusCore.Runtime.Function.Dyadic.NonScalar.Selection;
-using AplusCore.Runtime.Function.Dyadic.NonScalar.Other;
-using AplusCore.Runtime.Function.Dyadic.NonScalar.Computational;
-using AplusCore.Runtime.Function.Dyadic.Product;
-using AplusCore.Runtime.Function.Dyadic.Scalar.Bitwise;
 
 namespace AplusCore.Runtime.Function.Dyadic
 {
