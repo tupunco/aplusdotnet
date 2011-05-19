@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AplusCore.Runtime.Function.Monadic.Scalar;
-using AplusCore.Runtime.Function.Monadic.Scalar.Arithmetic;
-using AplusCore.Runtime.Function.Monadic.Scalar.Miscellaneous;
-using AplusCore.Runtime.Function.Monadic.Scalar.Logical;
-using AplusCore.Runtime.Function.Monadic.Scalar.Elementary;
-using AplusCore.Runtime.Function.Monadic.NonScalar.Structural;
+﻿using AplusCore.Runtime.Function.Monadic.NonScalar.Comprasion;
+using AplusCore.Runtime.Function.Monadic.NonScalar.Computational;
 using AplusCore.Runtime.Function.Monadic.NonScalar.Informational;
-using AplusCore.Runtime.Function.Monadic.NonScalar.Comprasion;
 using AplusCore.Runtime.Function.Monadic.NonScalar.Other;
 using AplusCore.Runtime.Function.Monadic.NonScalar.Selection;
-using AplusCore.Runtime.Function.Monadic.NonScalar.Computational;
+using AplusCore.Runtime.Function.Monadic.NonScalar.Structural;
 using AplusCore.Runtime.Function.Monadic.Operator.Reduction;
 using AplusCore.Runtime.Function.Monadic.Operator.Scan;
-using AplusCore.Runtime.Function.Monadic.Operator;
+using AplusCore.Runtime.Function.Monadic.Scalar.Arithmetic;
+using AplusCore.Runtime.Function.Monadic.Scalar.Elementary;
+using AplusCore.Runtime.Function.Monadic.Scalar.Logical;
+using AplusCore.Runtime.Function.Monadic.Scalar.Miscellaneous;
 
 namespace AplusCore.Runtime.Function.Monadic
 {

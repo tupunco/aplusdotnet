@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AplusCore.Types;
+﻿using System.Collections.Generic;
 using System.Reflection;
-using Microsoft.Scripting.Utils;
+
+using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.Dyadic
 {

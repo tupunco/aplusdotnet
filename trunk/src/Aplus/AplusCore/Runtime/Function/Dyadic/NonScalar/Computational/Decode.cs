@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 using AplusCore.Types;
-using AplusCore.Runtime.Function.Monadic;
 
 namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
 {

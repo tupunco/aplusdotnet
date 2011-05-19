@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 using Microsoft.Scripting.Utils;
-using DLR = System.Linq.Expressions;
-using AplusCore.Types;
+
 using AplusCore.Compiler;
+using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
 {

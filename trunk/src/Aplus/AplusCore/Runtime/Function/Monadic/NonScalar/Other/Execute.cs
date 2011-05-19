@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Scripting.Utils;
+
+using AplusCore.Types;
+
 using DLR = System.Linq.Expressions;
 using DYN = System.Dynamic;
-using AplusCore.Types;
-using AplusCore.Compiler;
-
 
 namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
 {

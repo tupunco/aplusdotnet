@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using AplusCore.Runtime.Function.Dyadic;
 using AplusCore.Types;
-using AplusCore.Runtime.Function.Dyadic;
 
 namespace AplusCore.Runtime.Function.Monadic.Operator.Scan
 {
