@@ -293,8 +293,11 @@
     <Compile Include="Types\AInteger.cs" />
     <Compile Include="Types\AFloat.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Types\MemoryMapped\IMapped.cs" />
     <Compile Include="Types\MemoryMapped\MMAArray.cs" />
     <Compile Include="Types\MemoryMapped\MMAArrayIterator.cs" />
+    <Compile Include="Types\MemoryMapped\MMAChar.cs" />
+    <Compile Include="Types\MemoryMapped\MMAFloat.cs" />
     <Compile Include="Types\MemoryMapped\MMAInteger.cs" />
     <Compile Include="Types\Utils.cs" />
   </ItemGroup>

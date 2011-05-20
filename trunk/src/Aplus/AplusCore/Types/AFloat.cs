@@ -14,7 +14,7 @@ namespace AplusCore.Types
 
         #region Constructor
 
-        private AFloat(double number)
+        protected AFloat(double number)
         {
             this.value = number;
 
@@ -40,7 +40,7 @@ namespace AplusCore.Types
         {
             get
             {
-                return Utils.ComparisonTolerance(this.value, Math.Round(this.value));
+                return Utils.ComparisonTolerance(this.asFloat, Math.Round(this.asFloat));
             }
         }
 
@@ -48,9 +48,9 @@ namespace AplusCore.Types
 
         #region Converter Properties
 
-        public override int asInteger { get { return (int)this.value; } }
+        public override int asInteger { get { return (int)this.asFloat; } }
         public override double asFloat { get { return this.value; } }
-        public override string asString { get { return this.value.ToString(); } }
+        public override string asString { get { return this.asFloat.ToString(); } }
 
         #endregion
 
@@ -58,7 +58,7 @@ namespace AplusCore.Types
 
         public override AType Clone()
         {
-            return new AFloat(this.value);
+            return new AFloat(this.asFloat);
         }
 
         public override bool Equals(object obj)
@@ -66,7 +66,7 @@ namespace AplusCore.Types
             if (obj is AFloat)
             {
                 AFloat other = (AFloat)obj;
-                return this.value == other.value;
+                return this.asFloat == other.value;
             }
             else if (obj is AInteger)
             {
@@ -79,18 +79,18 @@ namespace AplusCore.Types
 
         public override int GetHashCode()
         {
-            return this.value.GetHashCode();
+            return this.asFloat.GetHashCode();
         }
 
         public override string ToString()
         {
-            return this.value.ToString(CultureInfo.InvariantCulture);
+            return this.asFloat.ToString(CultureInfo.InvariantCulture);
         }
 
         public override bool ConvertToRestrictedWholeNumber(out int result)
         {
-            double roundedValue = Math.Round(this.value);
-            if (Math.Abs(this.value - roundedValue) < 1e-13)
+            double roundedValue = Math.Round(this.asFloat);
+            if (Math.Abs(this.asFloat - roundedValue) < 1e-13)
             {
                 return Utils.ConvertDoubleToInteger(roundedValue, out result);
             }
@@ -100,7 +100,7 @@ namespace AplusCore.Types
 
         public override int CompareTo(AType other)
         {
-            return this.value.CompareTo(other.asFloat);
+            return this.asFloat.CompareTo(other.asFloat);
         }
 
         #endregion

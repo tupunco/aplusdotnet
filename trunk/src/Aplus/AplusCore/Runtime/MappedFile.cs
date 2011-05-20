@@ -3,6 +3,8 @@ using System.IO.MemoryMappedFiles;
 
 using AplusCore.Types;
 using AplusCore.Types.MemoryMapped;
+using System.Runtime.InteropServices;
+using System;
 
 namespace AplusCore.Runtime
 {
@@ -10,22 +12,28 @@ namespace AplusCore.Runtime
     {
         #region Variables
 
+        delegate void WriteAType(long position, AType value);
+        delegate AType ReadAType(long position);
+
         private List<int> cellShape;
         private int cellLength = -1;
+        private ReadAType reader;
+        private WriteAType writer;
+        private int size = -1;
 
         private MemoryMappedFile memoryMappedFile;
         private MemoryMappedViewAccessor accessor;
-        private long cursor;
 
-        private static readonly byte TypePosition = 4;
-        private static readonly byte RankPosition = 8;
-        private static readonly byte ItemCountPosition = 12;
-        private static readonly byte ShapePosition = 16;
-        private static readonly byte LeadingAxesPosition = 52;
+        private static readonly byte TypePosition           = 4;
+        private static readonly byte RankPosition           = 8;
+        private static readonly byte ItemCountPosition      = 12;
+        private static readonly byte ShapePosition          = 16;
+        private static readonly byte LeadingAxesPosition    = 52;
         private static readonly byte ItemPosition = 56;
 
-        private static readonly int IntSize = 4;
-        //private static readonly int doubleSize              = 8;
+        private static readonly int ByteSize        = Marshal.SizeOf(typeof(byte));
+        private static readonly int IntSize         = Marshal.SizeOf(typeof(int));
+        private static readonly int DoubleSize      = Marshal.SizeOf(typeof(double));
 
         #endregion
 
@@ -129,6 +137,84 @@ namespace AplusCore.Runtime
             }
         }
 
+        public int Size
+        {
+            get
+            {
+                if (this.size == -1)
+                {
+                    switch (this.Type)
+                    {
+                        case ATypes.AFloat:
+                            this.size = DoubleSize;
+                            break;
+
+                        case ATypes.AChar:
+                            this.size = ByteSize;
+                            break;
+                        
+                        default:
+                            this.size = IntSize;
+                            break;
+                    }
+                }
+
+                return this.size;
+            }
+        }
+
+        private ReadAType Reader
+        {
+            get
+            {
+                if (this.reader == null)
+                {
+                    switch (this.Type)
+                    {
+                        case ATypes.AFloat:
+                            this.reader = new ReadAType(ReadMMAFloat);
+                            break;
+
+                        case ATypes.AChar:
+                            this.reader = new ReadAType(ReadMMAChar);
+                            break;
+
+                        default:
+                            this.reader = new ReadAType(ReadMMAInteger);
+                            break;
+                    }
+                }
+
+                return this.reader;
+            }
+        }
+
+        private WriteAType Writer
+        {
+            get
+            {
+                if (this.writer == null)
+                {
+                    switch (this.Type)
+                    {
+                        case ATypes.AFloat:
+                            this.writer = new WriteAType(WriteFloat);
+                            break;
+
+                        case ATypes.AChar:
+                            this.writer = new WriteAType(WriteChar);
+                            break;
+
+                        default:
+                            this.writer = new WriteAType(WriteInteger);
+                            break;
+                    }
+                }
+
+                return this.writer;
+            }
+        }
+
         #endregion
 
         #region Construction
@@ -137,15 +223,6 @@ namespace AplusCore.Runtime
         {
             this.memoryMappedFile = memoryMappedFile;
             this.accessor = memoryMappedFile.CreateViewAccessor();
-        }
-
-        public static AType Read(MemoryMappedFile memoryMappedFile)
-        {
-            MappedFile mappedFile = new MappedFile(memoryMappedFile);
-
-            return mappedFile.Rank > 0 ?
-                MMAArray.Create(mappedFile) :
-                MMAInteger.Create(ItemPosition, mappedFile);
         }
 
         #endregion
@@ -167,14 +244,34 @@ namespace AplusCore.Runtime
 
         #region Write/Read With Accessor
 
+        public char ReadChar(long position)
+        {
+            return Convert.ToChar(this.accessor.ReadByte(position));
+        }
+
         public int ReadInt32(long position)
         {
             return this.accessor.ReadInt32(position);
         }
 
+        public double ReadDouble(long position)
+        {
+            return this.accessor.ReadDouble(position);
+        }
+
         public void WriteInt32(long position, int value)
         {
             this.accessor.Write(position, value);
+        }
+
+        public void WriteDouble(long position, double value)
+        {
+            this.accessor.Write(position, value);
+        }
+
+        public void WriteChar(long position, char value)
+        {
+            this.accessor.Write(position, Convert.ToByte(value));
         }
 
         #endregion
@@ -196,37 +293,61 @@ namespace AplusCore.Runtime
             }
 
             this.WriteInt32(ItemCountPosition, allItem);
-            this.cursor = ItemPosition;
 
             this.LeadingAxes = argument.Rank > 0 ? argument.Shape[0] : 1;
 
-            Write(argument);
+            long position = ItemPosition;
+
+            Write(argument, ref position);
         }
 
-        private void Write(AType argument)
+        private void Write(AType argument, ref long position)
         {
             if (argument.Rank > 0)
             {
                 foreach (AType item in argument)
                 {
-                    Write(item);
+                    Write(item, ref position);
                 }
             }
             else
             {
-                WriteInt32(this.cursor, argument.asInteger);
-                this.cursor += IntSize;
+                this.Writer(position, argument);
+                position += this.Size;
             }
         }
 
+        private void WriteInteger(long position, AType value)
+        {
+            WriteInt32(position, value.asInteger);
+        }
+
+        private void WriteFloat(long position, AType value)
+        {
+            WriteDouble(position, value.asFloat);
+        }
+
+        private void WriteChar(long position, AType value)
+        {
+            WriteChar(position, value.asChar);
+        }
 
         #endregion
 
         #region Read
 
+        public static AType Read(MemoryMappedFile memoryMappedFile)
+        {
+            MappedFile mappedFile = new MappedFile(memoryMappedFile);
+
+            return mappedFile.Rank > 0 ?
+                MMAArray.Create(mappedFile) :
+                mappedFile.Reader(ItemPosition);
+        }
+
         public AType ReadCell(int index)
         {
-            long position = ItemPosition + (index * this.CellShapeCount * IntSize);
+            long position = ItemPosition + (index * this.CellShapeCount * this.Size);
 
             return CreateAArray(this.CellShape, ref position);
         }
@@ -250,12 +371,26 @@ namespace AplusCore.Runtime
             }
             else
             {
-                AType result = MMAInteger.Create(position, this);
-                position += IntSize;
+                AType result = this.Reader(position);
+                position += this.Size;
                 return result;
             }
         }
 
+        private AType ReadMMAInteger(long position)
+        {
+            return MMAInteger.Create(position, this);
+        }
+
+        private AType ReadMMAFloat(long position)
+        {
+            return MMAFloat.Create(position, this);
+        }
+
+        private AType ReadMMAChar(long position)
+        {
+            return MMAChar.Create(position, this);
+        }
 
         #endregion
 
@@ -263,9 +398,9 @@ namespace AplusCore.Runtime
 
         public void Add(AType argument)
         {
-            this.cursor = this.ItemCount * IntSize + ItemPosition;
+            long position = this.ItemCount * this.Size + ItemPosition;
 
-            Write(argument);
+            Write(argument, ref position);
 
             this.Length = (argument.Rank > 1 ? argument.Length : 1) + this.Length;
         }

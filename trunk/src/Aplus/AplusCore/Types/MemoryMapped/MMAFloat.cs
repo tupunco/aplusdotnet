@@ -2,7 +2,7 @@
 
 namespace AplusCore.Types.MemoryMapped
 {
-    public class MMAInteger : AInteger, IMapped
+    class MMAFloat : AFloat, IMapped
     {
         #region Variables
 
@@ -13,9 +13,9 @@ namespace AplusCore.Types.MemoryMapped
 
         #region Properties
 
-        public override int asInteger
+        public override double asFloat
         {
-            get { return this.mappedFile.ReadInt32(this.position); }
+            get { return this.mappedFile.ReadDouble(this.position); }
         }
 
         public override bool IsMemoryMappedFile
@@ -27,7 +27,7 @@ namespace AplusCore.Types.MemoryMapped
 
         #region Constructor
 
-        private MMAInteger(long position, MappedFile mappedFile)
+        private MMAFloat(long position, MappedFile mappedFile)
             : base(0)
         {
             this.position = position;
@@ -36,7 +36,7 @@ namespace AplusCore.Types.MemoryMapped
 
         public static AType Create(long position, MappedFile mappedFile)
         {
-            return new AReference(new MMAInteger(position, mappedFile));
+            return new AReference(new MMAFloat(position, mappedFile));
         }
 
         #endregion
@@ -45,7 +45,7 @@ namespace AplusCore.Types.MemoryMapped
 
         public void Update(AType value)
         {
-            this.mappedFile.WriteInt32(this.position, value.asInteger);
+            this.mappedFile.WriteDouble(this.position, value.asFloat);
         }
 
         #endregion

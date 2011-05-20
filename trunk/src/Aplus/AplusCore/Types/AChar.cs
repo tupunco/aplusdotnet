@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 
 namespace AplusCore.Types
 {
@@ -12,7 +13,7 @@ namespace AplusCore.Types
 
         #region Constructor
 
-        private AChar(char text)
+        protected AChar(char text)
         {
             this.value = text;
 
@@ -40,7 +41,7 @@ namespace AplusCore.Types
 
         public override AType Clone()
         {
-            return new AChar(this.value);
+            return new AChar(this.asChar);
         }
 
         public override bool Equals(object obj)
@@ -48,7 +49,7 @@ namespace AplusCore.Types
             if (obj is AChar)
             {
                 AChar other = (AChar)obj;
-                return this.value == other.value;
+                return this.asChar == other.value;
             }
 
             return false;
@@ -56,17 +57,17 @@ namespace AplusCore.Types
 
         public override int GetHashCode()
         {
-            return this.value.GetHashCode();
+            return this.asChar.GetHashCode();
         }
 
         public override string ToString()
         {
-            return this.value.ToString();
+            return this.asChar.ToString();
         }
 
         public override int CompareTo(AType other)
         {
-            return this.value.CompareTo(other.asChar);
+            return this.asChar.CompareTo(other.asChar);
         }
 
         #endregion

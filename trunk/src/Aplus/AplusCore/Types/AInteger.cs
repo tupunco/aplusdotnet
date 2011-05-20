@@ -39,8 +39,8 @@ namespace AplusCore.Types
         #region Converter Properties
 
         public override int asInteger { get { return this.value; } }
-        public override double asFloat { get { return (double)this.value; } }
-        public override string asString { get { return this.value.ToString(); } }
+        public override double asFloat { get { return (double)this.asInteger; } }
+        public override string asString { get { return this.asInteger.ToString(); } }
 
         #endregion
 
@@ -48,7 +48,7 @@ namespace AplusCore.Types
 
         public override AType Clone()
         {
-            return new AInteger(this.value);
+            return new AInteger(this.asInteger);
         }
 
         public override bool Equals(object obj)
@@ -69,17 +69,17 @@ namespace AplusCore.Types
 
         public override int GetHashCode()
         {
-            return this.value.GetHashCode();
+            return this.asInteger.GetHashCode();
         }
 
         public override string ToString()
         {
-            return this.value.ToString();
+            return this.asInteger.ToString();
         }
 
         public override bool ConvertToRestrictedWholeNumber(out int result)
         {
-            result = value;
+            result = this.asInteger;
             return true;
         }
 
