@@ -138,30 +138,38 @@ namespace AplusCore.Types
             }
             else
             {
+                AValue result;
+
                 if (target.Type == value.Type)
                 {
-                    if (target.IsMemoryMappedFile)
-                    {
-                        ((MMAInteger)target.Data).SetValue(value.asInteger);
-                    }
-                    else
-                    {
-                        target.Data = value.Clone().Data;
-                    }
+                    result = value.Clone().Data;
                 }
                 else if (target.Type == ATypes.AInteger && value.Type == ATypes.AFloat)
                 {
-                    int result;
-                    if (!value.ConvertToRestrictedWholeNumber(out result))
+                    int number;
+                    if (!value.ConvertToRestrictedWholeNumber(out number))
                     {
                         throw new Error.Type("assign");
                     }
 
-                    target.Data = AInteger.Create(result).Data;
+                    result = AInteger.Create(number).Data;
                 }
                 else if (target.Type == ATypes.AFloat && value.Type == ATypes.AInteger)
                 {
-                    target.Data = AFloat.Create(value.asInteger).Data;
+                    result = AFloat.Create(value.asInteger).Data;
+                }
+                else
+                {
+                    throw new Error.Type("Assign");
+                }
+
+                if (target.IsMemoryMappedFile)
+                {
+                    ((IMapped)target.Data).Update(result);
+                }
+                else
+                {
+                    target.Data = result;
                 }
             }
         }

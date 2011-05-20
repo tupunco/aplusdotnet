@@ -8,22 +8,6 @@ namespace AplusCore.Runtime
 {
     public class MemoryMappedFileManager
     {
-        #region Variables
-
-        private const byte typePosition         = 4;
-        private const byte rankPosition         = 8;
-        private const byte lengthPosition       = 12;
-        private const byte shapePosition        = 16;
-        private const byte leadingAxesPosition  = 52;
-        private const byte itemPosition         = 56;
-
-        private const int intSize       = 4;
-        private const int doubleSize    = 8;
-
-        //private Dictionary<string, MemoryMappedViewAccessor> accessors;
-        
-        #endregion
-
         #region Encode
 
         private string EncodeName(string name)

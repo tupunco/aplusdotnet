@@ -1,8 +1,9 @@
 ﻿using AplusCore.Runtime;
+using System;
 
 namespace AplusCore.Types.MemoryMapped
 {
-    public class MMAInteger : AInteger, IMapped
+    class MMAChar : AChar, IMapped
     {
         #region Variables
 
@@ -13,9 +14,9 @@ namespace AplusCore.Types.MemoryMapped
 
         #region Properties
 
-        public override int asInteger
+        public override char asChar
         {
-            get { return this.mappedFile.ReadInt32(this.position); }
+            get { return this.mappedFile.ReadChar(this.position); }
         }
 
         public override bool IsMemoryMappedFile
@@ -27,8 +28,8 @@ namespace AplusCore.Types.MemoryMapped
 
         #region Constructor
 
-        private MMAInteger(long position, MappedFile mappedFile)
-            : base(0)
+        private MMAChar(long position, MappedFile mappedFile)
+            : base(' ')
         {
             this.position = position;
             this.mappedFile = mappedFile;
@@ -36,7 +37,7 @@ namespace AplusCore.Types.MemoryMapped
 
         public static AType Create(long position, MappedFile mappedFile)
         {
-            return new AReference(new MMAInteger(position, mappedFile));
+            return new AReference(new MMAChar(position, mappedFile));
         }
 
         #endregion
@@ -45,7 +46,7 @@ namespace AplusCore.Types.MemoryMapped
 
         public void Update(AType value)
         {
-            this.mappedFile.WriteInt32(this.position, value.asInteger);
+            this.mappedFile.WriteChar(this.position, value.asChar);
         }
 
         #endregion
