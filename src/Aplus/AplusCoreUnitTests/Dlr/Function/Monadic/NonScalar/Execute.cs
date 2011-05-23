@@ -54,7 +54,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Execute"), TestMethod]
-        public void FuncionAssignExecute()
+        public void FunctionAssignExecute()
         {
             AType expected = AInteger.Create(20);
 
@@ -70,7 +70,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Execute"), TestMethod]
-        public void FuncionCombinedLookupsExecute()
+        public void FunctionCombinedLookupsExecute()
         {
             AType expected = AInteger.Create(21);
 
@@ -87,7 +87,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
 
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Execute"), TestMethod]
-        public void FuncionDyadicDoExecute()
+        public void FunctionDyadicDoExecute()
         {
             AType expected = AInteger.Create(2);
 
