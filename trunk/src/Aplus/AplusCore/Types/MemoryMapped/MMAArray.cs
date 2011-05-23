@@ -10,7 +10,7 @@ namespace AplusCore.Types.MemoryMapped
     {
         #region Variables
 
-        private Dictionary<int, ValueType> indexCash;
+        private Dictionary<int, ValueType> indexCache;
 
         private MappedFile mappedFile;
         private ConditionalWeakTable<ValueType, AType> items;
@@ -24,7 +24,7 @@ namespace AplusCore.Types.MemoryMapped
         {
             this.mappedFile = mappedFile;
             this.items = new ConditionalWeakTable<ValueType, AType>();
-            this.indexCash = new Dictionary<int, ValueType>();
+            this.indexCache = new Dictionary<int, ValueType>();
         }
 
         public static AType Create(MappedFile mappedFile)
@@ -138,12 +138,12 @@ namespace AplusCore.Types.MemoryMapped
 
         private ValueType GetIndex(int index)
         {
-            if (!this.indexCash.ContainsKey(index))
+            if (!this.indexCache.ContainsKey(index))
             {
-                this.indexCash[index] = index;
+                this.indexCache[index] = index;
             }
 
-            return this.indexCash[index];
+            return this.indexCache[index];
         }
 
         #endregion
