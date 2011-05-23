@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AplusCore.Types;
 using System.IO;
 using Microsoft.Scripting.Hosting;
+using AplusCore.Runtime;
 
 namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 {
@@ -17,6 +18,8 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
         {
             this.engine.Execute<AType>(CreateMapInCreator("IntegerScalar.m", "67"));
             this.engine.Execute<AType>(CreateMapInCreator("Integer23.m","2 3 rho 5 6 7 9 8 2"));
+            this.engine.Execute<AType>(CreateMapInCreator("Float22.m", "2 2 rho 3.4 1.4 7.6 1.1"));
+            this.engine.Execute<AType>(CreateMapInCreator("Char25.m", "2 5 rho 'HelloWorld'"));
         }
 
         [TestCleanup]
@@ -25,18 +28,16 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
-            string name = CreatePath("IntegerScalar.m");
+            string[] files = new string[] { "IntegerScalar.m", "Integer23.m", "Float22.m", "Char25.m" };
 
-            if (File.Exists(name))
+            for (int i = 0; i < files.Length; i++)
             {
-                File.Delete(name);
-            }
+                string name = CreatePath(files[i]);
 
-            name = CreatePath("Integer23.m");
-
-            if (File.Exists(name))
-            {
-                File.Delete(name);
+                if (File.Exists(name))
+                {
+                    File.Delete(name);
+                }
             }
         }
 
@@ -76,6 +77,60 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             this.engine.Execute<AType>("a[1;2] := 55", scope);
             AType result = this.engine.Execute<AType>("b", scope);
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+
+            scope.RemoveVariable(".a");
+            scope.RemoveVariable(".b");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Map"), TestMethod]
+        public void ReadAndWriteFloatArray()
+        {
+            AType expected = AArray.Create(
+                ATypes.AFloat,
+                AArray.Create(
+                    ATypes.AFloat,
+                    AFloat.Create(3.4),
+                    AFloat.Create(8)
+                ),
+                AArray.Create(
+                    ATypes.AFloat,
+                    AFloat.Create(7.6),
+                    AFloat.Create(1.1)
+                )
+            );
+
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("a := " + CreateMapIn(1, "Float22.m"), scope);
+            this.engine.Execute<AType>("b := " + CreateMapIn(1, "Float22.m"), scope);
+
+            this.engine.Execute<AType>("((0;1) # b) := 8", scope);
+            AType result = this.engine.Execute<AType>("a", scope);
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+
+            scope.RemoveVariable(".a");
+            scope.RemoveVariable(".b");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Map"), TestMethod]
+        public void ReadAndWriteCharArray()
+        {
+            AType expected = AArray.Create(
+                ATypes.AChar,
+                Helpers.BuildString("Hello"),
+                Helpers.BuildString("City ")
+            );
+
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("a := " + CreateMapIn(1, "Char25.m"), scope);
+            this.engine.Execute<AType>("b := " + CreateMapIn(1, "Char25.m"), scope);
+
+            this.engine.Execute<AType>("(1 drop b) := 1 5 rho 'City '", scope);
+            AType result = this.engine.Execute<AType>("a", scope);
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
