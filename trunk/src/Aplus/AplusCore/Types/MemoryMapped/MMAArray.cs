@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 using AplusCore.Runtime;
 
@@ -8,8 +10,10 @@ namespace AplusCore.Types.MemoryMapped
     {
         #region Variables
 
+        private Dictionary<int, ValueType> indexCash;
+
         private MappedFile mappedFile;
-        private Dictionary<int, AType> items;
+        private ConditionalWeakTable<ValueType, AType> items;
 
         #endregion
 
@@ -19,7 +23,8 @@ namespace AplusCore.Types.MemoryMapped
             : base(ATypes.AArray)
         {
             this.mappedFile = mappedFile;
-            this.items = new Dictionary<int, AType>();
+            this.items = new ConditionalWeakTable<ValueType, AType>();
+            this.indexCash = new Dictionary<int, ValueType>();
         }
 
         public static AType Create(MappedFile mappedFile)
@@ -71,12 +76,17 @@ namespace AplusCore.Types.MemoryMapped
             {
                 if (index >= 0 && this.Length > index)
                 {
-                    if (!this.items.ContainsKey(index))
+                    AType item;
+
+                    ValueType indexValue = GetIndex(index);
+
+                    if (!this.items.TryGetValue(indexValue, out item))
                     {
-                        this.items[index] = this.mappedFile.ReadCell(index);
+                        item = this.mappedFile.ReadCell(index);
+                        this.items.Add(indexValue, item);
                     }
 
-                    return this.items[index];
+                    return item;
                 }
                 else
                 {
@@ -124,6 +134,16 @@ namespace AplusCore.Types.MemoryMapped
         public override int GetHashCode()
         {
             return base.GetHashCode() ^ this.items.GetHashCode();
+        }
+
+        private ValueType GetIndex(int index)
+        {
+            if (!this.indexCash.ContainsKey(index))
+            {
+                this.indexCash[index] = index;
+            }
+
+            return this.indexCash[index];
         }
 
         #endregion

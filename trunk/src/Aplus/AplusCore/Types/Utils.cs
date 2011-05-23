@@ -17,7 +17,7 @@ namespace AplusCore.Types
         /// <param name="indexpos"></param>
         /// <param name="currentIdx">Array containing the current indexes</param>
         /// <returns></returns>
-        public static AType VectorIndexing(this AType input, List<AType> indexers, int indexpos, AType currentIdx, bool isAssign)
+        public static AType VectorIndexing(this AType input, List<AType> indexers, int indexpos, AType currentIdx, bool isAssign, bool isMemoryMapped)
         {
             if (currentIdx.Length == 0)
             {
@@ -36,8 +36,8 @@ namespace AplusCore.Types
             {
                 AType item =
                     index.IsArray ?
-                    input.VectorIndexing(indexers, indexpos, index, isAssign) :
-                    input.SimpleIndex(indexers, indexpos, index, isAssign);
+                    input.VectorIndexing(indexers, indexpos, index, isAssign, isMemoryMapped) :
+                    input.SimpleIndex(indexers, indexpos, index, isAssign, isMemoryMapped);
 
                 result.AddWithNoUpdate(item);
             }
@@ -46,7 +46,7 @@ namespace AplusCore.Types
             return result;
         }
 
-        public static AType Indexing(this AType input, List<AType> indexers, int indexpos, bool isAssign)
+        public static AType Indexing(this AType input, List<AType> indexers, int indexpos, bool isAssign, bool isMemoryMapped)
         {
             // Select the current indexer element
             AType currentIdx = indexers[indexpos];
@@ -54,18 +54,18 @@ namespace AplusCore.Types
             if (currentIdx.IsArray)
             {
                 // The indexer element is an Array handle that way
-                return input.VectorIndexing(indexers, indexpos, currentIdx, isAssign);
+                return input.VectorIndexing(indexers, indexpos, currentIdx, isAssign, isMemoryMapped);
             }
             else
             {
                 // The indexer element is a simple AType
-                return input.SimpleIndex(indexers, indexpos, currentIdx, isAssign);
+                return input.SimpleIndex(indexers, indexpos, currentIdx, isAssign, isMemoryMapped);
             }
 
         }
 
 
-        public static AType SimpleIndex(this AType input, List<AType> indexers, int indexpos, AType currentIdx, bool isAssign)
+        public static AType SimpleIndex(this AType input, List<AType> indexers, int indexpos, AType currentIdx, bool isAssign, bool isMemoryMapped)
         {
             // Get the current item, specified by the currentIdx
             AType item = input[currentIdx];
@@ -73,11 +73,11 @@ namespace AplusCore.Types
             if (item.IsArray && indexpos < indexers.Count - 1)
             {
                 // If it is an array and we can index further, then do so
-                return item.Indexing(indexers, indexpos + 1, isAssign);
+                return item.Indexing(indexers, indexpos + 1, isAssign, isMemoryMapped);
             }
             else
             {
-                return !isAssign && input.IsMemoryMappedFile ? item.Clone() : item;
+                return !isAssign && isMemoryMapped ? item.Clone() : item;
             }
         }
 

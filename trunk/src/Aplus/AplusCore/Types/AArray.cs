@@ -78,11 +78,11 @@ namespace AplusCore.Types
                     return this;
                 }
 
-                return this.Indexing(indexers, 0, false);
+                return this.Indexing(indexers, 0, false, this.IsMemoryMappedFile);
             }
             set
             {
-                AType target = this.Indexing(indexers, 0, true);
+                AType target = this.Indexing(indexers, 0, true, this.IsMemoryMappedFile);
                 Utils.PerformAssign(target, value);
             }
         }

@@ -72,7 +72,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
                 return right;
             }
 
-            return right.Indexing(GetIndexes(left,right),0, true);
+            return right.Indexing(GetIndexes(left,right),0, true, right.IsMemoryMappedFile);
         }
 
         #endregion

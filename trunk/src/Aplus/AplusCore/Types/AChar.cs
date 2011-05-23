@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System;
 
 namespace AplusCore.Types
 {
@@ -49,7 +48,7 @@ namespace AplusCore.Types
             if (obj is AChar)
             {
                 AChar other = (AChar)obj;
-                return this.asChar == other.value;
+                return this.asChar == other.asChar;
             }
 
             return false;
