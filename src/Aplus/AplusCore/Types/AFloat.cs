@@ -66,7 +66,7 @@ namespace AplusCore.Types
             if (obj is AFloat)
             {
                 AFloat other = (AFloat)obj;
-                return this.asFloat == other.value;
+                return this.asFloat == other.asFloat;
             }
             else if (obj is AInteger)
             {
