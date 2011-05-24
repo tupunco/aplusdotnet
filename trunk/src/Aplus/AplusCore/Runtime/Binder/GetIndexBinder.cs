@@ -20,47 +20,58 @@ namespace AplusCore.Runtime.Binder
 
         public override DYN.DynamicMetaObject FallbackGetIndex(DYN.DynamicMetaObject target, DYN.DynamicMetaObject[] indexes, DYN.DynamicMetaObject errorSuggestion)
         {
-            DYN.BindingRestrictions restriction = DYN.BindingRestrictions.GetTypeRestriction(
-                target.Expression, target.RuntimeType
-            );
+            DLR.Expression expression;
+            DYN.BindingRestrictions restriction;
 
-            var indexer = DLR.Expression.Convert(indexes[0].Expression, typeof(List<Types.AType>));
+            if (indexes.Length == 1 && indexes[0].HasValue && indexes[0].Value == null)
+            {
+                restriction = DYN.BindingRestrictions.GetExpressionRestriction(
+                        DLR.Expression.Equal(indexes[0].Expression, DLR.Expression.Constant(null))
+                );
 
-            var rankCheck = DLR.Expression.IfThen(
-                DLR.Expression.LessThan(
-                    DLR.Expression.Property(target.Expression, "Rank"),
-                    DLR.Expression.Property(indexer, "Count")
-                ),
-                DLR.Expression.Throw(
-                    DLR.Expression.New(typeof(Error.Rank).GetConstructor(new Type[] { typeof(string) }), 
+                expression = target.Expression;
+            }
+            else
+            {
+                restriction = DYN.BindingRestrictions.GetTypeRestriction(
+                    indexes[0].Expression, typeof(List<Types.AType>)
+                );
+
+                var indexer = DLR.Expression.Convert(indexes[0].Expression, typeof(List<Types.AType>));
+
+                var rankCheck = DLR.Expression.IfThen(
+                    DLR.Expression.LessThan(
+                        DLR.Expression.Property(target.Expression, "Rank"),
+                        DLR.Expression.Property(indexer, "Count")
+                    ),
+                    DLR.Expression.Throw(
+                        DLR.Expression.New(typeof(Error.Rank).GetConstructor(new Type[] { typeof(string) }),
                     //DLR.Expression.Constant("[]")
                     // FIXME-LATER: This is just for debug, so remove it later:
-                        DLR.Expression.Call(
-                            DLR.Expression.Property(indexer, "Count"),
-                            typeof(Int32).GetMethod("ToString", new Type[] {})
+                            DLR.Expression.Call(
+                                DLR.Expression.Property(indexer, "Count"),
+                                typeof(Int32).GetMethod("ToString", new Type[] { })
+                            )
                         )
                     )
-                )
-            );        
+                );
 
-            DLR.Expression expression = DLR.Expression.Block(
-                rankCheck,
-                DLR.Expression.MakeIndex(
-                    DLR.Expression.Convert(target.Expression, typeof(Types.AType)), 
-                    GetIndexBinder.AArrayIndexerProperty,
-                    new DLR.Expression[] { indexer }
-                )
-            );
+                expression = DLR.Expression.Block(
+                    rankCheck,
+                    DLR.Expression.MakeIndex(
+                        DLR.Expression.Convert(target.Expression, typeof(Types.AType)),
+                        GetIndexBinder.AArrayIndexerProperty,
+                        new DLR.Expression[] { indexer }
+                    )
+                );
+            }
 
-
-            var dynobj = new DYN.DynamicMetaObject(
+            DYN.DynamicMetaObject dynobj = new DYN.DynamicMetaObject(
                 expression,
-                restriction
+                DYN.BindingRestrictions.GetTypeRestriction(target.Expression, target.RuntimeType).Merge(restriction)
             );
-
 
             return dynobj;
-
         }
     }
 }

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.Scripting.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AplusCore.Types;
+
 using AplusCore;
-using Microsoft.Scripting.Hosting;
 using AplusCore.Runtime;
+using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr
 {
@@ -162,6 +159,26 @@ namespace AplusCoreUnitTests.Dlr
             Assert.AreEqual(expected_a, result_a, "Incorrect assignment performed");
         }
 
+        [TestCategory("DLR"), TestCategory("Indexing"), TestMethod]
+        public void ReplaceScalarIndexing()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+            scope.SetVariable(".a", AInteger.Create(100));
+
+            this.engine.Execute<AType>("a[] := -500", scope);
+
+            Assert.AreEqual(AInteger.Create(-500), scope.GetVariable<AType>(".a"), "Incorrect assignment performed");
+        }
+
+        [TestCategory("DLR"), TestCategory("Indexing"), TestMethod]
+        [ExpectedException(typeof(Error.Type))]
+        public void ReplaceScalarIndexingTypeError()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+            scope.SetVariable(".a", AInteger.Create(100));
+
+            this.engine.Execute<AType>("a[] := 'F'", scope);
+        }
 
         [TestCategory("DLR"), TestCategory("Indexing"), TestMethod]
         [ExpectedException(typeof(Error.Type))]
