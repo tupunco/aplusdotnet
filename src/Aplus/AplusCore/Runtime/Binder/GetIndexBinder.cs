@@ -23,7 +23,6 @@ namespace AplusCore.Runtime.Binder
             DYN.BindingRestrictions restriction = DYN.BindingRestrictions.GetTypeRestriction(
                 target.Expression, target.RuntimeType
             );
-            var endLabel = DLR.Expression.Label(typeof(Types.AType), "EXIT");
 
             var indexer = DLR.Expression.Convert(indexes[0].Expression, typeof(List<Types.AType>));
 
@@ -46,12 +45,10 @@ namespace AplusCore.Runtime.Binder
 
             DLR.Expression expression = DLR.Expression.Block(
                 rankCheck,
-                DLR.Expression.Label(endLabel, 
-                    DLR.Expression.MakeIndex(
-                        DLR.Expression.Convert(target.Expression, typeof(Types.AType)), 
-                        GetIndexBinder.AArrayIndexerProperty,
-                        new DLR.Expression[] { indexer }
-                    )
+                DLR.Expression.MakeIndex(
+                    DLR.Expression.Convert(target.Expression, typeof(Types.AType)), 
+                    GetIndexBinder.AArrayIndexerProperty,
+                    new DLR.Expression[] { indexer }
                 )
             );
 
