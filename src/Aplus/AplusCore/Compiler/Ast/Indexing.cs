@@ -6,6 +6,7 @@ using AplusCore.Runtime;
 using AplusCore.Types;
 
 using DLR = System.Linq.Expressions;
+using DYN = System.Dynamic;
 
 namespace AplusCore.Compiler.AST
 {
@@ -39,39 +40,57 @@ namespace AplusCore.Compiler.AST
 
         public override DLR.Expression Generate(AplusScope scope)
         {
-            // Generate each indexer expression in reverse order
-            // the reverse order is to mimic the A+ evaulation order
-            IEnumerable<DLR.Expression> indexerValues = this.indexExpression.Items.Reverse().Select(
-                item => { return item.Generate(scope); }
-            );
+            DLR.Expression result;
 
-            DLR.ParameterExpression indexerParam = DLR.Expression.Parameter(typeof(List<AType>), "__INDEX__");
+            if (this.indexExpression != null)
+            {
+                // Generate each indexer expression in reverse order
+                // the reverse order is to mimic the A+ evaulation order
+                IEnumerable<DLR.Expression> indexerValues = this.indexExpression.Items.Reverse().Select(
+                    item => { return item.Generate(scope); }
+                );
 
-            List<DLR.Expression> arguments = new List<DLR.Expression>();
-            arguments.Add(this.item.Generate(scope));
-            arguments.Add(indexerParam);
+                DLR.ParameterExpression indexerParam = DLR.Expression.Parameter(typeof(List<AType>), "__INDEX__");
 
-            DLR.Expression codeblock = DLR.Expression.Block(
-                new DLR.ParameterExpression[] { indexerParam },
-                DLR.Expression.Assign(
-                    indexerParam,
-                    DLR.Expression.Call(
-                        typeof(Helpers).GetMethod("BuildIndexerArray"),
-                        DLR.Expression.NewArrayInit(typeof(AType), indexerValues)
-                    )
-                ),
-                DLR.Expression.Convert(
-                    DLR.Expression.Dynamic(
-                        scope.GetRuntime().GetIndexBinder(new System.Dynamic.CallInfo(indexerValues.Count())),
-                        typeof(object),
-                        arguments
+                List<DLR.Expression> arguments = new List<DLR.Expression>();
+                arguments.Add(this.item.Generate(scope));
+                arguments.Add(indexerParam);
+
+                result = DLR.Expression.Block(
+                    new DLR.ParameterExpression[] { indexerParam },
+                    DLR.Expression.Assign(
+                        indexerParam,
+                        DLR.Expression.Call(
+                            typeof(Helpers).GetMethod("BuildIndexerArray"),
+                            DLR.Expression.NewArrayInit(typeof(AType), indexerValues)
+                        )
                     ),
-                typeof(AType)
-                )
-            );
+                    DLR.Expression.Convert(
+                        DLR.Expression.Dynamic(
+                            scope.GetRuntime().GetIndexBinder(new DYN.CallInfo(indexerValues.Count())),
+                            typeof(object),
+                            arguments
+                        ),
+                    typeof(AType)
+                    )
+                );
+            }
+            else
+            {
+                // in case of: a[];
+                result = DLR.Expression.Convert(
+                    DLR.Expression.Dynamic(
+                        scope.GetRuntime().GetIndexBinder(new DYN.CallInfo(0)),
+                        typeof(object),
+                        this.item.Generate(scope),
+                        DLR.Expression.Constant(null)
+                    ),
+                    typeof(AType)
+                );
+                    
+            }
 
-
-            return codeblock;
+            return result;
         }
 
         #endregion

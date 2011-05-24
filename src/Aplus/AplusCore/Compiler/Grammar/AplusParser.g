@@ -349,7 +349,7 @@ simpleExpression returns [AST.Node node]
 
 termExpression returns [AST.Node node]
 	:	term { node = $term.node; }
-		(LSBracket i=expressionList RSBracket
+		(LSBracket (/* Allow empty */ | i=expressionList) RSBracket
 			{ node = AST.Node.Indexing(node, $i.node);  } 
 		)*
 	;

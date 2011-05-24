@@ -1,11 +1,8 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.Scripting.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.Scripting.Hosting;
-using AplusCore.Types;
+
 using AplusCore.Runtime;
+using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr
 {
@@ -189,9 +186,17 @@ namespace AplusCoreUnitTests.Dlr
 
         [TestCategory("DLR"), TestCategory("Indexing"), TestMethod]
         [ExpectedException(typeof(Error.Rank))]
-        public void ScalarIndexing()
+        public void ScalarIndexingError()
         {
             this.engine.Execute<AType>("1[0]");
+        }
+
+        [TestCategory("DLR"), TestCategory("Indexing"), TestMethod]
+        public void ScalarIndexing()
+        {
+            AType result = this.engine.Execute<AType>("1[]");
+
+            Assert.AreEqual<AType>(AInteger.Create(1), result, "Incorrect value returned");
         }
 
         [TestCategory("DLR"), TestCategory("Indexing"), TestMethod]

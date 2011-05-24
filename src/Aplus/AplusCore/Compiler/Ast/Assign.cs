@@ -77,7 +77,7 @@ namespace AplusCore.Compiler.AST
                 Indexing target = (Indexing)this.target;
 
                 // in case of:  a[,] := ...
-                if (target.IndexExpression[0] is BuiltInFunction)
+                if (target.IndexExpression != null && target.IndexExpression[0] is BuiltInFunction)
                 {
                     BuiltInFunction function = (BuiltInFunction)target.IndexExpression[0];
                     if (function.Function.Type != Grammar.Tokens.RAVEL)
@@ -265,8 +265,21 @@ namespace AplusCore.Compiler.AST
 
         private static DLR.Expression GenerateIndexAssign(AplusScope scope, Indexing target, DLR.Expression value)
         {
-            DLR.Expression result = DLR.Expression.Convert(
-                DLR.Expression.Dynamic(
+            DLR.Expression result;
+
+            if (target.IndexExpression == null)
+            {
+                result = DLR.Expression.Dynamic(
+                    scope.GetRuntime().SetIndexBinder(new DYN.CallInfo(0)),
+                    typeof(object),
+                    target.Item.Generate(scope),
+                    DLR.Expression.Constant(null),
+                    value
+                );
+            }
+            else
+            {
+                result = DLR.Expression.Dynamic(
                     scope.GetRuntime().SetIndexBinder(new System.Dynamic.CallInfo(target.IndexExpression.Length)),
                     typeof(object),
                     target.Item.Generate(scope),
@@ -278,11 +291,9 @@ namespace AplusCore.Compiler.AST
                         )
                     ),
                     value
-                ),
-                typeof(AType)
-            );
-
-            return result;
+                );
+            }
+            return DLR.Expression.Convert(result, typeof(AType));
         }
 
         #endregion
