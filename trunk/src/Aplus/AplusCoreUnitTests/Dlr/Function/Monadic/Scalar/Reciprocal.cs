@@ -29,5 +29,13 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
 
             Assert.AreEqual(expected, result);
         }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Reciprocal"), TestMethod]
+        public void ReciprocalNull()
+        {
+            AType result = this.engine.Execute<AType>("% ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AFloat, result.Type, "Incorrect type");
+        }
     }
 }

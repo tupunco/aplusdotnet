@@ -34,5 +34,12 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
             AType result = this.engine.Execute<AType>("log -5");
         }
 
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("NaturalLog"), TestMethod]
+        public void NaturalLogNull()
+        {
+            AType result = this.engine.Execute<AType>("log ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AFloat, result.Type, "Incorrect type");
+        }
     }
 }

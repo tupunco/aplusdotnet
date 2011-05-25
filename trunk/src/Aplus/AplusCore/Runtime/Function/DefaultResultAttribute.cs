@@ -2,10 +2,10 @@
 
 using AplusCore.Types;
 
-namespace AplusCore.Runtime.Function.Dyadic.Scalar
+namespace AplusCore.Runtime.Function
 {
     /// <summary>
-    /// Class to represent the default result type for dyadic scalar methods.
+    /// Class to represent the default result type for scalar methods.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     sealed class DefaultResultAttribute : Attribute

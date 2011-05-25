@@ -2,6 +2,7 @@
 
 namespace AplusCore.Runtime.Function.Monadic.Scalar.Arithmetic
 {
+    [DefaultResult(ATypes.AFloat)]
     class Negate : MonadicScalar
     {
         public override AType ExecutePrimitive(AInteger argument, AplusEnvironment environment = null)

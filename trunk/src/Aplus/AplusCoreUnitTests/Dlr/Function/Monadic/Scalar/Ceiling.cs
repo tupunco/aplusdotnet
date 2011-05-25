@@ -32,5 +32,13 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
             Assert.AreEqual(expected.Type, result.Type, "Type mismatch");
             Assert.AreEqual(expected, result);
         }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Ceiling"), TestMethod]
+        public void CeilingNull()
+        {
+            AType result = this.engine.Execute<AType>("max ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Incorrect type");
+        }
     }
 }

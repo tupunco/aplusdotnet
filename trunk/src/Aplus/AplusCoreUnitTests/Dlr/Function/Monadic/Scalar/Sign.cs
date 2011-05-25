@@ -26,5 +26,13 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
 
             Assert.AreEqual(expected, result);
         }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Sign"), TestMethod]
+        public void SignNull()
+        {
+            AType result = this.engine.Execute<AType>("* ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Incorrect type");
+        }
     }
 }

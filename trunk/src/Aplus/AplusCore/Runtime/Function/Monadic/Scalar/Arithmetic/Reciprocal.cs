@@ -4,6 +4,7 @@ using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.Monadic.Scalar.Arithmetic
 {
+    [DefaultResult(ATypes.AFloat)]
     class Reciprocal : MonadicScalar
     {
         public override AType ExecutePrimitive(AInteger argument, AplusEnvironment environment = null)

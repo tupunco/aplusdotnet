@@ -4,6 +4,7 @@ using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.Monadic.Scalar.Elementary
 {
+    [DefaultResult(ATypes.AFloat)]
     class Exponential : MonadicScalar
     {
         public override AType ExecutePrimitive(AInteger argument, AplusEnvironment environment = null)

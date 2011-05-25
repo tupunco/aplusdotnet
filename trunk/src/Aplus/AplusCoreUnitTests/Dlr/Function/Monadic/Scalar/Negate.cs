@@ -78,5 +78,13 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
         {
             this.engine.Execute<AType>(" - 'hello'");
         }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Neagate"), TestMethod]
+        public void NegateNull()
+        {
+            AType result = this.engine.Execute<AType>("- ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AFloat, result.Type, "Incorrect type");
+        }
     }
 }
