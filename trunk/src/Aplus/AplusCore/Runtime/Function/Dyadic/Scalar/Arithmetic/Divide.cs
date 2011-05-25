@@ -11,7 +11,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar.Arithmetic
     /// 
     /// Exceptions: Type, Domain
     /// </remarks>
-
+    [DefaultResult(ATypes.AFloat)]
     class Divide : DyadicScalar
     {
 

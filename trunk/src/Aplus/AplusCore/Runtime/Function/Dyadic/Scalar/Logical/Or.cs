@@ -2,6 +2,7 @@
 
 namespace AplusCore.Runtime.Function.Dyadic.Scalar.Logical
 {
+    [DefaultResult(ATypes.AInteger)]
     class Or : DyadicScalar
     {
         [DyadicScalarMethod]

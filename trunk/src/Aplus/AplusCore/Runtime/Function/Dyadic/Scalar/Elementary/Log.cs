@@ -68,6 +68,7 @@ C# Math.Log source: http://msdn.microsoft.com/en-us/library/hd50b6h5.aspx
 
 namespace AplusCore.Runtime.Function.Dyadic.Scalar.Elementary
 {
+    [DefaultResult(ATypes.AFloat)]
     class Log : DyadicScalar
     {
         [DyadicScalarMethod]

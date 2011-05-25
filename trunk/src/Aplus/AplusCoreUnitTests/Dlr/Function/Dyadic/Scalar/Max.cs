@@ -23,5 +23,21 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 
             Assert.AreEqual(expected, result);
         }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Max"), TestMethod]
+        public void MaxNull2Null()
+        {
+            AType result = this.engine.Execute<AType>("() max ()");
+
+            Assert.AreEqual<ATypes>(ATypes.ANull, result.Type, "Type mismatch");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Max"), TestMethod]
+        public void MaxFloat2Null()
+        {
+            AType result = this.engine.Execute<AType>("3.3 max ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AFloat, result.Type, "Type mismatch");
+        }
     }
 }

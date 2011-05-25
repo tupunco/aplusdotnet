@@ -11,6 +11,22 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
     public class CombineSymbols : AbstractTest
     {
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("CombineSymbols"), TestMethod]
+        public void CombineSymbolsNull()
+        {
+            AType result = this.engine.Execute<AType>("`c dot ()");
+
+            Assert.AreEqual<ATypes>(ATypes.ANull, result.Type, "Incorrect type returned");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("CombineSymbols"), TestMethod]
+        public void CombineSymbolsNull2Null()
+        {
+            AType result = this.engine.Execute<AType>("() dot ()");
+
+            Assert.AreEqual<ATypes>(ATypes.ANull, result.Type, "Incorrect type returned");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("CombineSymbols"), TestMethod]
         public void CombineSymbolsVector2Vector1()
         {
             AType expected = AArray.Create(

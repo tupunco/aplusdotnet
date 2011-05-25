@@ -25,5 +25,21 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 
             Assert.AreEqual(expected, result);
         }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Min"), TestMethod]
+        public void MinNull2Null()
+        {
+            AType result = this.engine.Execute<AType>("() min ()");
+
+            Assert.AreEqual<ATypes>(ATypes.ANull, result.Type, "Type mismatch");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Min"), TestMethod]
+        public void MinFloat2Null()
+        {
+            AType result = this.engine.Execute<AType>("3.3 min ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AFloat, result.Type, "Type mismatch");
+        }
     }
 }

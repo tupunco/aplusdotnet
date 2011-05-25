@@ -20,6 +20,14 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Circle"), TestMethod]
+        public void NullWithNull()
+        {
+            AType result = this.engine.Execute<AType>("() pi ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AFloat, result.Type, "Type mismatch");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Circle"), TestMethod]
         public void ComputeSinArcCosWithInt()
         {
             AType result = this.engine.Execute<AType>("0 pi .5");

@@ -11,6 +11,22 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
     public class LessThan : AbstractTest
     {
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("LessThan"), TestMethod]
+        public void LessThanInteger2Null()
+        {
+            AType result = this.engine.Execute<AType>("1 < ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Type mismatch");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("LessThan"), TestMethod]
+        public void LessThanNull2Null()
+        {
+            AType result = this.engine.Execute<AType>("() < ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Type mismatch");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("LessThan"), TestMethod]
         public void LessThanVector2Vector()
         {
             AType expected = AArray.Create(

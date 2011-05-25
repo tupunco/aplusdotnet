@@ -207,5 +207,21 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 
             Assert.AreEqual(expected, result);
         }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Log"), TestMethod]
+        public void LogInteger2Null()
+        {
+            AType result = this.engine.Execute<AType>("1 log ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AFloat, result.Type, "Type mismatch");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Log"), TestMethod]
+        public void LogNull2Null()
+        {
+            AType result = this.engine.Execute<AType>("() log ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AFloat, result.Type, "Type mismatch");
+        }
     }
 }
