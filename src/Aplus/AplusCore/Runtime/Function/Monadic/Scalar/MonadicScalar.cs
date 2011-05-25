@@ -10,17 +10,9 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
     {
         #region Variables
 
+        private ATypes defaultResultType;
         private byte currentType;
         private HashSet<byte> allowedTypes;
-
-        #endregion
-
-        #region Properties
-
-        public virtual ATypes ReturnType
-        {
-            get { return ATypes.AInteger; }
-        }
 
         #endregion
 
@@ -29,8 +21,19 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
         public MonadicScalar()
         {
             this.allowedTypes = new HashSet<byte>();
-            
-            MethodInfo[] methods = this.GetType().GetMethods(
+            Type currentType = this.GetType();
+            object[] attributes = currentType.GetCustomAttributes(typeof(DefaultResultAttribute), false);
+
+            if (attributes.Length == 1)
+            {
+                this.defaultResultType = ((DefaultResultAttribute)attributes[0]).DefaultType;
+            }
+            else
+            {
+                this.defaultResultType = ATypes.AType;
+            }
+
+            MethodInfo[] methods = currentType.GetMethods(
                 BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public
             );
 
@@ -44,7 +47,6 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
                 ParameterInfo[] parameterInfo = method.GetParameters();
 
                 this.allowedTypes.Add((byte)Utils.GetATypesFromType(parameterInfo[0].ParameterType));
-                
             }
         }
 
@@ -55,8 +57,12 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
         public override AType Execute(AType argument, AplusEnvironment environment = null)
         {
             this.currentType = (byte)argument.Type;
-            // Check if we have a rule for the specific input types
-            if (!this.allowedTypes.Contains(this.currentType))
+            if (argument.Length == 0)
+            {
+                return AArray.Create(this.defaultResultType != ATypes.AType ? this.defaultResultType : argument.Type);
+            }
+            // Check if we have a rule for the specific input type
+            else if (!this.allowedTypes.Contains(this.currentType))
             {
                 // Rule not found
 
@@ -85,7 +91,7 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
                 AType currentItem;
 
                 AType arg = argument;
-                AType result = AArray.Create(this.ReturnType);
+                AType result = AArray.Create(ATypes.AArray);
 
                 for (int i = 0; i < arg.Length; i++)
                 {
@@ -96,6 +102,7 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
                 }
 
                 result.UpdateInfo();
+
                 if ((typeCounter != result.Length) && (typeCounter != 0))
                 {
                     result.ConvertToFloat();
@@ -137,7 +144,7 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
         #endregion
 
         #region Type specific executes
-       
+
         public virtual AType ExecuteDefault(AType argument, AplusEnvironment environment = null)
         {
             throw new NotImplementedException("Invalid use-case");

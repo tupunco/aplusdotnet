@@ -4,6 +4,7 @@ using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.Monadic.Scalar.Miscellaneous
 {
+    [DefaultResult(ATypes.AInteger)]
     class Floor : MonadicScalar
     {
         public override AType ExecutePrimitive(AInteger argument, AplusEnvironment environment = null)

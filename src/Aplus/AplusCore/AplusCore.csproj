@@ -192,7 +192,7 @@
     <Compile Include="Runtime\Function\Dyadic\Scalar\Bitwise\BitwiseLessEqual.cs" />
     <Compile Include="Runtime\Function\Dyadic\Scalar\Bitwise\BitwiseNotEqual.cs" />
     <Compile Include="Runtime\Function\Dyadic\Scalar\Bitwise\BitwiseOr.cs" />
-    <Compile Include="Runtime\Function\Dyadic\Scalar\DefaultResultAttribute.cs" />
+    <Compile Include="Runtime\Function\DefaultResultAttribute.cs" />
     <Compile Include="Runtime\Function\Dyadic\Scalar\DyadicScalarAttribute.cs" />
     <Compile Include="Runtime\Function\Dyadic\Scalar\Elementary\Power.cs" />
     <Compile Include="Runtime\Function\Dyadic\Scalar\Logical\And.cs" />

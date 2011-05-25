@@ -27,5 +27,13 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
 
             Assert.AreEqual(expected, result);
         }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Exponential"), TestMethod]
+        public void ExponentialNull()
+        {
+            AType result = this.engine.Execute<AType>("^ ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AFloat, result.Type, "Incorrect type");
+        }
     }
 }

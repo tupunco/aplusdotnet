@@ -156,6 +156,8 @@
     <Compile Include="Dlr\Function\Monadic\NonScalar\Type.cs" />
     <Compile Include="Dlr\Function\Monadic\NonScalar\Unpack.cs" />
     <Compile Include="Dlr\Function\Monadic\NonScalar\Value.cs" />
+    <Compile Include="Dlr\Function\Monadic\Scalar\Identity.cs" />
+    <Compile Include="Dlr\Function\Monadic\Scalar\Roll.cs" />
     <Compile Include="Dlr\MemoryMappedFile\Map.cs" />
     <Compile Include="Dlr\MemoryMappedFile\Operations.cs" />
     <Compile Include="Dlr\Operator\Dyadic\Apply.cs" />

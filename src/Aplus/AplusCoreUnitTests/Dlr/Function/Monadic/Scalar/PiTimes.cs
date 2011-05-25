@@ -26,5 +26,13 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
 
             Assert.AreEqual(expected, result);
         }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("PiTimes"), TestMethod]
+        public void PiTimesNull()
+        {
+            AType result = this.engine.Execute<AType>("pi ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AFloat, result.Type, "Incorrect type");
+        }
     }
 }
