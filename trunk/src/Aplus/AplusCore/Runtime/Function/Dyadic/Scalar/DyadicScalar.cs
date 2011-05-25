@@ -45,7 +45,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar
             // Detect the methods and add a rule for it based on the parameter types
             foreach (MethodInfo method in methods)
             {
-                object[] attribs = method.GetCustomAttributes(typeof(Scalar.DyadicScalarMethodAttribute), false);
+                object[] attribs = method.GetCustomAttributes(typeof(DyadicScalarMethodAttribute), false);
                 // check if the method has the correct attribute
                 if (attribs.Length < 1)
                 {
@@ -92,7 +92,6 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar
                 this.combination = CombinationKey(ATypes.ANull, ATypes.ANull);
             }
             // Check if we have a rule for the specific input types
-            //Contains(this.combination)
             else if (!this.allowedMethods.ContainsKey(this.combination))
             {
                 // Rule not found
@@ -115,43 +114,40 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar
 
         private AType ExecuteRecursion(AType rightArgument, AType leftArgument)
         {
+            AType result;
+
             if (leftArgument.IsArray && rightArgument.IsArray)
             {
-                if (leftArgument.Length == rightArgument.Length)
-                {
-                    AType currentItem;
-                    uint typeCounter = 0;
-
-                    AType left = leftArgument;
-                    AType right = rightArgument;
-                    AType result = AArray.Create(ATypes.AArray);
-
-                    for (int i = 0; i < left.Length; i++)
-                    {
-                        currentItem = ExecuteRecursion(right[i], left[i]);
-                        typeCounter += (uint)((currentItem.Type == ATypes.AFloat) ? 1 : 0);
-
-                        result.AddWithNoUpdate(currentItem);
-                    }
-                    result.UpdateInfo();
-
-                    if (left.Type == ATypes.ANull && right.Type == ATypes.ANull)
-                    {
-                        result.Type = 
-                            (this.defaultResultType != ATypes.AType) ? this.defaultResultType : ATypes.ANull;
-                    }
-
-                    // If one element was not as the others then the typeCounter will be
-                    // in an interval of:  0 < typeCounter < itemCount
-                    if ((typeCounter != result.Length) && (typeCounter != 0))
-                    {
-                        result.ConvertToFloat();
-                    }
-                    return result;
-                }
-                else
+                if (leftArgument.Length != rightArgument.Length)
                 {
                     throw new Error.Length(this.LengthErrorText);
+                }
+
+                AType currentItem;
+                uint floatTypeCounter = 0;
+
+                result = AArray.Create(ATypes.AArray);
+
+                for (int i = 0; i < leftArgument.Length; i++)
+                {
+                    currentItem = ExecuteRecursion(rightArgument[i], leftArgument[i]);
+                    floatTypeCounter += (uint)((currentItem.Type == ATypes.AFloat) ? 1 : 0);
+
+                    result.AddWithNoUpdate(currentItem);
+                }
+                result.UpdateInfo();
+
+                if (leftArgument.Type == ATypes.ANull && rightArgument.Type == ATypes.ANull)
+                {
+                    result.Type = 
+                        (this.defaultResultType != ATypes.AType) ? this.defaultResultType : ATypes.ANull;
+                }
+
+                // If one element was not as the others then the typeCounter will be
+                // in an interval of:  0 < typeCounter < itemCount
+                if ((floatTypeCounter != result.Length) && (floatTypeCounter != 0))
+                {
+                    result.ConvertToFloat();
                 }
             }
             else if (leftArgument.IsArray && !rightArgument.IsArray)
@@ -162,15 +158,14 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar
                 }
 
                 AType currentItem;
-                uint typeCounter = 0;
+                uint floatTypeCounter = 0;
 
-                AType left = leftArgument;
-                AType result = AArray.Create(ATypes.AArray);
+                result = AArray.Create(ATypes.AArray);
 
-                for (int i = 0; i < left.Length; i++)
+                for (int i = 0; i < leftArgument.Length; i++)
                 {
-                    currentItem = ExecuteRecursion(rightArgument, left[i]);
-                    typeCounter += (uint)((currentItem.Type == ATypes.AFloat) ? 1 : 0);
+                    currentItem = ExecuteRecursion(rightArgument, leftArgument[i]);
+                    floatTypeCounter += (uint)((currentItem.Type == ATypes.AFloat) ? 1 : 0);
 
                     result.AddWithNoUpdate(currentItem);
                 }
@@ -182,12 +177,10 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar
                         (this.defaultResultType != ATypes.AType) ? this.defaultResultType : rightArgument.Type;
                 }
 
-                if ((typeCounter != result.Length) && (typeCounter != 0))
+                if ((floatTypeCounter != result.Length) && (floatTypeCounter != 0))
                 {
                     result.ConvertToFloat();
                 }
-
-                return result;
             }
             else if (!leftArgument.IsArray && rightArgument.IsArray)
             {
@@ -197,15 +190,14 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar
                 }
 
                 AType currentItem;
-                uint typeCounter = 0;
+                uint floatTypeCounter = 0;
 
-                AType right = rightArgument;
-                AType result = AArray.Create(ATypes.AArray);
+                result = AArray.Create(ATypes.AArray);
 
-                for (int i = 0; i < right.Length; i++)
+                for (int i = 0; i < rightArgument.Length; i++)
                 {
-                    currentItem = ExecuteRecursion(right[i], leftArgument);
-                    typeCounter += (uint)((currentItem.Type == ATypes.AFloat) ? 1 : 0);
+                    currentItem = ExecuteRecursion(rightArgument[i], leftArgument);
+                    floatTypeCounter += (uint)((currentItem.Type == ATypes.AFloat) ? 1 : 0);
 
                     result.AddWithNoUpdate(currentItem);
                 }
@@ -217,23 +209,20 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar
                         (this.defaultResultType != ATypes.AType) ? this.defaultResultType : leftArgument.Type;
                 }
 
-                if ((typeCounter != result.Length) && (typeCounter != 0))
+                if ((floatTypeCounter != result.Length) && (floatTypeCounter != 0))
                 {
                     result.ConvertToFloat();
                 }
-
-                return result;
+            }
+            else if (this.combination == CombinationKey(ATypes.ANull, ATypes.ANull))
+            {
+                return Utils.ANull();
             }
             else
             {
-                if (this.combination == CombinationKey(ATypes.ANull, ATypes.ANull))
-                {
-                    return Utils.ANull();
-                }
-
                 // Get the method for the current input type combination
                 MethodInfo method = this.allowedMethods[this.combination];
-                AType result = null;
+
                 try
                 {
                     // Invoke the method
@@ -254,9 +243,9 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar
                         throw;
                     }
                 }
-
-                return result/* ?? new ANull()*/;
             }
+
+            return result;
         }
 
         #endregion
