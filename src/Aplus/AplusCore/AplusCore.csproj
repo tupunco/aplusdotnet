@@ -180,7 +180,7 @@
     <Compile Include="Runtime\Function\Dyadic\Product\OuterProduct.cs" />
     <Compile Include="Runtime\Function\Dyadic\Scalar\Arithmetic\Add.cs" />
     <Compile Include="Runtime\Function\Dyadic\Scalar\Arithmetic\Divide.cs" />
-    <Compile Include="Runtime\Function\Dyadic\DyadicScalar.cs" />
+    <Compile Include="Runtime\Function\Dyadic\Scalar\DyadicScalar.cs" />
     <Compile Include="Runtime\Function\Dyadic\Scalar\Arithmetic\Multiply.cs" />
     <Compile Include="Runtime\Function\Dyadic\Scalar\Arithmetic\Subtract.cs" />
     <Compile Include="Runtime\Function\Dyadic\DyadicFunctionInstance.cs" />

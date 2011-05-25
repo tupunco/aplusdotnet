@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-using AplusCore.Runtime.Function.Dyadic.Scalar;
 using AplusCore.Types;
 
-namespace AplusCore.Runtime.Function.Dyadic
+namespace AplusCore.Runtime.Function.Dyadic.Scalar
 {
-
     abstract class DyadicScalar : AbstractDyadicFunction
     {
         #region Variables
@@ -27,7 +25,6 @@ namespace AplusCore.Runtime.Function.Dyadic
 
         public DyadicScalar()
         {
-
             this.allowedMethods = new Dictionary<byte, MethodInfo>();
             Type currentType = this.GetType();
             object[] attributes = currentType.GetCustomAttributes(typeof(DefaultResultAttribute), false);
@@ -66,7 +63,6 @@ namespace AplusCore.Runtime.Function.Dyadic
                     method
                 );
             }
-
         }
 
         #endregion
@@ -265,5 +261,4 @@ namespace AplusCore.Runtime.Function.Dyadic
 
         #endregion
     }
-
 }
