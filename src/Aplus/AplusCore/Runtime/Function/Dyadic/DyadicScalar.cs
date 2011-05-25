@@ -1,14 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 
+using AplusCore.Runtime.Function.Dyadic.Scalar;
 using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.Dyadic
 {
+
     abstract class DyadicScalar : AbstractDyadicFunction
     {
         #region Variables
 
+        private ATypes defaultResultType;
         private byte combination;
 
         /// <summary>
@@ -25,8 +29,19 @@ namespace AplusCore.Runtime.Function.Dyadic
         {
 
             this.allowedMethods = new Dictionary<byte, MethodInfo>();
+            Type currentType = this.GetType();
+            object[] attributes = currentType.GetCustomAttributes(typeof(DefaultResultAttribute), false);
 
-            MethodInfo[] methods = this.GetType().GetMethods(
+            if (attributes.Length == 1)
+            {
+                this.defaultResultType = ((DefaultResultAttribute)attributes[0]).DefaultType;
+            }
+            else
+            {
+                this.defaultResultType = ATypes.AType;
+            }
+
+            MethodInfo[] methods = currentType.GetMethods(
                 BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public
             );
 
@@ -41,7 +56,7 @@ namespace AplusCore.Runtime.Function.Dyadic
                 }
 
                 ParameterInfo[] parameterInfo = method.GetParameters();
-                
+
                 // Add the method to the allowed method's list
                 this.allowedMethods.Add(
                     CombinationKey(
@@ -124,6 +139,12 @@ namespace AplusCore.Runtime.Function.Dyadic
                     }
                     result.UpdateInfo();
 
+                    if (left.Type == ATypes.ANull && right.Type == ATypes.ANull)
+                    {
+                        result.Type = 
+                            (this.defaultResultType != ATypes.AType) ? this.defaultResultType : ATypes.ANull;
+                    }
+
                     // If one element was not as the others then the typeCounter will be
                     // in an interval of:  0 < typeCounter < itemCount
                     if ((typeCounter != result.Length) && (typeCounter != 0))
@@ -161,7 +182,8 @@ namespace AplusCore.Runtime.Function.Dyadic
 
                 if (leftArgument.Type == ATypes.ANull)
                 {
-                    result.Type = rightArgument.Type;
+                    result.Type =
+                        (this.defaultResultType != ATypes.AType) ? this.defaultResultType : rightArgument.Type;
                 }
 
                 if ((typeCounter != result.Length) && (typeCounter != 0))
@@ -195,7 +217,8 @@ namespace AplusCore.Runtime.Function.Dyadic
 
                 if (rightArgument.Type == ATypes.ANull)
                 {
-                    result.Type = leftArgument.Type;
+                    result.Type =
+                        (this.defaultResultType != ATypes.AType) ? this.defaultResultType : leftArgument.Type;
                 }
 
                 if ((typeCounter != result.Length) && (typeCounter != 0))

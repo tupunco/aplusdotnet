@@ -20,6 +20,14 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("EqualTo"), TestMethod]
+        public void EqualToNull2Null()
+        {
+            AType result = this.engine.Execute<AType>("() = ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Type mismatch");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("EqualTo"), TestMethod]
         public void EqualToInteger2Float()
         {
             AType expected = AInteger.Create(0);

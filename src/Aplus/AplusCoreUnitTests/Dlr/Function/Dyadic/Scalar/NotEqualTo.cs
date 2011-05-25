@@ -96,5 +96,13 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 
             Assert.AreEqual(expected, result);
         }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
+        public void NotEqualToNull2Null()
+        {
+            AType result = this.engine.Execute<AType>("() ~= ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Incorrect type");
+        }
     }
 }

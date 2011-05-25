@@ -11,7 +11,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar.Logical
     /// 
     /// Exceptions: Type
     /// </remarks>
-
+    [DefaultResult(ATypes.AInteger)]
     class And : DyadicScalar
     {
         [DyadicScalarMethod]

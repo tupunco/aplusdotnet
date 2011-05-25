@@ -20,6 +20,14 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Divide"), TestMethod]
+        public void DivideNull2Null()
+        {
+            AType result = this.engine.Execute<AType>("() % ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AFloat, result.Type, "Type mismatch");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Divide"), TestMethod]
         public void DivideInteger2Float()
         {
             AType expected = AFloat.Create(1 / 3.1);

@@ -135,6 +135,7 @@ C# Math.Power source: http://msdn.microsoft.com/en-us/library/system.math.pow.as
 
 namespace AplusCore.Runtime.Function.Dyadic.Scalar.Elementary
 {
+    [DefaultResult(ATypes.AFloat)]
     class Power : DyadicScalar
     {
         [DyadicScalarMethod]

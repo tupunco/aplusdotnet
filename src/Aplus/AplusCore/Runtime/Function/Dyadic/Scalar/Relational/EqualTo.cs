@@ -12,7 +12,8 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar.Relational
     /// (AChar,AChar)                                           ->  AInteger: 0,1
     /// (ABox,ABox)                                             ->  AInteger: 0,1
     /// </remarks>
-    /// 
+    ///
+    [DefaultResult(ATypes.AInteger)]
     class EqualTo : DyadicScalar
     {
 

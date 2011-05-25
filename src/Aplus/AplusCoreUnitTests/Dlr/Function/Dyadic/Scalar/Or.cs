@@ -37,6 +37,14 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Or"), TestMethod]
+        public void OrNull2Null()
+        {
+            AType result = this.engine.Execute<AType>("() ? ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Incorrect type");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Or"), TestMethod]
         [ExpectedException(typeof(Error.Type))]
         public void OrTypeError1()
         {

@@ -2,6 +2,7 @@
 
 namespace AplusCore.Runtime.Function.Dyadic.Scalar.Relational
 {
+    [DefaultResult(ATypes.AInteger)]
     class NotEqualTo : DyadicScalar
     {
         [DyadicScalarMethod]

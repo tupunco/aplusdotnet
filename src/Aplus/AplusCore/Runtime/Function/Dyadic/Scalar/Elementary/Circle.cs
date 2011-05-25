@@ -15,7 +15,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar.Elementary
     /// 
     /// Exeception: Type, Domain
     /// </remarks>
-
+    [DefaultResult(ATypes.AFloat)]
     class Circle : DyadicScalar
     {
         [DyadicScalarMethod]
@@ -152,7 +152,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar.Elementary
         //If the argument is incorrent, we throw Domain Error execpetion.
         private void Check(double argument, int number)
         {
-            switch(number)
+            switch (number)
             {
                 case 0:
                 case 1:
@@ -161,7 +161,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar.Elementary
                 case -7:
                     if (argument == Double.PositiveInfinity || argument == Double.NegativeInfinity)
                     {
-                        throw new Error.Domain(DomainErrorText); 
+                        throw new Error.Domain(DomainErrorText);
                     }
                     break;
                 case -1:
@@ -174,7 +174,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar.Elementary
                 case -6:
                     if (argument == Double.NegativeInfinity)
                     {
-                        throw new Error.Domain(DomainErrorText); 
+                        throw new Error.Domain(DomainErrorText);
                     }
                     break;
 

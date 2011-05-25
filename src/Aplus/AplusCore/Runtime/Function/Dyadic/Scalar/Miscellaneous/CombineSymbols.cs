@@ -2,6 +2,7 @@
 
 namespace AplusCore.Runtime.Function.Dyadic.Scalar.Miscellaneous
 {
+    [DefaultResult(ATypes.ANull)]
     class CombineSymbols : DyadicScalar
     {
         [DyadicScalarMethod]

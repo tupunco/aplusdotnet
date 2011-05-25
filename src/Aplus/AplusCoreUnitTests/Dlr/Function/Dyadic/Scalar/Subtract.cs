@@ -20,6 +20,14 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Subtract"), TestMethod]
+        public void SubtractNull2Null()
+        {
+            AType result = this.engine.Execute<AType>("() - ()");
+
+            Assert.AreEqual<ATypes>(ATypes.ANull, result.Type, "Type mismatch");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Subtract"), TestMethod]
         public void SubtractInteger2Float()
         {
             AType expected = AFloat.Create(-2.1);

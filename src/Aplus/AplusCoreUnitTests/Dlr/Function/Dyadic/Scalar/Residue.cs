@@ -54,5 +54,13 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
             Assert.AreEqual(expected, result);
             Assert.IsTrue(result.Type == ATypes.AFloat);
         }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Residue"), TestMethod]
+        public void ResidueNull2Null()
+        {
+            AType result = this.engine.Execute<AType>("() | ()");
+
+            Assert.AreEqual<ATypes>(ATypes.ANull, result.Type, "Incorrect type");
+        }
     }
 }
