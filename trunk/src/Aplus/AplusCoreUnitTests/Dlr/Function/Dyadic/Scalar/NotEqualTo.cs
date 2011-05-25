@@ -10,7 +10,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
     [TestClass]
     public class NotEqualTo : AbstractTest
     {
-        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
         public void NotEqualToCharachterList2CharacterList()
         {
             AType expected = AArray.Create(
@@ -31,7 +31,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
             Assert.AreEqual(expected, result);
         }
 
-        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
         public void NotEqualToBox2Box()
         {
             AType expected = AArray.Create(
@@ -44,7 +44,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
             Assert.AreEqual(expected, result);
         }
 
-        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
         public void NotEqualToIntList2CharachterList()
         {
             AType expected = AArray.Create(
@@ -58,7 +58,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
             Assert.AreEqual(expected, result);
         }
 
-        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
         public void NotEqualToFloat2FloatList()
         {
             AType expected = AArray.Create(
@@ -73,7 +73,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
             Assert.AreEqual(expected, result);
         }
 
-        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
         public void NotEqualToSymbolConstant2SymbolConstant()
         {
             AType expected = AInteger.Create(0);
@@ -82,7 +82,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
             Assert.AreEqual(expected, result);
         }
 
-        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
         public void NotEqualToSymbolConstant2IntList()
         {
             AType expected = AArray.Create(
