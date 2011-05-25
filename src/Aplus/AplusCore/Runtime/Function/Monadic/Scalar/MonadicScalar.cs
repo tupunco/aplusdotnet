@@ -11,8 +11,8 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
         #region Variables
 
         private ATypes defaultResultType;
-        private byte currentType;
-        private HashSet<byte> allowedTypes;
+        private ATypes currentType;
+        private HashSet<ATypes> allowedTypes;
 
         #endregion
 
@@ -20,7 +20,7 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
 
         public MonadicScalar()
         {
-            this.allowedTypes = new HashSet<byte>();
+            this.allowedTypes = new HashSet<ATypes>();
             Type currentType = this.GetType();
             object[] attributes = currentType.GetCustomAttributes(typeof(DefaultResultAttribute), false);
 
@@ -46,7 +46,7 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
 
                 ParameterInfo[] parameterInfo = method.GetParameters();
 
-                this.allowedTypes.Add((byte)Utils.GetATypesFromType(parameterInfo[0].ParameterType));
+                this.allowedTypes.Add(Utils.GetATypesFromType(parameterInfo[0].ParameterType));
             }
         }
 
@@ -56,7 +56,8 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
 
         public override AType Execute(AType argument, AplusEnvironment environment = null)
         {
-            this.currentType = (byte)argument.Type;
+            this.currentType = argument.Type;
+
             if (argument.Length == 0)
             {
                 return AArray.Create(this.defaultResultType != ATypes.AType ? this.defaultResultType : argument.Type);
@@ -67,7 +68,7 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
                 // Rule not found
 
                 // reset to the general case
-                this.currentType = (byte)ATypes.AType;
+                this.currentType = ATypes.AType;
 
                 // Check if we have default case
                 if (!this.allowedTypes.Contains(this.currentType))
@@ -76,6 +77,7 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
                     throw new Error.Type(this.TypeErrorText);
                 }
             }
+
             return ExecuteRecursion(argument, environment);
         }
 
@@ -85,60 +87,57 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
 
         private AType ExecuteRecursion(AType argument, AplusEnvironment environment)
         {
+            AType result;
             if (argument.IsArray)
             {
-                uint typeCounter = 0;
+                uint floatTypeCounter = 0;
                 AType currentItem;
 
-                AType arg = argument;
-                AType result = AArray.Create(ATypes.AArray);
+                result = AArray.Create(ATypes.AArray);
 
-                for (int i = 0; i < arg.Length; i++)
+                for (int i = 0; i < argument.Length; i++)
                 {
-                    currentItem = ExecuteRecursion(arg[i], environment);
-                    typeCounter += (uint)((currentItem.Type == ATypes.AFloat) ? 1 : 0);
+                    currentItem = ExecuteRecursion(argument[i], environment);
+                    floatTypeCounter += (uint)((currentItem.Type == ATypes.AFloat) ? 1 : 0);
 
                     result.AddWithNoUpdate(currentItem);
                 }
 
                 result.UpdateInfo();
 
-                if ((typeCounter != result.Length) && (typeCounter != 0))
+                if ((floatTypeCounter != result.Length) && (floatTypeCounter != 0))
                 {
                     result.ConvertToFloat();
                 }
-                return result;
             }
             else
             {
-                AType result = null;
                 switch (currentType)
                 {
-                    //case (byte)ATypes.ANull:
-                    //    result = new ANull();
-                    //    break;
-                    case (byte)ATypes.AInteger:
+                    case ATypes.AInteger:
                         result = ExecutePrimitive((AInteger)argument.Data, environment);
                         break;
-                    case (byte)ATypes.AFloat:
+                    case ATypes.AFloat:
                         result = ExecutePrimitive((AFloat)argument.Data, environment);
                         break;
-                    case (byte)ATypes.AChar:
+                    case ATypes.AChar:
                         result = ExecutePrimitive((AChar)argument.Data, environment);
                         break;
-                    case (byte)ATypes.ASymbol:
+                    case ATypes.ASymbol:
                         result = ExecutePrimitive((ASymbol)argument.Data, environment);
                         break;
-                    case (byte)ATypes.ABox:
+                    case ATypes.ABox:
                         result = ExecutePrimitive((ABox)argument.Data, environment);
                         break;
-                    case (byte)ATypes.AType:
+                    case ATypes.AType:
                         result = ExecuteDefault((AType)argument.Data, environment);
                         break;
+                    default:
+                        throw new Error.Invalid("Something really went wrong...");
                 }
-
-                return result;
             }
+
+            return result;
         }
 
         #endregion
@@ -176,6 +175,5 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
         }
 
         #endregion
-
     }
 }
