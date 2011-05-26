@@ -22,16 +22,9 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
         {
             this.allowedTypes = new HashSet<ATypes>();
             Type currentType = this.GetType();
-            object[] attributes = currentType.GetCustomAttributes(typeof(DefaultResultAttribute), false);
 
-            if (attributes.Length == 1)
-            {
-                this.defaultResultType = ((DefaultResultAttribute)attributes[0]).DefaultType;
-            }
-            else
-            {
-                this.defaultResultType = ATypes.AType;
-            }
+            DefaultResultAttribute attribute = currentType.GetSingleAttribute<DefaultResultAttribute>();
+            this.defaultResultType = (attribute != null) ? attribute.DefaultType : ATypes.AType;
 
             MethodInfo[] methods = currentType.GetMethods(
                 BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public

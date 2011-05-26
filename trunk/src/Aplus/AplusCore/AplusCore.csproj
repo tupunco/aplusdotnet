@@ -283,6 +283,7 @@
     <Compile Include="Runtime\SystemCommands.cs" />
     <Compile Include="Runtime\SystemVariables.cs" />
     <Compile Include="Runtime\Util.cs" />
+    <Compile Include="TypeExtensions.cs" />
     <Compile Include="Types\AArray.cs" />
     <Compile Include="Types\ABox.cs" />
     <Compile Include="Types\AReference.cs" />
