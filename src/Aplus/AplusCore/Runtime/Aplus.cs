@@ -67,6 +67,11 @@ namespace AplusCore.Runtime
             this.sysvars["mode"] = ASymbol.Create(parsemode.ToString().ToLower());
 
             this.mmfmanager = new MemoryMappedFileManager();
+
+            if (String.IsNullOrEmpty(Environment.GetEnvironmentVariable("APATH", EnvironmentVariableTarget.User)))
+            {
+                Environment.SetEnvironmentVariable("APATH", ".", EnvironmentVariableTarget.User);
+            }
         }
 
         #endregion

@@ -1,6 +1,7 @@
 ﻿using System;
 
 using AplusCore.Types;
+using AplusCore.Runtime.Function.Dyadic;
 
 namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
 {
@@ -8,7 +9,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
     {
         public override AType Execute(AType argument, AplusEnvironment environment = null)
         {
-            throw new NotImplementedException();
+            return DyadicFunctionInstance.Map.Execute(argument, AInteger.Create(0), environment);
         }
     }
 }
