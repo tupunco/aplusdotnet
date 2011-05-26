@@ -27,16 +27,9 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar
         {
             this.allowedMethods = new Dictionary<byte, MethodInfo>();
             Type currentType = this.GetType();
-            object[] attributes = currentType.GetCustomAttributes(typeof(DefaultResultAttribute), false);
 
-            if (attributes.Length == 1)
-            {
-                this.defaultResultType = ((DefaultResultAttribute)attributes[0]).DefaultType;
-            }
-            else
-            {
-                this.defaultResultType = ATypes.AType;
-            }
+            DefaultResultAttribute attribute = currentType.GetSingleAttribute<DefaultResultAttribute>();
+            this.defaultResultType = (attribute != null) ? attribute.DefaultType : ATypes.AType;
 
             MethodInfo[] methods = currentType.GetMethods(
                 BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public
@@ -45,9 +38,10 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar
             // Detect the methods and add a rule for it based on the parameter types
             foreach (MethodInfo method in methods)
             {
-                object[] attribs = method.GetCustomAttributes(typeof(DyadicScalarMethodAttribute), false);
-                // check if the method has the correct attribute
-                if (attribs.Length < 1)
+                DyadicScalarMethodAttribute scalarAttribute =
+                    method.GetSingleAttribute<DyadicScalarMethodAttribute>();
+
+                if (scalarAttribute == null)
                 {
                     continue;
                 }
