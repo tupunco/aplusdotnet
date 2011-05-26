@@ -23,7 +23,7 @@ namespace AplusCore.Runtime
 
         public static long ComputeSize(AType argument)
         {
-            return 1024 * 1024;
+            return 20 * 1024 * 1024;
         }
 
         public void CreateMemmoryMappedFile(string path, AType argument)
@@ -32,16 +32,25 @@ namespace AplusCore.Runtime
             GC.WaitForPendingFinalizers();
 
             string memoryMappedFileName = EncodeName(path);
+            MemoryMappedFile memoryMappedFile;
 
-            var memoryMappedFile = MemoryMappedFile.CreateFromFile(
-                new FileStream(path, FileMode.Create),
-                memoryMappedFileName,
-                ComputeSize(argument),
-                MemoryMappedFileAccess.ReadWrite,
-                new MemoryMappedFileSecurity(),
-                HandleInheritability.Inheritable,
-                false
-            );
+            try
+            {
+                memoryMappedFile = MemoryMappedFile.CreateFromFile(
+                    new FileStream(path, FileMode.Create),
+                    memoryMappedFileName,
+                    ComputeSize(argument),
+                    MemoryMappedFileAccess.ReadWrite,
+                    new MemoryMappedFileSecurity(),
+                    HandleInheritability.Inheritable,
+                    false
+                );
+
+            }
+            catch (Exception)
+            {
+                throw new Error.Invalid("MemoryMappedFile");
+            }
 
             MappedFile mappedFile = new MappedFile(memoryMappedFile);
 
@@ -53,7 +62,7 @@ namespace AplusCore.Runtime
 
         #region Read
 
-        public AType Read(string memoryMappadFilePath, byte mode)
+        public AType Read(string memoryMappadFilePath, bool localWrite)
         {
             string memoryMappedFileName = EncodeName(memoryMappadFilePath);
             MemoryMappedFile memoryMappedFile;
@@ -62,12 +71,12 @@ namespace AplusCore.Runtime
             {
                 memoryMappedFile = MemoryMappedFile.OpenExisting(memoryMappedFileName);
             }
-            catch (Exception)
+            catch (FileNotFoundException)
             {
                 memoryMappedFile = MemoryMappedFile.CreateFromFile(memoryMappadFilePath, FileMode.Open, memoryMappedFileName);
             }
 
-            return MappedFile.Read(memoryMappedFile);
+            return MappedFile.Read(memoryMappedFile, localWrite);
         }
 
         #endregion

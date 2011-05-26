@@ -219,10 +219,12 @@ namespace AplusCore.Runtime
 
         #region Construction
 
-        public MappedFile(MemoryMappedFile memoryMappedFile)
+        public MappedFile(MemoryMappedFile memoryMappedFile, bool localWrite = false)
         {
             this.memoryMappedFile = memoryMappedFile;
-            this.accessor = memoryMappedFile.CreateViewAccessor();
+            this.accessor = localWrite ?
+                memoryMappedFile.CreateViewAccessor(0, 0, MemoryMappedFileAccess.CopyOnWrite) : 
+                memoryMappedFile.CreateViewAccessor();
         }
 
         #endregion
@@ -336,9 +338,9 @@ namespace AplusCore.Runtime
 
         #region Read
 
-        public static AType Read(MemoryMappedFile memoryMappedFile)
+        public static AType Read(MemoryMappedFile memoryMappedFile, bool localWrite)
         {
-            MappedFile mappedFile = new MappedFile(memoryMappedFile);
+            MappedFile mappedFile = new MappedFile(memoryMappedFile, localWrite);
 
             return mappedFile.Rank > 0 ?
                 MMAArray.Create(mappedFile) :
