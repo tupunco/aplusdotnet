@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 
+using AplusCore.Runtime;
+
 using DLR = System.Linq.Expressions;
 
-namespace AplusCore.Runtime
+namespace AplusCore.Compiler
 {
     
     public class AplusScope

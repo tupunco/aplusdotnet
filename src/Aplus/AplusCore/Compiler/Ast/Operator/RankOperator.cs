@@ -1,6 +1,5 @@
 ﻿using System;
 
-using AplusCore.Runtime;
 using AplusCore.Runtime.Function.Operator.Dyadic;
 using AplusCore.Runtime.Function.Operator.Monadic;
 
