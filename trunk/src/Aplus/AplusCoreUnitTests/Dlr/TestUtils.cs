@@ -1,8 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+
+using Microsoft.Scripting.Hosting;
+
 using AplusCore.Types;
+
 
 namespace AplusCoreUnitTests.Dlr
 {
@@ -43,6 +47,8 @@ namespace AplusCoreUnitTests.Dlr
 
     public static class TestUtils
     {
+        #region Compare
+
         /// <summary>
         /// Compares the AType's information's to an other AType
         /// </summary>
@@ -87,5 +93,62 @@ namespace AplusCoreUnitTests.Dlr
             return InfoResult.OK;
         }
 
+        #endregion
+
+        #region MemoryMappedFiles
+
+        public static void CreateMemoryMappedFiles(ScriptEngine engine)
+        {
+            engine.Execute<AType>(CreateMapCreator("IntegerScalar.m", "67"));
+            engine.Execute<AType>(CreateMapCreator("FloatScalar.m", "2.3"));
+            engine.Execute<AType>(CreateMapCreator("CharScalar.m", "'A'"));
+            engine.Execute<AType>(CreateMapCreator("Integer23.m", "2 3 rho 5 6 7 9 8 2"));
+            engine.Execute<AType>(CreateMapCreator("Float22.m", "2 2 rho 3.4 1.4 7.6 1.1"));
+            engine.Execute<AType>(CreateMapCreator("Char25.m", "2 5 rho 'HelloWorld'"));
+        }
+
+        public static void DeleteMemoryMappedFiles()
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            string[] files = new string[] { "IntegerScalar.m", "CharScalar.m", "FloatScalar.m", "Integer23.m", "Float22.m", "Char25.m" };
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                if (File.Exists(files[i]))
+                {
+                    File.Delete(files[i]);
+                }
+            }
+        }
+
+        public static string CreateMapCreator(string name, string data)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.Append("'");
+            builder.Append(name);
+            builder.Append("'");
+            builder.Append(" beam ");
+            builder.Append(data);
+
+            return builder.ToString();
+        }
+
+        public static string CreateMap(byte mode, string name)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.Append(mode);
+            builder.Append(" beam ");
+            builder.Append("'");
+            builder.Append(name);
+            builder.Append("'");
+
+            return builder.ToString();
+        }
+
+        #endregion
     }
 }
