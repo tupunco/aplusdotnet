@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Scripting.Utils;
 
+using AplusCore.Compiler;
 using AplusCore.Types;
 
 using DLR = System.Linq.Expressions;

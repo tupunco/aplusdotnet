@@ -56,7 +56,7 @@ namespace AplusCore.Compiler
 
         public DLR.Expression<System.Func<Runtime.AplusEnvironment, AType>> ParseToLambda(string code)
         {
-            Runtime.AplusScope scope = new Runtime.AplusScope(null, "__top__", this.aplus,
+            AplusScope scope = new AplusScope(null, "__top__", this.aplus,
                 DLR.Expression.Parameter(typeof(Runtime.Aplus), "__aplusRuntime__"),
                 DLR.Expression.Parameter(typeof(DYN.IDynamicMetaObjectProvider), "__module__"),
                 DLR.Expression.Parameter(typeof(AplusEnvironment), "__ENVIRONMENT__")
