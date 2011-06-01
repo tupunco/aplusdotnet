@@ -280,6 +280,31 @@ namespace AplusCore.Runtime
 
         #region Write
 
+        public static long ComputeSize(AType argument)
+        {
+           //Header
+            long result = 14 * IntSize;
+
+            int size;
+
+            switch (argument.Type)
+            {
+                case ATypes.AChar:
+                    size = ByteSize;
+                    break;
+                case ATypes.AFloat:
+                    size = DoubleSize;
+                    break;
+                default:
+                    size = IntSize;
+                    break;
+            }
+
+            result += (size * AllItem(argument));
+
+            return result;
+        }
+
         public void Create(AType argument)
         {
             WriteInt32(0,0);
@@ -287,20 +312,25 @@ namespace AplusCore.Runtime
             this.Rank = argument.Rank;
             this.Shape = argument.Shape;
 
-            int allItem = 1;
-
-            for (int i = 0; i < argument.Shape.Count; i++)
-            {
-                allItem *= argument.Shape[i];
-            }
-
-            this.WriteInt32(ItemCountPosition, allItem);
+            this.WriteInt32(ItemCountPosition, AllItem(argument));
 
             this.LeadingAxes = argument.Rank > 0 ? argument.Shape[0] : 1;
 
             long position = ItemPosition;
 
             Write(argument, ref position);
+        }
+
+        private static int AllItem(AType argument)
+        {
+            int allItem = 1;
+
+            for (int i = 0; i < argument.Rank; i++)
+            {
+                allItem *= argument.Shape[i];
+            }
+
+            return allItem;
         }
 
         private void Write(AType argument, ref long position)

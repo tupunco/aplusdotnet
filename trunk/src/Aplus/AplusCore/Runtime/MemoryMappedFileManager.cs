@@ -21,11 +21,6 @@ namespace AplusCore.Runtime
 
         #region Create
 
-        public static long ComputeSize(AType argument)
-        {
-            return 20 * 1024 * 1024;
-        }
-
         public void CreateMemmoryMappedFile(string path, AType argument)
         {
             GC.Collect();
@@ -39,7 +34,7 @@ namespace AplusCore.Runtime
                 memoryMappedFile = MemoryMappedFile.CreateFromFile(
                     new FileStream(path, FileMode.Create),
                     memoryMappedFileName,
-                    ComputeSize(argument),
+                    MappedFile.ComputeSize(argument),
                     MemoryMappedFileAccess.ReadWrite,
                     new MemoryMappedFileSecurity(),
                     HandleInheritability.Inheritable,
