@@ -63,11 +63,20 @@ namespace AplusCore.Compiler.AST
 
         public override DLR.Expression Generate(AplusScope scope)
         {
-            Aplus runtime = scope.GetRuntime();
-            DLR.Expression variableContainer = scope.GetModuleExpression();
-
-            string[] contextParts = CreateContextNames(runtime.CurrentContext);
             DLR.Expression result;
+            Aplus runtime = scope.GetRuntime();
+
+            if (this.Type == IdentifierType.SystemName && runtime.SystemFunctions.ContainsKey(this.Name))
+            {
+                // Check if the name is a system function's name and we have such system function
+                // and return it
+                result = DLR.Expression.Constant(runtime.SystemFunctions[this.Name]);
+
+                return result;
+            }
+
+            DLR.Expression variableContainer = scope.GetModuleExpression();
+            string[] contextParts = CreateContextNames(runtime.CurrentContext);
 
             // Check if the scope is a method
             if (scope.IsMethod)
