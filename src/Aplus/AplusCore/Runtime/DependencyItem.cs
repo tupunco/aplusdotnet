@@ -13,6 +13,8 @@ namespace AplusCore.Runtime
         private HashSet<string> dependentItems;
         private DependencyState state;
         private AType function;
+        private bool itemwise;
+        private AType invalidIndex;
 
         #endregion
 
@@ -42,6 +44,20 @@ namespace AplusCore.Runtime
             get { return this.function; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsItemwise
+        {
+            get { return this.itemwise; }
+        }
+
+        public AType InvalidIndex
+        {
+            get { return this.invalidIndex; }
+            set { this.invalidIndex = value; }
+        }
+
         #endregion
 
         #region Constructors
@@ -54,6 +70,13 @@ namespace AplusCore.Runtime
 
             // By default the dependencies are invalid.
             MarkAsInvalid();
+        }
+
+        public DependencyItem(string variableName, HashSet<string> dependentItems, AType function, bool itemwise)
+            : this(variableName, dependentItems, function)
+        {
+            this.itemwise = itemwise;
+            this.InvalidIndex = Utils.ANull();
         }
 
         #endregion
@@ -86,6 +109,11 @@ namespace AplusCore.Runtime
         public void MarkAsInvalid()
         {
             this.state = DependencyState.Invalid;
+
+            if (this.IsItemwise)
+            {
+                this.InvalidIndex = Utils.ANull();
+            }
         }
 
         /// <summary>
