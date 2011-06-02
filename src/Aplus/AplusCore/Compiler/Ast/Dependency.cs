@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 using AplusCore.Compiler.Grammar;
@@ -204,11 +203,9 @@ namespace AplusCore.Compiler.AST
 
     partial class Node
     {
-        public static Dependency Dependency(Node variable, Node functionBody, string codeText, Variables variables)
+        public static Dependency Dependency(Identifier variable, Node functionBody, string codeText, Variables variables)
         {
-            Debug.Assert(variable is Identifier);
-
-            return new Dependency((Identifier)variable, functionBody, codeText, variables);
+            return new Dependency(variable, functionBody, codeText, variables);
         }
     }
 
