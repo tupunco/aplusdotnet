@@ -92,6 +92,7 @@
     <Compile Include="Compiler\Ast\Token.cs" />
     <Compile Include="Compiler\Ast\UserDefInvoke.cs" />
     <Compile Include="Compiler\Ast\MethodChooser.cs" />
+    <Compile Include="Compiler\ExpressionTreeExtensions.cs" />
     <Compile Include="Compiler\Grammar\AplusParser.Utils.cs" />
     <Compile Include="Compiler\Grammar\Apl\AplusLexer.cs">
       <DependentUpon>AplusLexer.g</DependentUpon>

@@ -59,21 +59,6 @@ namespace AplusCore
             return property;
         }
 
-        /// <summary>
-        /// Wraps the expression inside a Dynamic cast to AType
-        /// </summary>
-        /// <param name="expression">Expression to cast.</param>
-        /// <param name="runtime"></param>
-        /// <returns></returns>
-        internal static DLR.Expression ConvertToAType(this DLR.Expression expression, Aplus runtime)
-        {
-            return DLR.Expression.Dynamic(
-                runtime.ConvertBinder(typeof(AType)),
-                typeof(AType),
-                expression
-            );
-        }
-
         public static string ToTypeString(this ATypes type)
         {
             switch (type)
