@@ -197,7 +197,7 @@ namespace AplusCore.Compiler.AST
                             contextParts
                     ),
                     typeof(object)
-                ).ConvertToAType(runtime);
+                ).ToAType(runtime);
 
             return result;
         }
