@@ -72,6 +72,17 @@ namespace AplusCore.Runtime
         }
 
         /// <summary>
+        /// Tries to get the <see cref="DependencyItem"/> for the given variable.
+        /// </summary>
+        /// <param name="variableName">Global variable name.</param>
+        /// <param name="dependency"><see cref="DependencyItem"/> for the given global variable name.</param>
+        /// <returns>True if ther is a <see cref="DependencyItem"/>, otherwise false.</returns>
+        public bool TryGetDependency(string variableName, out DependencyItem dependency)
+        {
+            return this.mapping.TryGetValue(variableName, out dependency);
+        }
+
+        /// <summary>
         /// Mark dependencies invalid, based on the variable.
         /// </summary>
         /// <remarks>Only valid dependencies will be marked as invalid.</remarks>

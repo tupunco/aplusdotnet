@@ -21,6 +21,8 @@ namespace AplusCore.Runtime
         private MemoryMappedFileManager mmfmanager;
         private DependencyManager dependencies;
 
+        private Dictionary<string, AType> systemFunctions;
+
         #endregion
 
         #region Properties
@@ -52,6 +54,11 @@ namespace AplusCore.Runtime
             set { this.sysvars["cx"] = ASymbol.Create(value); }
         }
 
+        public Dictionary<string, AType> SystemFunctions
+        {
+            get { return this.systemFunctions; }
+        }
+
         #endregion
 
         #region Constructor
@@ -67,6 +74,8 @@ namespace AplusCore.Runtime
             this.sysvars["mode"] = ASymbol.Create(parsemode.ToString().ToLower());
 
             this.mmfmanager = new MemoryMappedFileManager();
+
+            this.systemFunctions = Function.SystemFunction.DiscoverSystemFunctions();
 
             if (String.IsNullOrEmpty(Environment.GetEnvironmentVariable("APATH", EnvironmentVariableTarget.User)))
             {
