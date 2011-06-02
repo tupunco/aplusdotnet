@@ -52,10 +52,6 @@ namespace AplusCore.Compiler.AST
 
                 DLR.ParameterExpression indexerParam = DLR.Expression.Parameter(typeof(List<AType>), "__INDEX__");
 
-                List<DLR.Expression> arguments = new List<DLR.Expression>();
-                arguments.Add(this.item.Generate(scope));
-                arguments.Add(indexerParam);
-
                 result = DLR.Expression.Block(
                     new DLR.ParameterExpression[] { indexerParam },
                     DLR.Expression.Assign(
@@ -65,32 +61,27 @@ namespace AplusCore.Compiler.AST
                             DLR.Expression.NewArrayInit(typeof(AType), indexerValues)
                         )
                     ),
-                    DLR.Expression.Convert(
-                        DLR.Expression.Dynamic(
-                            scope.GetRuntime().GetIndexBinder(new DYN.CallInfo(indexerValues.Count())),
-                            typeof(object),
-                            arguments
-                        ),
-                    typeof(AType)
+                    DLR.Expression.Dynamic(
+                        scope.GetRuntime().GetIndexBinder(new DYN.CallInfo(indexerValues.Count())),
+                        typeof(object),
+                        this.item.Generate(scope),
+                        indexerParam
                     )
                 );
             }
             else
             {
                 // in case of: a[];
-                result = DLR.Expression.Convert(
+                result =
                     DLR.Expression.Dynamic(
                         scope.GetRuntime().GetIndexBinder(new DYN.CallInfo(0)),
                         typeof(object),
                         this.item.Generate(scope),
                         DLR.Expression.Constant(null)
-                    ),
-                    typeof(AType)
-                );
-                    
+                    );
             }
 
-            return result;
+            return result.To<AType>();
         }
 
         #endregion
