@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AplusCore.Types;
+
 using Microsoft.Scripting.Hosting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using AplusCore;
 using AplusCore.Runtime;
+using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr
 {
@@ -20,6 +20,13 @@ namespace AplusCoreUnitTests.Dlr
         }
 
         [TestCategory("DLR"), TestCategory("Dependencies"), TestMethod]
+        public void ItemwiseDependencyDefinition()
+        {
+            var scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("a[i]: b[i] + 2", scope);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dependencies"), TestMethod]
         public void BasicDependencyEvaluation()
         {
             var expected = AInteger.Create(5);
@@ -29,6 +36,25 @@ namespace AplusCoreUnitTests.Dlr
 
             this.engine.Execute<AType>("a: b + 2", scope);
             this.engine.Execute<AType>("b:=3", scope);
+
+            Assert.IsTrue(runtime.DependencyManager.IsInvalid(".a"), "Dependency '.a' marked valid");
+
+            AType result = this.engine.Execute<AType>("a", scope);
+
+            Assert.AreEqual<AType>(expected, result, "Incorrect dependency evaluation");
+            Assert.IsFalse(runtime.DependencyManager.IsInvalid(".a"), "Dependency '.a' marked invalid");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dependencies"), TestMethod]
+        public void ItemwiseDependencyEvaluation()
+        {
+            var expected = new int[] { 3, 4, 5 }.ToAArray();
+            var scope = this.engine.CreateScope();
+
+            Aplus runtime = this.engine.GetService<Aplus>();
+
+            this.engine.Execute<AType>("a[i]: b[i] + 2", scope);
+            this.engine.Execute<AType>("b:=1 2 3", scope);
 
             Assert.IsTrue(runtime.DependencyManager.IsInvalid(".a"), "Dependency '.a' marked valid");
 

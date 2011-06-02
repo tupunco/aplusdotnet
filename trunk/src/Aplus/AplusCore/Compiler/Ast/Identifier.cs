@@ -162,13 +162,25 @@ namespace AplusCore.Compiler.AST
 
             // Build the ET for invoking the dependecy.
             DLR.Expression dependencyEvaulate =
-                AST.UserDefInvoke.BuildInvoke(
-                    runtime,
-                    new DLR.Expression[] 
-                    {
-                        DLR.Expression.Property(dependencyInformation, "Function"),
-                        scope.GetAplusEnvironment()
-                    }
+                DLR.Expression.Condition(
+                    dependencyInformation.Property("IsItemwise"),
+                    AST.UserDefInvoke.BuildInvoke(
+                        runtime,
+                        new DLR.Expression[]
+                        {
+                            dependencyInformation.Property("Function"),
+                            scope.GetAplusEnvironment(),
+                            dependencyInformation.Property("InvalidIndex")
+                        }
+                    ),
+                    AST.UserDefInvoke.BuildInvoke(
+                        runtime,
+                        new DLR.Expression[] 
+                        {
+                            DLR.Expression.Property(dependencyInformation, "Function"),
+                            scope.GetAplusEnvironment()
+                        }
+                    )
                 );
 
             /* 

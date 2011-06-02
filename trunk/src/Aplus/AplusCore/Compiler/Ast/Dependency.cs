@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using AplusCore.Compiler.Grammar;
 using AplusCore.Runtime;
@@ -29,6 +30,11 @@ namespace AplusCore.Compiler.AST
         {
             get { return this.indexer; }
             set { this.indexer = value; }
+        }
+
+        internal bool IsItemwise
+        {
+            get { return this.indexer != null; }
         }
 
         #endregion
@@ -77,9 +83,27 @@ namespace AplusCore.Compiler.AST
                 enviromentParam: DLR.Expression.Parameter(typeof(AplusEnvironment), "_EXTERNAL_EVN_"),
                 isMethod: true
             );
+            // 1.5. Method for registering dependencies
+            MethodInfo registerMethod;
 
             // 2. Prepare the method arguments (AplusEnvironment)
-            DLR.ParameterExpression[] methodParameters = new DLR.ParameterExpression[] {  dependencyScope.AplusEnvironment };
+            DLR.ParameterExpression[] methodParameters;
+
+            if (this.IsItemwise)
+            {
+                DLR.ParameterExpression index = 
+                    DLR.Expression.Parameter(typeof(AType), string.Format("__INDEX[{0}]__", this.Indexer.Name));
+                dependencyScope.Variables.Add(this.Indexer.Name, index);
+
+                methodParameters = new DLR.ParameterExpression[] { dependencyScope.AplusEnvironment, index };
+                registerMethod = typeof(DependencyManager).GetMethod("RegisterItemwise");
+            }
+            else
+            {
+                methodParameters = new DLR.ParameterExpression[] { dependencyScope.AplusEnvironment };
+                registerMethod = typeof(DependencyManager).GetMethod("Register");
+            }
+
             // 2.5  Create a result parameter
             DLR.ParameterExpression resultParameter = DLR.Expression.Parameter(typeof(AType), "__RESULT__");
 
@@ -132,7 +156,7 @@ namespace AplusCore.Compiler.AST
             );
 
             DLR.Expression wrappedLambda = DLR.Expression.Call(
-                typeof(AFunc).GetMethod("Create", new Type[] { typeof(string), typeof(object), typeof(int), typeof(string) }),
+                typeof(AFunc).GetMethod("Create"),
                 DLR.Expression.Constant(dependencyName),
                 method,
                 DLR.Expression.Constant(methodParameters.Length),
@@ -155,7 +179,7 @@ namespace AplusCore.Compiler.AST
                 DLR.Expression.Assign(dependencyMethodParam, wrappedLambda),
                 DLR.Expression.Call(
                     dependencyManager,
-                    typeof(DependencyManager).GetMethod("Register"),
+                    registerMethod,
                     DLR.Expression.Constant(dependencyName, typeof(string)),
                     DLR.Expression.Constant(dependents, typeof(HashSet<string>)),
                     dependencyMethodParam
@@ -168,6 +192,11 @@ namespace AplusCore.Compiler.AST
 
         private void PreprocessVariables(AplusScope scope)
         {
+            if (this.IsItemwise)
+            {
+                this.variables.Accessing.Remove(this.indexer.Name);
+            }
+
             if (this.variables.LocalAssignment.ContainsKey(this.variable.Name))
             {
                 if (!this.variables.GlobalAssignment.ContainsKey(this.variable.Name))

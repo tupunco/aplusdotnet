@@ -47,6 +47,23 @@ namespace AplusCore.Runtime
         }
 
         /// <summary>
+        /// Register an itemwise dependency.
+        /// </summary>
+        /// <param name="variableName"></param>
+        /// <param name="dependentItems"></param>
+        /// <param name="function"></param>
+        /// <returns>Returns the registerd dependency information.</returns>
+        public DependencyItem RegisterItemwise(string variableName, HashSet<string> dependentItems, AType function)
+        {
+            // Invalidate any dependencies using the variable
+            InvalidateDependencies(variableName);
+
+            DependencyItem item = new DependencyItem(variableName, dependentItems, function, true);
+            this.mapping[variableName] = item;
+            return item;
+        }
+
+        /// <summary>
         /// Check if the variable's dependency is invalid.
         /// </summary>
         /// <param name="variableName">The name of the variable to check for.</param>
