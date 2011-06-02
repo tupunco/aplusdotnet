@@ -245,6 +245,55 @@ namespace AplusCoreUnitTests.AstNode
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
+        public void SingeQuotedKanaKanjiConstantTest()
+        {
+            string input = "'こんにちは世界'";
+            string expectedText = "こんにちは世界";
+            this.lexer = new AplusLexer(new ANTLRStringStream(input));
+            this.parser = new AplusParser(new CommonTokenStream(lexer));
+
+            Assert.IsTrue(this.parser.Parse(), "Singe quoted constant input parse FAILED");
+
+            ExpressionList expectedNodeA = Node.ExpressionList(
+                Node.ExpressionList(
+                    Node.SingeQuotedConstant(expectedText)
+                )
+            );
+            ExpressionList expectedNodeB = Node.ExpressionList(
+                Node.ExpressionList(
+                // for Single quoted characters remove the leading and trailing '
+                    new Constant(expectedText, ConstantType.CharacterConstant)
+                )
+            );
+
+            Assert.AreEqual(expectedNodeA, this.parser.tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, this.parser.tree, "Invalid Node created!");
+
+            Assert.IsTrue(this.parser.tree == expectedNodeA, "Operator == Compare Failed!");
+        }
+
+
+        [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
+        public void DoubleQuotedKanaKanjiConstantTest()
+        {
+            string input = "\"こんにちは世界\"";
+            string expectedText = "こんにちは世界";
+            this.lexer = new AplusLexer(new ANTLRStringStream(input));
+            this.parser = new AplusParser(new CommonTokenStream(lexer));
+
+            Assert.IsTrue(this.parser.Parse(), "Double quoted constant input parse FAILED");
+
+            ExpressionList expectedNodeA = Node.ExpressionList(
+                Node.ExpressionList(
+                    Node.DoubleQuotedConstant(expectedText)
+                )
+            );
+
+            Assert.AreEqual(expectedNodeA, this.parser.tree, "Invalid Node created! (Helper method used)");
+            Assert.IsTrue(this.parser.tree == expectedNodeA, "Operator == Compare Failed!");
+        }
+
+        [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
         public void DoubleQuotedConstantTest()
         {
             string input = "\"@tes\\11st\"";
