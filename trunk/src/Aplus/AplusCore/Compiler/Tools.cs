@@ -1,8 +1,8 @@
-﻿using DLR = System.Linq.Expressions;
-using DYN = System.Dynamic;
-using AplusCore.Types.MemoryMapped;
-using AplusCore.Runtime;
+﻿using AplusCore.Runtime;
 using AplusCore.Types;
+using AplusCore.Types.MemoryMapped;
+
+using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler
 {
