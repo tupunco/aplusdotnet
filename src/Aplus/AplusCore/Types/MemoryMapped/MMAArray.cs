@@ -6,7 +6,7 @@ using AplusCore.Runtime;
 
 namespace AplusCore.Types.MemoryMapped
 {
-    class MMAArray : AArray
+    class MMAArray : AArray, IMapped
     {
         #region Variables
 
@@ -66,6 +66,11 @@ namespace AplusCore.Types.MemoryMapped
             get { return true; }
         }
 
+        public MemoryMappedFileMode Mode
+        {
+            get { return this.mappedFile.Mode; }
+        }
+
         #endregion
 
         #region Indexing
@@ -113,6 +118,14 @@ namespace AplusCore.Types.MemoryMapped
             this.mappedFile.Add(item);
         }
 
+        public override void AddRange(IEnumerable<AType> items)
+        {
+            foreach (AType item in items)
+            {
+                Add(item);
+            }
+        }
+
         public override AType Clone()
         {
             AType result = AArray.Create(this.Type);
@@ -144,6 +157,11 @@ namespace AplusCore.Types.MemoryMapped
             }
 
             return this.indexCache[index];
+        }
+
+        public void Update(AType value)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

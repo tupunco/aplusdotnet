@@ -142,7 +142,7 @@ namespace AplusCore.Compiler.AST
 
             }
 
-            result = BuildGlobalAccessor(scope, runtime, variableContainer, contextParts);
+            result = Tools.CloneMemoryMappedFile(BuildGlobalAccessor(scope, runtime, variableContainer, contextParts));
 
             return result;
         }

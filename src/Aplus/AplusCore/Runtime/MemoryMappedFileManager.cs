@@ -6,6 +6,15 @@ using AplusCore.Types;
 
 namespace AplusCore.Runtime
 {
+
+    public enum MemoryMappedFileMode
+    {
+        Read,
+        ReadAndWrite,
+        LocalWrite
+    }
+
+
     public class MemoryMappedFileManager
     {
         #region Encode
@@ -57,7 +66,7 @@ namespace AplusCore.Runtime
 
         #region Read
 
-        public AType Read(string memoryMappadFilePath, bool localWrite)
+        public AType Read(string memoryMappadFilePath, MemoryMappedFileMode memoryMappedFileMode)
         {
             string memoryMappedFileName = EncodeName(memoryMappadFilePath);
             MemoryMappedFile memoryMappedFile;
@@ -71,7 +80,7 @@ namespace AplusCore.Runtime
                 memoryMappedFile = MemoryMappedFile.CreateFromFile(memoryMappadFilePath, FileMode.Open, memoryMappedFileName);
             }
 
-            return MappedFile.Read(memoryMappedFile, localWrite);
+            return MappedFile.Read(memoryMappedFile, memoryMappedFileMode);
         }
 
         #endregion

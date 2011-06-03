@@ -1,7 +1,7 @@
 ﻿using System;
 
-using AplusCore.Types;
 using AplusCore.Runtime.Function.Dyadic;
+using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
 {

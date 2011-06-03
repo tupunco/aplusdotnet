@@ -1,8 +1,8 @@
 ﻿using System;
-
 using System.Collections.Generic;
 using System.Reflection;
 
+using AplusCore.Compiler;
 using AplusCore.Types;
 
 using DLR = System.Linq.Expressions;
@@ -90,11 +90,12 @@ namespace AplusCore.Runtime.Binder
                     )
                 );
 
-                expression = DLR.Expression.Block(typeof(Types.AType),
+                expression = DLR.Expression.Block(
+                    typeof(Types.AType),
                     rankCheck,
                     DLR.Expression.Assign(
                         DLR.Expression.MakeIndex(
-                            DLR.Expression.Convert(target.Expression, typeof(Types.AType)),
+                            DLR.Expression.Convert(Tools.CloneMemoryMappedFile(target.Expression), typeof(Types.AType)),
                             SetIndexBinder.AArrayIndexerProperty,
                             new DLR.Expression[] { indexer }
                         ),

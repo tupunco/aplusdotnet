@@ -1,7 +1,8 @@
-﻿using AplusCore.Types;
-using AplusCore.Runtime.Function.Monadic;
+﻿using System;
 using System.IO;
-using System;
+
+using AplusCore.Runtime.Function.Monadic;
+using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
 {
@@ -58,15 +59,13 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
 
             int mode = left.asInteger;
 
-            //0: read, 1: read and write, 2: read and local write
+            // 0: read, 1: read and write, 2: read and local write
             if (mode != 0 && mode != 1 && mode != 2)
             {
                 throw new Error.Domain(DomainErrorText);
             }
 
-            AType result = environment.Runtime.MemoryMappedFileManager.Read(resultPath, mode == 2);
-
-            return mode == 0 ? result.Clone() : result;
+            return environment.Runtime.MemoryMappedFileManager.Read(resultPath, (MemoryMappedFileMode)mode);
         }
 
         private bool FileSearch(string path, out string result)

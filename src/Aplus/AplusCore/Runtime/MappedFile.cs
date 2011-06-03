@@ -20,6 +20,7 @@ namespace AplusCore.Runtime
         private ReadAType reader;
         private WriteAType writer;
         private int size = -1;
+        private MemoryMappedFileMode memoryMappedFileMode;
 
         private MemoryMappedFile memoryMappedFile;
         private MemoryMappedViewAccessor accessor;
@@ -38,6 +39,11 @@ namespace AplusCore.Runtime
         #endregion
 
         #region Properties
+
+        public MemoryMappedFileMode Mode
+        {
+            get { return this.memoryMappedFileMode; }
+        }
 
         public int Rank
         {
@@ -219,10 +225,11 @@ namespace AplusCore.Runtime
 
         #region Construction
 
-        public MappedFile(MemoryMappedFile memoryMappedFile, bool localWrite = false)
+        public MappedFile(MemoryMappedFile memoryMappedFile, MemoryMappedFileMode memoryMappedFileMode = MemoryMappedFileMode.ReadAndWrite)
         {
             this.memoryMappedFile = memoryMappedFile;
-            this.accessor = localWrite ?
+            this.memoryMappedFileMode = memoryMappedFileMode;
+            this.accessor = memoryMappedFileMode == MemoryMappedFileMode.LocalWrite ?
                 memoryMappedFile.CreateViewAccessor(0, 0, MemoryMappedFileAccess.CopyOnWrite) : 
                 memoryMappedFile.CreateViewAccessor();
         }
@@ -368,9 +375,9 @@ namespace AplusCore.Runtime
 
         #region Read
 
-        public static AType Read(MemoryMappedFile memoryMappedFile, bool localWrite)
+        public static AType Read(MemoryMappedFile memoryMappedFile, MemoryMappedFileMode memoryMappedFileMode)
         {
-            MappedFile mappedFile = new MappedFile(memoryMappedFile, localWrite);
+            MappedFile mappedFile = new MappedFile(memoryMappedFile, memoryMappedFileMode);
 
             return mappedFile.Rank > 0 ?
                 MMAArray.Create(mappedFile) :
