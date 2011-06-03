@@ -104,6 +104,7 @@
     <Compile Include="Compiler\Grammar\Tokens.cs" />
     <Compile Include="Compiler\Parse.cs" />
     <Compile Include="Compiler\ParseException.cs" />
+    <Compile Include="Compiler\Tools.cs" />
     <Compile Include="Compiler\VariableHelper.cs" />
     <Compile Include="Hosting\AplusCommandLine.cs" />
     <Compile Include="Hosting\AplusConsoleHost.cs" />

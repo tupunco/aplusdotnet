@@ -24,6 +24,11 @@ namespace AplusCore.Types.MemoryMapped
             get { return true; }
         }
 
+        public MemoryMappedFileMode Mode
+        {
+            get { return this.mappedFile.Mode;  }
+        }
+
         #endregion
 
         #region Constructor
