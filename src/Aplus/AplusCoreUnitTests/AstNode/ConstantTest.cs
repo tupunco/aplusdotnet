@@ -1,14 +1,9 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using AplusCore.Compiler.Grammar;
-using AplusCore.Compiler.AST;
-using System.Threading;
-using System.Globalization;
 using Antlr.Runtime;
+
+using AplusCore.Compiler.AST;
+using AplusCore.Compiler.Grammar;
 using AplusCore.Compiler.Grammar.Ascii;
 
 namespace AplusCoreUnitTests.AstNode
@@ -365,7 +360,6 @@ namespace AplusCoreUnitTests.AstNode
             Assert.IsTrue(this.parser.tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
-
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
          public void NullConstantTest3()
         {
@@ -503,6 +497,29 @@ namespace AplusCoreUnitTests.AstNode
 
         }
 
+        [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
+        public void MultiLineStrandTest()
+        {
+            string input = "(3;\n'hello')";
+            this.lexer = new AplusLexer(new ANTLRStringStream(input));
+            this.parser = new AplusParser(new CommonTokenStream(lexer));
+
+            Assert.IsTrue(this.parser.Parse(), "Strand parsing FAILED!");
+
+            #region expected AST
+            ExpressionList expectedTree = Node.ExpressionList(
+                Node.ExpressionList(
+                   Node.Strand(
+                        Node.ConstantList(Node.IntConstant("3")),
+                        Node.SingeQuotedConstant("hello")
+                   )
+                )
+            );
+            #endregion
+
+            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+        }
+
         /// <summary>
         /// Tests bug found in ANTLR's generated Lexer
         /// </summary>
@@ -512,7 +529,7 @@ namespace AplusCoreUnitTests.AstNode
         ///      " ( ~" )* "
         ///      
         ///   in the generated code the middle part's matching won't accept the 'S' character.
-        ///   It seems the the cutpoint in the ascii table is somehow calculated incorrectly
+        ///   It seems that the cutpoint in the ascii table is somehow calculated incorrectly
         ///   inside the ANTLR. 
         ///   
         /// Workaround for bug:

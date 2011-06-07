@@ -140,8 +140,8 @@ BWNotEqual:		'\u00A8\u00AE';
 //Miscelonus:
 StackReference:	'&';
 
-LP:				'(';
-RP:				')';
+LP:				'(' {mode++;};
+RP:				')' {mode--;};
 LSBracket:		'[';
 RSBracket:		']';
 SemiColon:		';';

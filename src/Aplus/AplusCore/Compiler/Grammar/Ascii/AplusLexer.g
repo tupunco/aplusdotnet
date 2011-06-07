@@ -141,8 +141,8 @@ BWNotEqual:		'bwne';
 //Miscelonus:
 StackReference:	'\u00FE';
 
-LP:				'(';
-RP:				')';
+LP:				'(' {mode++;};
+RP:				')' {mode--;};
 LSBracket:		'[';
 RSBracket:		']';
 SemiColon:		';';
