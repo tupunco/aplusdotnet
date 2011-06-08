@@ -212,6 +212,7 @@
     <Compile Include="Runtime\Function\Dyadic\Scalar\Relational\LessThanOrEqualTo.cs" />
     <Compile Include="Runtime\Function\Dyadic\Scalar\Relational\NotEqualTo.cs" />
     <Compile Include="Runtime\Function\System\Dependency.cs" />
+    <Compile Include="Runtime\Function\System\Items.cs" />
     <Compile Include="Runtime\Function\System\SystemFunction.cs" />
     <Compile Include="Runtime\Function\System\SystemFunctionAttribute.cs" />
     <Compile Include="Runtime\MappedFile.cs" />
