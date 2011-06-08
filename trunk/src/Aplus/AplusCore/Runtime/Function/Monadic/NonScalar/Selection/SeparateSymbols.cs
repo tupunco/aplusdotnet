@@ -70,16 +70,13 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Selection
         private AType SeparateSymbol(AType argument)
         {
             AType result = AArray.Create(ATypes.ASymbol);
-
             string symbol = argument.asString;
+            int index = symbol.LastIndexOf('.');
 
-            if (symbol.Contains('.'))
+            if (index != -1)
             {
-                int index = symbol.LastIndexOf('.');
-
                 result.AddWithNoUpdate(ASymbol.Create(symbol.Substring(0, index)));
                 result.AddWithNoUpdate(ASymbol.Create(symbol.Substring(index + 1)));
-
             }
             else
             {

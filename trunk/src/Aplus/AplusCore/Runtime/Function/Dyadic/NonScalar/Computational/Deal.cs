@@ -21,7 +21,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
         {
             PrepareVariables(left, right);
 
-            return Schuffle(GetSeed(environment));
+            return Shuffle(GetSeed(environment));
         }
 
         #endregion
@@ -93,7 +93,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
         /// </summary>
         /// <param name="seed"></param>
         /// <returns></returns>
-        private AType Schuffle(int seed)
+        private AType Shuffle(int seed)
         {
             AType result = AArray.Create(ATypes.AInteger);
             

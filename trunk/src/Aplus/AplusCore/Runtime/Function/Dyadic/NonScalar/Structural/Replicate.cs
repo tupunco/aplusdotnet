@@ -40,47 +40,40 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                 throw new Error.Rank(RankErrorText);
             }
 
+            int element;
             AType scalar;
 
             if (left.TryFirstScalar(out scalar, true))
             {
-                int result;
-
-                if (scalar.ConvertToRestrictedWholeNumber(out result))
-                {
-                    if (result < 0)
-                    {
-                        throw new Error.Domain(DomainErrorText);
-                    }
-
-                    this.replicateVector.Add(result);
-                }
-                else
+                if (!scalar.ConvertToRestrictedWholeNumber(out element))
                 {
                     throw new Error.Type(TypeErrorText);
                 }
+
+                if (element < 0)
+                {
+                    throw new Error.Domain(DomainErrorText);
+                }
+
+                this.replicateVector.Add(element);
             }
             else
             {
                 if (left.Length > 0)
                 {
-                    int element;
-
                     foreach (AType item in left)
                     {
-                        if (item.ConvertToRestrictedWholeNumber(out element))
-                        {
-                            if (element < 0)
-                            {
-                                throw new Error.Domain(DomainErrorText);
-                            }
-
-                            this.replicateVector.Add(element);
-                        }
-                        else
+                        if (!item.ConvertToRestrictedWholeNumber(out element))
                         {
                             throw new Error.Type(TypeErrorText);
                         }
+
+                        if (element < 0)
+                        {
+                            throw new Error.Domain(DomainErrorText);
+                        }
+
+                        this.replicateVector.Add(element);
                     }
                 }
                 else
@@ -122,6 +115,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                             result.AddWithNoUpdate(items[i].Clone());
                         }
                     }
+
                     length = this.replicateVector[0] * this.items.Length;
             }
             else //replicateCounter.Count > 1
@@ -132,18 +126,20 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                     {
                         result.AddWithNoUpdate(this.items[this.items.Length > 1 ? i : 0].Clone());
                     }
+
                     length += this.replicateVector[i];
                 }
             }
 
             result.Length = length;
             result.Shape = new List<int>() { length };
+
             if (this.items.Rank > 1)
             {
                 result.Shape.AddRange(this.items.Shape.GetRange(1, this.items.Shape.Count - 1));
             }
-            result.Rank = this.items.Rank;
 
+            result.Rank = this.items.Rank;
             result.Type = length > 0 ? result[0].Type :(this.items.MixedType() ? ATypes.ANull : this.items.Type);
 
             return result;

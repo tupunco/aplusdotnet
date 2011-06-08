@@ -45,13 +45,13 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
         private AType NestedCase(AType argument)
         {
             this.result = AArray.Create(ATypes.AArray);
-            length = 0;
+            this.length = 0;
 
             DiscloseNestedElement(argument);
 
-            this.result.Type = length > 0 ? argument.Type : ATypes.ANull;
-            this.result.Length = length;
-            this.result.Shape = new List<int>() { length };
+            this.result.Type = this.length > 0 ? argument.Type : ATypes.ANull;
+            this.result.Length = this.length;
+            this.result.Shape = new List<int>() { this.length };
             this.result.Rank = 1;
 
             return result;
@@ -90,7 +90,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
                     if (argument.IsBox ? !IsNull(argument) : true)
                     {
                         this.result.AddWithNoUpdate(argument);
-                        length++;
+                        this.length++;
                     }
                 }
             }

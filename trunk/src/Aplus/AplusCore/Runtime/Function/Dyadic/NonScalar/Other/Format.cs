@@ -92,15 +92,12 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
         private void PrepareItem(AType argument)
         {
             string item = argument.asFloat.ToString(CultureInfo.InvariantCulture);
-
             int index = item.IndexOf(".");
-
             int[] pair = new int[2];
 
             if (index != -1)
             {
                 pair[0] = int.Parse(item.Substring(0, index));
-
                 pair[1] = int.Parse(item.Substring(index + 1, 1));
             }
             else
@@ -226,13 +223,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
                 }
 
                 formatString += "e+00";
-
-                //string formatString = "e" + (this.formaters[index][1] != int.MaxValue ? this.formaters[index][1] : 0);
-
                 result = argument.asFloat.ToString(formatString, CultureInfo.InvariantCulture);
-
                 result = result.PadLeft(result.Length + (result[0] == '-' ? 1 : 2));
-
                 result = Pad(result, index);
             }
             else

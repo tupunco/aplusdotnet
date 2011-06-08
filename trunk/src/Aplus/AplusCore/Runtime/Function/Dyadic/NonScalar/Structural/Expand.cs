@@ -48,45 +48,38 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                 throw new Error.Rank(RankErrorText);
             }
 
+            int element;
             AType scalar;
 
             if (left.TryFirstScalar(out scalar, true))
             {
-                int result;
-
-                if (scalar.ConvertToRestrictedWholeNumber(out result))
+                if (!scalar.ConvertToRestrictedWholeNumber(out element))
                 {
-                    if (result != 0 && result != 1)
+                    throw new Error.Type(TypeErrorText);
+                }
+
+                if (element != 0 && element != 1)
+                {
+                    throw new Error.Domain(DomainErrorText);
+                }
+
+                this.expandVector.Add((byte)element);
+            }
+            else
+            {
+                foreach (AType item in left)
+                {
+                    if (!item.ConvertToRestrictedWholeNumber(out element))
+                    {
+                        throw new Error.Type(TypeErrorText);
+                    }
+
+                    if (element != 0 && element != 1)
                     {
                         throw new Error.Domain(DomainErrorText);
                     }
 
-                    this.expandVector.Add((byte)result);
-                }
-                else
-                {
-                    throw new Error.Type(TypeErrorText);
-                }
-            }
-            else
-            {
-                int element;
-
-                foreach (AType item in left)
-                {
-                    if (item.ConvertToRestrictedWholeNumber(out element))
-                    {
-                        if (element != 0 && element != 1)
-                        {
-                            throw new Error.Domain(DomainErrorText);
-                        }
-
-                        this.expandVector.Add((byte)element);
-                    }
-                    else
-                    {
-                        throw new Error.Type(TypeErrorText);
-                    }
+                    this.expandVector.Add((byte)element);
                 }
             }
         }
@@ -118,7 +111,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
             int index = 0;
 
             // Get the filler element based on the right argument
-            AType fillElementShape = this.items.Rank > 1 ? this.items.Shape.GetRange(1, this.items.Shape.Count - 1).ToAArray() : null;
+            AType fillElementShape = 
+                this.items.Rank > 1 ? this.items.Shape.GetRange(1, this.items.Shape.Count - 1).ToAArray() : null;
             AType filler = Utils.FillElement(this.items.Type, fillElementShape);
 
             for (int i = 0; i < this.expandVector.Count; i++)
@@ -135,10 +129,12 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 
             result.Length = this.expandVector.Count;
             result.Shape = new List<int>() { this.expandVector.Count };
+
             if (items.Rank > 1)
             {
                 result.Shape.AddRange(items.Shape.GetRange(1, items.Shape.Count - 1));
             }
+
             result.Rank = items.Rank;
             result.Type = result.Length > 0 ? result[0].Type : (this.items.MixedType() ? ATypes.ANull : this.items.Type);
 

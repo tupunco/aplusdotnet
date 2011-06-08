@@ -25,7 +25,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 
         #endregion
 
-        #region Preparationf
+        #region Preparation
 
         private void PrepareVariables(AType right, AType left)
         {

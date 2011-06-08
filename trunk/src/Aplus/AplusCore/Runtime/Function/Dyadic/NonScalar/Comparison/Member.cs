@@ -103,6 +103,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
                         break;
                     }
                 }
+
                 this.result.AddWithNoUpdate(AInteger.Create(value));
             }
             else

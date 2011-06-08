@@ -8,7 +8,6 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
 {
     class Cast : AbstractDyadicFunction
     {
-        // Declare delegate
         private delegate AType Converter(AType argument);
 
         #region Variables
@@ -143,23 +142,19 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
             {
                 case ATypes.ASymbol:
                 case ATypes.ANull:
-
                     return argument.Clone();
 
                 case ATypes.AChar:
-
                     return MonadicFunctionInstance.Pack.Execute(argument);
 
                 case ATypes.AInteger:
                 case ATypes.AFloat:
-
                     this.converter = new Converter(ConvertNumberConstantToSymbolConstant);
                     this.type = ATypes.ASymbol;
 
                     return Walker(argument);
 
                 default:
-
                     throw new Error.Domain(DomainErrorText);
             }
         }
@@ -208,27 +203,22 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
             switch (argument.Type)
             {
                 case ATypes.AChar:
-
                     return argument.Clone();
 
                 case ATypes.ANull:
-
                     return Utils.ANull(ATypes.AChar);
 
                 case ATypes.ASymbol:
-
                     return MonadicFunctionInstance.Unpack.Execute(argument);
 
                 case ATypes.AInteger:
                 case ATypes.AFloat:
-
                     this.converter = new Converter(ConvertNumberConstantToCharConstant);
                     this.type = ATypes.AChar;
 
                     return Walker(argument);
 
                 default:
-
                     throw new Error.Domain(DomainErrorText);
             }
         }
@@ -265,25 +255,20 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
             switch (argument.Type)
             {
                 case ATypes.AFloat:
-
                     return argument.Clone();
 
                 case ATypes.ANull:
-
                     return Utils.ANull(ATypes.AFloat);
 
                 case ATypes.AInteger:
-
                     this.converter = new Converter(ConvertIntegerConstantToFloatConstant);
                     return Walker(argument);
 
                 case ATypes.AChar:
-
                     this.converter = new Converter(ConvertCharConstantToNumberConstant);
                     return Walker(argument);
 
                 case ATypes.ASymbol:
-
                     if (!argument.SimpleSymbolArray())
                     {
                         throw new Error.Type(TypeErrorText);
@@ -294,7 +279,6 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
                     return Walker(argument);
 
                 default:
-
                     throw new Error.Domain(DomainErrorText);
             }
         }

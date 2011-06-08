@@ -118,6 +118,5 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
         }
 
         #endregion
-
     }
 }
