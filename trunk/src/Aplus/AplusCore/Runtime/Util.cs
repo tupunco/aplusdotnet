@@ -83,163 +83,164 @@ namespace AplusCore.Runtime
         /// <param name="left"></param>
         /// <param name="acceptTypes"></param>
         /// <returns></returns>
-         internal static bool TypeCorrect(ATypes right, ATypes left, params string[] acceptTypes)
- 	        {
- 	            foreach (string item in acceptTypes)
-	            {
- 	                if (item[0] == '?')
- 	                {
- 	                    if(right == getType(item[1]))
- 	                    {
- 	                        return true;
- 	                    }
- 	                }
-	                else if(item[1] == '?')
- 	                {
- 	                    if (left == getType(item[0]))
- 	                    {
- 	                        return true;
-	                    }
- 	                }
- 	                else
-	                {
- 	                    if (left == getType(item[0]) && right == getType(item[1]))
-	                    {
-	                        return true;
-	                    }
-	                }
- 	            }
- 	
-	            return false;
- 	        }
+        internal static bool TypeCorrect(ATypes right, ATypes left, params string[] acceptTypes)
+        {
+            foreach (string item in acceptTypes)
+            {
+                if (item[0] == '?')
+                {
+                    if (right == getType(item[1]))
+                    {
+                        return true;
+                    }
+                }
+                else if (item[1] == '?')
+                {
+                    if (left == getType(item[0]))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (left == getType(item[0]) && right == getType(item[1]))
+                    {
+                        return true;
+                    }
+                }
+            }
 
-         internal static bool TypeCorrect(ATypes argument, params char[] acceptTypes)
-         {
-             foreach (char item in acceptTypes)
-             {
-                 if (argument == getType(item))
-                 {
-                     return true;
-                 }
-             }
-             return false;
-         }
+            return false;
+        }
 
-         #region FileSearch
+        internal static bool TypeCorrect(ATypes argument, params char[] acceptTypes)
+        {
+            foreach (char item in acceptTypes)
+            {
+                if (argument == getType(item))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        #region File search
 
         /// <summary>
-         /// pathArgument type must be char or symbol. Result is the value of pathArgument with full path.
-         /// If the result is null, we didn't found the file. When we search, we use the APATH environment.
+        /// Gets the absolute path for the supplied <see cref="pathArgument"/>.
         /// </summary>
-        /// <param name="pathArgument"></param>
+        /// <remarks>
+        /// The search for the file relies on the APATH environment variable.
+        /// </remarks>
+        /// <param name="pathArgument">Must be a Char or Symbol type.</param>
         /// <param name="environment"></param>
-        /// <returns></returns>
-         internal static string GetPath(AType pathArgument, AplusEnvironment environment)
-         {
-             string path = GetFullPathOrValue(pathArgument, environment);
-             string resultPath = null;
+        /// <returns>The absolute path for the file or if not found null.</returns>
+        internal static string GetPath(AType pathArgument, AplusEnvironment environment)
+        {
+            string path = GetFullPathOrValue(pathArgument, environment);
+            string resultPath = null;
 
-             if (path != null && !Path.IsPathRooted(path))
-             {
-                 string apath = Environment.GetEnvironmentVariable("APATH", EnvironmentVariableTarget.User);
+            if (path != null && !Path.IsPathRooted(path))
+            {
+                string apath = Environment.GetEnvironmentVariable("APATH", EnvironmentVariableTarget.User);
+                string absolutePath;
 
-                 string absolutePath;
+                foreach (string item in apath.Split(';'))
+                {
+                    absolutePath = Path.Combine(item, path);
 
-                 foreach (string item in apath.Split(';'))
-                 {
-                     absolutePath = Path.Combine(item, path);
+                    if (!Path.IsPathRooted(absolutePath))
+                    {
+                        absolutePath = Path.GetFullPath(absolutePath);
+                    }
 
-                     if (!Path.IsPathRooted(absolutePath))
-                     {
-                         absolutePath = Path.GetFullPath(absolutePath);
-                     }
+                    if (FileSearch(absolutePath, out resultPath))
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                FileSearch(path, out resultPath);
+            }
 
-                     if (FileSearch(absolutePath, out resultPath))
-                     {
-                         break;
-                     }
-                 }
-             }
-             else
-             {
-                 FileSearch(path, out resultPath);
-             }
+            return resultPath;
+        }
 
-             return resultPath;
-         }
-
-         /// <summary>
-         /// pathArgument type must be char or symbol. The result is the value of the pathArgument,
-         /// if it doesn't have path. Else it gives back the value with the full path.
+        /// <summary>
+        /// Extracts the path from the supplied <see cref="pathArgument"/>.
         /// </summary>
-        /// <param name="pathArgument"></param>
+        /// <param name="pathArgument">Must be a Char or Symbol type.</param>
         /// <param name="environment"></param>
-        /// <returns></returns>
-         internal static string GetFullPathOrValue(AType pathArgument, AplusEnvironment environment)
-         {
-             if (pathArgument.Type != ATypes.AChar && pathArgument.Type != ATypes.ASymbol)
-             {
-                 return null;
-             }
+        /// <returns>
+        /// Absolute path if the <see cref="parthArgument"/> is a relative/absoulte path.
+        /// Name of the file extracted from the <see cref="pathArgument"/> if it is not a relative/absolute path.
+        /// Null if the supplied <see cref="AType"/> has an incorrect type.
+        /// </returns>
+        internal static string GetFullPathOrValue(AType pathArgument, AplusEnvironment environment)
+        {
+            if (pathArgument.Type != ATypes.AChar && pathArgument.Type != ATypes.ASymbol)
+            {
+                return null;
+            }
 
-             AType raveled = pathArgument.Rank > 1 ?
-                 MonadicFunctionInstance.Ravel.Execute(pathArgument, environment) :
-                 pathArgument;
+            AType raveled = pathArgument.Rank > 1 ?
+                MonadicFunctionInstance.Ravel.Execute(pathArgument, environment) :
+                pathArgument;
 
-             string path;
+            string path;
 
-             if (raveled.Type == ATypes.AChar)
-             {
-                 path = raveled.ToString();
-             }
-             else
-             {
-                 if (raveled.Rank > 0)
-                 {
-                     path = raveled.Length > 0 ? raveled[0].asString : "";
-                 }
-                 else
-                 {
-                     path = raveled.asString;
-                 }
-             }
+            if (raveled.Type == ATypes.AChar)
+            {
+                path = raveled.ToString();
+            }
+            else if (raveled.Rank > 0)
+            {
+                path = raveled.Length > 0 ? raveled[0].asString : "";
+            }
+            else
+            {
+                path = raveled.asString;
+            }
 
-             if (!String.IsNullOrEmpty(path) && !Path.IsPathRooted(path) && !String.IsNullOrEmpty(Path.GetDirectoryName(path)))
-             {
-                 path = Path.GetFullPath(path);
-             }
+            if (!String.IsNullOrEmpty(path) && !Path.IsPathRooted(path) && !String.IsNullOrEmpty(Path.GetDirectoryName(path)))
+            {
+                path = Path.GetFullPath(path);
+            }
 
-             return path;
-         }
+            return path;
+        }
 
-         private static bool FileSearch(string path, out string result)
-         {
-             bool found = false;
-             result = null;
+        private static bool FileSearch(string path, out string result)
+        {
+            bool found = false;
+            result = null;
 
-             if (Path.GetExtension(path) == ".m" && File.Exists(path))
-             {
-                 result = path;
-                 found = true;
-             }
-             else
-             {
-                 string appendedExtension = path + ".m";
+            if (Path.GetExtension(path) == ".m" && File.Exists(path))
+            {
+                result = path;
+                found = true;
+            }
+            else
+            {
+                string appendedExtension = path + ".m";
 
-                 if (File.Exists(appendedExtension))
-                 {
-                     result = appendedExtension;
-                     found = true;
-                 }
-                 else if (File.Exists(path))
-                 {
-                     result = path;
-                     found = true;
-                 }
-             }
+                if (File.Exists(appendedExtension))
+                {
+                    result = appendedExtension;
+                    found = true;
+                }
+                else if (File.Exists(path))
+                {
+                    result = path;
+                    found = true;
+                }
+            }
 
-             return found;
-         }
+            return found;
+        }
 
         #endregion
     }
