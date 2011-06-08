@@ -68,19 +68,91 @@ namespace AplusCore.Runtime
 
         public AType Read(string memoryMappadFilePath, MemoryMappedFileMode memoryMappedFileMode)
         {
-            string memoryMappedFileName = EncodeName(memoryMappadFilePath);
             MemoryMappedFile memoryMappedFile;
+
+            GetMemoryMappedFile(memoryMappadFilePath, out memoryMappedFile);
+              
+            return MappedFile.Read(memoryMappedFile, memoryMappedFileMode);
+        }
+
+        private bool GetMemoryMappedFile(string memoryMappadFilePath, out MemoryMappedFile memoryMappedFile)
+        {
+            string memoryMappedFileName = EncodeName(memoryMappadFilePath);
+            bool exist = false;
 
             try
             {
                 memoryMappedFile = MemoryMappedFile.OpenExisting(memoryMappedFileName);
+                exist = true;
             }
             catch (FileNotFoundException)
             {
                 memoryMappedFile = MemoryMappedFile.CreateFromFile(memoryMappadFilePath, FileMode.Open, memoryMappedFileName);
             }
 
-            return MappedFile.Read(memoryMappedFile, memoryMappedFileMode);
+            return exist;
+        }
+
+        public bool ExistMemoryMappedFile(string memoryMappedFilePath)
+        {
+            MemoryMappedFile memoryMappedFile;
+
+            bool result = GetMemoryMappedFile(memoryMappedFilePath, out memoryMappedFile);
+
+            memoryMappedFile.Dispose();
+
+            return result;
+        }
+
+        #endregion
+
+        #region Expand/Decrease
+
+        public AType GetLeadingAxesLength(string memoryMappedFilePath)
+        {
+            MemoryMappedFile memoryMappedFile;
+
+            GetMemoryMappedFile(memoryMappedFilePath, out memoryMappedFile);
+
+            MappedFile mappedFile = new MappedFile(memoryMappedFile);
+
+            AType result = AInteger.Create(mappedFile.LeadingAxes);
+
+            mappedFile.Dispose();
+
+            return result;
+        }
+
+        public AType ExpandOrDecrease(string memoryMappedFilePath, int newLeadingAxesLength)
+        {
+            string memoryMappedFileName = EncodeName(memoryMappedFilePath);
+
+            var memoryMappedFile = MemoryMappedFile.CreateFromFile(memoryMappedFilePath, FileMode.Open, memoryMappedFileName);
+            
+            MappedFile mappedFile = new MappedFile(memoryMappedFile);
+
+            int newSize = mappedFile.ComputeNewSize(newLeadingAxesLength);
+            int oldLeadingAxesLength = mappedFile.LeadingAxes;
+
+            if (mappedFile.LeadingAxes < newLeadingAxesLength)
+            {
+                mappedFile.LeadingAxes = newLeadingAxesLength;
+                mappedFile.Dispose();
+
+                memoryMappedFile = MemoryMappedFile.CreateFromFile(memoryMappedFilePath, FileMode.Open, memoryMappedFileName, newSize);
+                memoryMappedFile.Dispose();
+            }
+            else if (newLeadingAxesLength < mappedFile.LeadingAxes)
+            {
+                mappedFile.LeadingAxes = mappedFile.Length = newLeadingAxesLength;
+                mappedFile.Dispose();
+
+                FileStream fileStream = new FileStream(memoryMappedFilePath, FileMode.Open);
+                fileStream.SetLength(newSize);
+                fileStream.Close();
+            }
+
+            return AInteger.Create(oldLeadingAxesLength);
         }
 
         #endregion

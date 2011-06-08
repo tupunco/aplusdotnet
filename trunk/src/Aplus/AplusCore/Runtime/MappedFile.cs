@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
 
@@ -35,6 +36,8 @@ namespace AplusCore.Runtime
         private static readonly int ByteSize        = Marshal.SizeOf(typeof(byte));
         private static readonly int IntSize         = Marshal.SizeOf(typeof(int));
         private static readonly int DoubleSize      = Marshal.SizeOf(typeof(double));
+
+        private static readonly int HeaderSize = 14 * IntSize;
 
         #endregion
 
@@ -289,9 +292,6 @@ namespace AplusCore.Runtime
 
         public static long ComputeSize(AType argument)
         {
-           //Header
-            long result = 14 * IntSize;
-
             int size;
 
             switch (argument.Type)
@@ -307,9 +307,7 @@ namespace AplusCore.Runtime
                     break;
             }
 
-            result += (size * AllItem(argument));
-
-            return result;
+            return HeaderSize + size * AllItem(argument);
         }
 
         public void Create(AType argument)
@@ -435,8 +433,18 @@ namespace AplusCore.Runtime
 
         #region Add
 
+        public int ComputeNewSize(int newLength)
+        {
+            return HeaderSize + IntSize * this.CellShapeCount * newLength;
+        }
+
         public void Add(AType argument)
         {
+            if((this.Length + 1) > this.LeadingAxes)
+            {
+                throw new Error.Length("Not enough allocated memory");
+            }
+
             long position = this.ItemCount * this.Size + ItemPosition;
 
             Write(argument, ref position);

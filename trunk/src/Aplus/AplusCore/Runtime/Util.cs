@@ -1,4 +1,8 @@
-﻿using AplusCore.Types;
+﻿using System;
+using System.IO;
+
+using AplusCore.Runtime.Function.Monadic;
+using AplusCore.Types;
 
 namespace AplusCore.Runtime
 {
@@ -120,5 +124,123 @@ namespace AplusCore.Runtime
              }
              return false;
          }
+
+         #region FileSearch
+
+        /// <summary>
+         /// pathArgument type must be char or symbol. Result is the value of pathArgument with full path.
+         /// If the result is null, we didn't found the file. When we search, we use the APATH environment.
+        /// </summary>
+        /// <param name="pathArgument"></param>
+        /// <param name="environment"></param>
+        /// <returns></returns>
+         internal static string GetPath(AType pathArgument, AplusEnvironment environment)
+         {
+             string path = GetFullPathOrValue(pathArgument, environment);
+             string resultPath = null;
+
+             if (path != null && !Path.IsPathRooted(path))
+             {
+                 string apath = Environment.GetEnvironmentVariable("APATH", EnvironmentVariableTarget.User);
+
+                 string absolutePath;
+
+                 foreach (string item in apath.Split(';'))
+                 {
+                     absolutePath = Path.Combine(item, path);
+
+                     if (!Path.IsPathRooted(absolutePath))
+                     {
+                         absolutePath = Path.GetFullPath(absolutePath);
+                     }
+
+                     if (FileSearch(absolutePath, out resultPath))
+                     {
+                         break;
+                     }
+                 }
+             }
+             else
+             {
+                 FileSearch(path, out resultPath);
+             }
+
+             return resultPath;
+         }
+
+         /// <summary>
+         /// pathArgument type must be char or symbol. The result is the value of the pathArgument,
+         /// if it doesn't have path. Else it gives back the value with the full path.
+        /// </summary>
+        /// <param name="pathArgument"></param>
+        /// <param name="environment"></param>
+        /// <returns></returns>
+         internal static string GetFullPathOrValue(AType pathArgument, AplusEnvironment environment)
+         {
+             if (pathArgument.Type != ATypes.AChar && pathArgument.Type != ATypes.ASymbol)
+             {
+                 return null;
+             }
+
+             AType raveled = pathArgument.Rank > 1 ?
+                 MonadicFunctionInstance.Ravel.Execute(pathArgument, environment) :
+                 pathArgument;
+
+             string path;
+
+             if (raveled.Type == ATypes.AChar)
+             {
+                 path = raveled.ToString();
+             }
+             else
+             {
+                 if (raveled.Rank > 0)
+                 {
+                     path = raveled.Length > 0 ? raveled[0].asString : "";
+                 }
+                 else
+                 {
+                     path = raveled.asString;
+                 }
+             }
+
+             if (!String.IsNullOrEmpty(path) && !Path.IsPathRooted(path) && !String.IsNullOrEmpty(Path.GetDirectoryName(path)))
+             {
+                 path = Path.GetFullPath(path);
+             }
+
+             return path;
+         }
+
+         private static bool FileSearch(string path, out string result)
+         {
+             bool found = false;
+             result = null;
+
+             if (Path.GetExtension(path) == ".m" && File.Exists(path))
+             {
+                 result = path;
+                 found = true;
+             }
+             else
+             {
+                 string appendedExtension = path + ".m";
+
+                 if (File.Exists(appendedExtension))
+                 {
+                     result = appendedExtension;
+                     found = true;
+                 }
+                 else if (File.Exists(path))
+                 {
+                     result = path;
+                     found = true;
+                 }
+             }
+
+             return found;
+         }
+
+        #endregion
     }
 }
