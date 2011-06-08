@@ -7,7 +7,6 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 {
     class Catenate : AbstractDyadicFunction
     {
-        
         #region DLR Entry point
 
         public override AType Execute(AType right, AType left, AplusEnvironment environment = null)

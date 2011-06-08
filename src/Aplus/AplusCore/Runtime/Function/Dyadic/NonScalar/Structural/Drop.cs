@@ -7,25 +7,19 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 {
     class Drop : AbstractDyadicFunction
     {
-        #region Variables
-
-        private int dropCounter;
-
-        #endregion
-
         #region Entry point
 
         public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
         {
-            PrepareDropCounter(left);
-            return Compute(right);
+            int dropCounter = GetDropCounter(left);
+            return Compute(right, dropCounter);
         }
 
         #endregion
 
         #region Preparation
 
-        private void PrepareDropCounter(AType element)
+        private int GetDropCounter(AType element)
         {
             if (element.Type == ATypes.AFloat || element.Type == ATypes.AInteger)
             {
@@ -37,11 +31,14 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                     throw new Error.Nonce(this.NonceErrorText);
                 }
 
+                int dropCounter;
                 // Check if the scalar is a whole number and set the drop counter
-                if (!scalar.ConvertToRestrictedWholeNumber(out this.dropCounter))
+                if (!scalar.ConvertToRestrictedWholeNumber(out dropCounter))
                 {
                     throw new Error.Type(this.TypeErrorText);
                 }
+
+                return dropCounter;
             }
             else if (element.Type == ATypes.ANull)
             {
@@ -57,7 +54,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 
         #region Computation
 
-        private AType Compute(AType right)
+        private AType Compute(AType right, int dropCounter)
         {
             if (right.IsArray && dropCounter == 0)
             {
@@ -86,10 +83,12 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                     }
                     result.Length = right.Length - Math.Abs(dropCounter);
                     result.Shape = new List<int>() { result.Length };
+                    
                     if (right.Rank > 1)
                     {
                         result.Shape.AddRange(right.Shape.GetRange(1, right.Shape.Count - 1));
                     }
+
                     result.Rank = right.Rank;
                     result.Type = result[0].Type;
                 }
@@ -106,7 +105,6 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                     result.Length = 1;
                     result.Shape = new List<int>() { 1 };
                     result.Type = right.Type;
-
                 }
                 else
                 {

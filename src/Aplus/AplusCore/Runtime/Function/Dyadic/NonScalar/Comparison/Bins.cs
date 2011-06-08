@@ -18,8 +18,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
 
         public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
         {
-            PrepareVariables(left,right);
-            return MultipleItmesWalking(right);
+            PrepareVariables(left, right);
+            return MultipleItemsWalking(right);
         }
 
         #endregion
@@ -32,7 +32,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
         /// <param name="left"></param>
         private void PrepareVariables(AType left, AType right)
         {
-            if (left.IsBox || right.IsBox || left.Type != right.Type && !Util.TypeCorrect(right.Type, left.Type, "FI", "IF", "N?", "?N"))
+            if (left.IsBox || right.IsBox || 
+                (left.Type != right.Type && !Util.TypeCorrect(right.Type, left.Type, "FI", "IF", "N?", "?N")))
             {
                 throw new Error.Type(TypeErrorText);
             }
@@ -51,33 +52,29 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
         #region Computation
 
         /// <summary>
-        /// Classify element to the correspond class. 
+        /// Classify element to the corresponding group.
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
         private AType Classify(AType element)
         {
-            int index = this.interval.Length;
+            int index;
 
             if (this.interval.IsArray)
             {
                 AType intervalArray = this.interval;
 
-                for (int i = 0; i < intervalArray.Length; i++)
+                for (index = 0; index < intervalArray.Length; index++)
                 {
-                    if (element.CompareTo(intervalArray[i]) <= 0)
+                    if (element.CompareTo(intervalArray[index]) <= 0)
                     {
-                        index = i;
                         break;
                     }
                 }
             }
             else
             {
-                if (element.CompareTo(this.interval) <= 0)
-                {
-                    index = 0;
-                }
+                index = (element.CompareTo(this.interval) <= 0) ? 0 : this.interval.Length;
             }
 
             return AInteger.Create(index);
@@ -89,7 +86,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
         /// </summary>
         /// <param name="cell"></param>
         /// <returns></returns>
-        private AType MultipleItmesWalking(AType cell)
+        private AType MultipleItemsWalking(AType cell)
         {
             if (this.cellShape.Count == cell.Shape.Count)
             {
@@ -97,6 +94,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
                 {
                     throw new Error.Length(LengthErrorText);
                 }
+
                 return Classify(cell);
             }
             else
@@ -105,7 +103,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
 
                 foreach (AType item in cell)
                 {
-                    result.AddWithNoUpdate(MultipleItmesWalking(item));
+                    result.AddWithNoUpdate(MultipleItemsWalking(item));
                 }
                 result.UpdateInfo();
 

@@ -106,9 +106,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
             int pos = 0;
             if (right.Length == 0)
             {
-                AType filler = Utils.FillElement(
-                    right.Type == ATypes.ANull ? ATypes.ABox : right.Type
-                );
+                AType filler = Utils.FillElement(right.Type == ATypes.ANull ? ATypes.ABox : right.Type);
 
                 return Process(left, AArray.Create(filler.Type, filler), ref pos, 0);
             }

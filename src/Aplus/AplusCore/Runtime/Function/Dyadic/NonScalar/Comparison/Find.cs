@@ -19,7 +19,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
         public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
         {
             PrepareVariables(left, right);
-            return MultipleItmesWalking(right);
+            return MultipleItemsWalking(right);
         }
 
         #endregion
@@ -56,7 +56,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
         /// </summary>
         /// <param name="cell"></param>
         /// <returns></returns>
-        private AType MultipleItmesWalking(AType cell)
+        private AType MultipleItemsWalking(AType cell)
         {
             if (this.cellShape.Count == cell.Shape.Count)
             {
@@ -72,7 +72,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
 
                 foreach (AType item in cell)
                 {
-                    result.AddWithNoUpdate(MultipleItmesWalking(item));
+                    result.AddWithNoUpdate(MultipleItemsWalking(item));
                 }
                 result.UpdateInfo();
 

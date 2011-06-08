@@ -29,9 +29,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
         {
             if (argument.SimpleArray())
             {
-                return argument.IsMemoryMappedFile ?
-                    argument :
-                    argument.Clone();
+                return argument.IsMemoryMappedFile ? argument : argument.Clone();
             }
             else
             {

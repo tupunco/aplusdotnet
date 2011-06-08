@@ -8,30 +8,19 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Comprasion
 
         public override AType Execute(AType argument, AplusEnvironment environment = null)
         {
-            //If the is scalar, it can't be sort.
-            if (argument.Rank >= 1)
-            {
-                //Likewise box array...
-                if(argument.IsBox)
-                {
-                    throw new Error.Type(TypeErrorText);
-                }
-
-                return argument.InsertionSortIndex((a, b) => { return -a.CompareTo(b); });
-            }
-            else
+            // Scalar can not be sorted
+            if (argument.Rank < 1)
             {
                 throw new Error.Rank(RankErrorText);
             }
-        }
 
-        #endregion
+            // Likewise box array
+            if (argument.IsBox)
+            {
+                throw new Error.Type(TypeErrorText);
+            }
 
-        #region Comparison
-
-        private static int GradeDownComparison(AType x, AType y)
-        {
-            return - x.CompareTo(y);
+            return argument.InsertionSortIndex((a, b) => { return -a.CompareTo(b); });
         }
 
         #endregion
