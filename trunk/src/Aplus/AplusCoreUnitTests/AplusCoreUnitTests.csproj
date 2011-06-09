@@ -158,6 +158,7 @@
     <Compile Include="Dlr\Function\Monadic\NonScalar\Value.cs" />
     <Compile Include="Dlr\Function\Monadic\Scalar\Identity.cs" />
     <Compile Include="Dlr\Function\Monadic\Scalar\Roll.cs" />
+    <Compile Include="Dlr\Function\System\Items.cs" />
     <Compile Include="Dlr\MemoryMappedFile\Map.cs" />
     <Compile Include="Dlr\MemoryMappedFile\MapIn.cs" />
     <Compile Include="Dlr\MemoryMappedFile\Operations.cs" />
