@@ -67,8 +67,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
         }
     }
 }

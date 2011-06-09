@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AplusCore.Types;
 using Microsoft.Scripting.Hosting;
 using System.IO;
+using AplusCore.Runtime;
 
 namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 {
@@ -52,7 +53,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := > a", scope);
 
             this.engine.Execute<AType>("(0 0 flip b) := 1 3", scope);
@@ -61,9 +62,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
         }
 
         [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
@@ -86,7 +84,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := < a", scope);
             this.engine.Execute<AType>("c := > b", scope);
 
@@ -96,10 +94,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
-            scope.RemoveVariable(".c");
         }
 
         [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
@@ -122,8 +116,8 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
-            this.engine.Execute<AType>("b := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            this.engine.Execute<AType>("b := 1 beam `Integer23.m", scope);
 
             this.engine.Execute<AType>("c := (a; iota 2 3; b)", scope);
             this.engine.Execute<AType>("d := > c[2]", scope);
@@ -133,11 +127,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
-            scope.RemoveVariable(".c");
-            scope.RemoveVariable(".d");
         }
 
         [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
@@ -160,7 +149,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
 
             this.engine.Execute<AType>("c := (a; iota 2 3)", scope);
             this.engine.Execute<AType>("d := > c", scope);
@@ -171,11 +160,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
-            scope.RemoveVariable(".c");
-            scope.RemoveVariable(".d");
         }
 
         #endregion
@@ -202,7 +186,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := in a", scope);
 
             this.engine.Execute<AType>("c := > b[0]", scope);
@@ -213,10 +197,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
-            scope.RemoveVariable(".c");
         }
 
         #endregion
@@ -243,7 +223,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := pick a", scope);
 
             this.engine.Execute<AType>("(0 0 flip b):=1 3", scope);
@@ -252,9 +232,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
         }
 
         [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
@@ -277,7 +254,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := < a", scope);
             this.engine.Execute<AType>("c := pick b", scope);
 
@@ -287,10 +264,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
-            scope.RemoveVariable(".c");
         }
 
         [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
@@ -313,7 +286,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := (a;iota 2 3)", scope);
             this.engine.Execute<AType>("c := pick b", scope);
 
@@ -323,10 +296,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
-            scope.RemoveVariable(".c");
         }
 
         #endregion
@@ -355,7 +324,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := rtack a", scope);
 
             this.engine.Execute<AType>("b[1;1] := 5", scope);
@@ -364,9 +333,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
         }
 
         [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
@@ -389,7 +355,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := rtack < a", scope);
             this.engine.Execute<AType>("c := > b", scope);
 
@@ -399,10 +365,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
-            scope.RemoveVariable(".c");
         }
 
         [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
@@ -425,7 +387,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := + a", scope);
             this.engine.Execute<AType>("b[] := 34", scope);
 
@@ -433,9 +395,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
         }
 
         [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
@@ -444,7 +403,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             AType expected = AFloat.Create(2.3);
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "FloatScalar.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `FloatScalar.m", scope);
             this.engine.Execute<AType>("b := + a", scope);
             this.engine.Execute<AType>("b[] := 3.4", scope);
 
@@ -452,9 +411,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
         }
 
         #endregion
@@ -483,7 +439,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := a[]", scope);
 
             this.engine.Execute<AType>("b[1;1] := 12", scope);
@@ -492,9 +448,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
         }
 
         #endregion
@@ -521,7 +474,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := () # a", scope);
 
             this.engine.Execute<AType>("b[1;1] := 5", scope);
@@ -530,9 +483,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
         }
 
         [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
@@ -555,7 +505,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := 1 # a", scope);
 
             this.engine.Execute<AType>("b[1] := 12", scope);
@@ -564,9 +514,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
         }
 
         [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
@@ -589,7 +536,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             AType g = this.engine.Execute<AType>("b := (0;0 2) # a", scope);
 
             this.engine.Execute<AType>("b[1] := 65", scope);
@@ -598,9 +545,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
         }
 
         #endregion
@@ -627,7 +571,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := () pick a", scope);
 
             this.engine.Execute<AType>("b[0;0] := 23", scope);
@@ -636,9 +580,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
         }
 
         [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
@@ -661,7 +602,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := () pick < a", scope);
             this.engine.Execute<AType>("c := > b", scope);
 
@@ -671,10 +612,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
-            scope.RemoveVariable(".c");
         }
 
         [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
@@ -697,7 +634,7 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("b := () pick (2;a;8)", scope);
             this.engine.Execute<AType>("c := > b[1]", scope);
 
@@ -707,10 +644,6 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
-            scope.RemoveVariable(".b");
-            scope.RemoveVariable(".c");
         }
 
         #endregion
@@ -739,19 +672,17 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("a[] := 2 3 rho 3 9 1 8 6 5", scope);
 
-            AType result = this.engine.Execute<AType>(TestUtils.CreateMap(1, "Integer23.m"), scope);
+            AType result = this.engine.Execute<AType>("1 beam `Integer23.m", scope);
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
         }
 
         [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
-        public void ReplaceAllMappedFloatrArray()
+        public void ReplaceAllMappedFloatArray()
         {
             AType expected = AArray.Create(
                 ATypes.AFloat,
@@ -768,15 +699,13 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Float22.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Float22.m", scope);
             this.engine.Execute<AType>("a[] := 6.4", scope);
 
-            AType result = this.engine.Execute<AType>(TestUtils.CreateMap(1, "Float22.m"), scope);
+            AType result = this.engine.Execute<AType>("1 beam `Float22.m", scope);
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
         }
 
         [TestCategory("DLR"), TestCategory("Operations"), TestMethod]
@@ -785,17 +714,65 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             AType expected = AChar.Create('B');
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "CharScalar.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `CharScalar", scope);
             this.engine.Execute<AType>("a[] := 'B'", scope);
 
-            AType result = this.engine.Execute<AType>(TestUtils.CreateMap(1, "CharScalar.m"), scope);
+            AType result = this.engine.Execute<AType>("1 beam `CharScalar", scope);
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+
+        #endregion
+
+        #region Case 6: Append
+
+        [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
+        public void CreateAndAppendMappedIntegerArray()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AArray.Create(
+                    ATypes.AInteger,
+                    AInteger.Create(10),
+                    AInteger.Create(20),
+                    AInteger.Create(30),
+                    AInteger.Create(40)
+                ),
+                AArray.Create(
+                    ATypes.AInteger,
+                    AInteger.Create(1),
+                    AInteger.Create(2),
+                    AInteger.Create(3),
+                    AInteger.Create(4)
+                )
+            );
+
+            ScriptScope scope = this.engine.CreateScope();
+
+            this.engine.Execute<AType>("'test.m' beam 0 4 rho 0", scope);
+
+            this.engine.Execute<AType>("_items{10;'test.m'}", scope);
+
+            this.engine.Execute<AType>("t := 1 beam 'test.m'", scope);
+
+            this.engine.Execute<AType>("t[,] := 10 20 30 40", scope);
+            this.engine.Execute<AType>("t[,] := 1 2 3 4", scope);
+
+            AType result = scope.GetVariable<AType>(".t");
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
 
-            scope.RemoveVariable(".a");
-        }
+            scope.RemoveVariable(".");
 
+            result = null;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            File.Delete("test.m");
+        }
 
         #endregion
 
@@ -823,15 +800,13 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             ScriptScope scope = this.engine.CreateScope();
             this.engine.Execute<AType>("f{a} : {(1 take a) := 1 3 rho 7 4 1 }", scope);
 
-            this.engine.Execute<AType>("a := " + TestUtils.CreateMap(1, "Integer23.m"), scope);
+            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
             this.engine.Execute<AType>("f{a}", scope);
 
-            AType result = this.engine.Execute<AType>(TestUtils.CreateMap(1, "Integer23.m"), scope);
+            AType result = this.engine.Execute<AType>("1 beam `Integer23.m", scope);
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
         }
 
         [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
@@ -852,17 +827,15 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("f{} : { " + TestUtils.CreateMap(1, "Float22.m") + " }", scope);
+            this.engine.Execute<AType>("f{} : { 1 beam `Float22.m }", scope);
 
             this.engine.Execute<AType>("a := f{}", scope);
             this.engine.Execute<AType>("a[1;1] := 34", scope);
 
-            AType result = this.engine.Execute<AType>(TestUtils.CreateMap(1, "Float22.m"), scope);
+            AType result = this.engine.Execute<AType>("1 beam `Float22.m", scope);
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
-
-            scope.RemoveVariable(".a");
         }
 
         #endregion

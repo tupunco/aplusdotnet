@@ -99,12 +99,12 @@ namespace AplusCoreUnitTests.Dlr
 
         public static void CreateMemoryMappedFiles(ScriptEngine engine)
         {
-            engine.Execute<AType>(CreateMapCreator("IntegerScalar.m", "67"));
-            engine.Execute<AType>(CreateMapCreator("FloatScalar.m", "2.3"));
-            engine.Execute<AType>(CreateMapCreator("CharScalar.m", "'A'"));
-            engine.Execute<AType>(CreateMapCreator("Integer23.m", "2 3 rho 5 6 7 9 8 2"));
-            engine.Execute<AType>(CreateMapCreator("Float22.m", "2 2 rho 3.4 1.4 7.6 1.1"));
-            engine.Execute<AType>(CreateMapCreator("Char25.m", "2 5 rho 'HelloWorld'"));
+            engine.Execute<AType>("`IntegerScalar.m beam 67");
+            engine.Execute<AType>("`FloatScalar.m beam 2.3");
+            engine.Execute<AType>("`CharScalar.m beam 'A'");
+            engine.Execute<AType>("`Integer23.m beam 2 3 rho 5 6 7 9 8 2");
+            engine.Execute<AType>("`Float22.m beam 2 2 rho 3.4 1.4 7.6 1.1");
+            engine.Execute<AType>("`Char25.m beam 2 5 rho 'HelloWorld'");
         }
 
         public static void DeleteMemoryMappedFiles()
@@ -121,32 +121,6 @@ namespace AplusCoreUnitTests.Dlr
                     File.Delete(files[i]);
                 }
             }
-        }
-
-        public static string CreateMapCreator(string name, string data)
-        {
-            StringBuilder builder = new StringBuilder();
-
-            builder.Append("'");
-            builder.Append(name);
-            builder.Append("'");
-            builder.Append(" beam ");
-            builder.Append(data);
-
-            return builder.ToString();
-        }
-
-        public static string CreateMap(byte mode, string name)
-        {
-            StringBuilder builder = new StringBuilder();
-
-            builder.Append(mode);
-            builder.Append(" beam ");
-            builder.Append("'");
-            builder.Append(name);
-            builder.Append("'");
-
-            return builder.ToString();
         }
 
         #endregion
