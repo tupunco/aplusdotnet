@@ -25,6 +25,25 @@ namespace AplusCoreUnitTests.Dlr.Function.System
         }
 
         [TestCategory("DLR"), TestCategory("System"), TestCategory("ToSlotfiller"), TestMethod]
+        public void SymbolVector()
+        {
+            AType expected = 
+                AArray.Create(ATypes.ABox,
+                                ABox.Create(AArray.Create(ATypes.ASymbol, ASymbol.Create("a"), ASymbol.Create("c"))),
+                                ABox.Create(
+                                    AArray.Create(ATypes.ABox, 
+                                                    ABox.Create(ASymbol.Create("b")),
+                                                    ABox.Create(ASymbol.Create("d"))
+                                                 )
+                                            )
+                                );
+
+            AType result = this.engine.Execute<AType>("_alsf{`a `b `c `d}");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("System"), TestCategory("ToSlotfiller"), TestMethod]
         public void AlsfExample()
         {
             AType titles = AArray.Create(ATypes.ASymbol,
