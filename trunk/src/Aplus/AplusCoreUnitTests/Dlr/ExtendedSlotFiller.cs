@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AplusCore.Types;
-using Microsoft.Scripting.Runtime;
+
 using Microsoft.Scripting.Hosting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using AplusCore.Runtime;
+using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr
 {
@@ -14,7 +12,7 @@ namespace AplusCoreUnitTests.Dlr
     public class ExtendedSlotFiller : AbstractTest
     {
         AType issf = AFunc.Create(
-            "_issf",
+            "issf",
             (Func<AplusEnvironment, AType, AType>)((scope, x) =>
             {
                 if (x.IsArray)
@@ -31,10 +29,10 @@ namespace AplusCoreUnitTests.Dlr
         public void ExtendedSlotFiller1()
         {
             ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
+            scriptscope.SetVariable("issf", issf);
 
             AType expected = AInteger.Create(1);
-            AType result = this.engine.Execute<AType>("_issf{(`this`was`this`that;(10;20;30;40))}", scriptscope);
+            AType result = this.engine.Execute<AType>("issf{(`this`was`this`that;(10;20;30;40))}", scriptscope);
 
             Assert.AreEqual(expected, result);
         }
@@ -43,10 +41,10 @@ namespace AplusCoreUnitTests.Dlr
         public void ExtendedSlotFiller2()
         {
             ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
+            scriptscope.SetVariable("issf", issf);
 
             AType expected = AInteger.Create(1);
-            AType result = this.engine.Execute<AType>("_issf{(2 2 rho `a`b`c`d;(10;20;30;40))}", scriptscope);
+            AType result = this.engine.Execute<AType>("issf{(2 2 rho `a`b`c`d;(10;20;30;40))}", scriptscope);
 
             Assert.AreEqual(expected, result);
         }
@@ -55,10 +53,10 @@ namespace AplusCoreUnitTests.Dlr
         public void ExtendedSlotFiller3()
         {
             ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
+            scriptscope.SetVariable("issf", issf);
 
             AType expected = AInteger.Create(1);
-            AType result = this.engine.Execute<AType>("_issf{(`a`b;1 2 rho (4;2))}", scriptscope);
+            AType result = this.engine.Execute<AType>("issf{(`a`b;1 2 rho (4;2))}", scriptscope);
 
             Assert.AreEqual(expected, result);
         }
@@ -67,10 +65,10 @@ namespace AplusCoreUnitTests.Dlr
         public void ExtendedSlotFiller4()
         {
             ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
+            scriptscope.SetVariable("issf", issf);
 
             AType expected = AInteger.Create(1);
-            AType result = this.engine.Execute<AType>("_issf{(2 2 rho `a`b`c`d;2 2 rho (6;7;2;9))}", scriptscope);
+            AType result = this.engine.Execute<AType>("issf{(2 2 rho `a`b`c`d;2 2 rho (6;7;2;9))}", scriptscope);
 
             Assert.AreEqual(expected, result);
         }
@@ -79,12 +77,12 @@ namespace AplusCoreUnitTests.Dlr
         public void ExtendedSlotFiller5()
         {
             ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
+            scriptscope.SetVariable("issf", issf);
             this.engine.Execute<AType>("a{b}: b+b", scriptscope);
             this.engine.Execute<AType>("b{a}: a*a", scriptscope);
 
             AType expected = AInteger.Create(1);
-            AType result = this.engine.Execute<AType>("_issf{(`a`c`b;(a;+;b))}", scriptscope);
+            AType result = this.engine.Execute<AType>("issf{(`a`c`b;(a;+;b))}", scriptscope);
 
             Assert.AreEqual(expected, result);
         }
@@ -94,10 +92,10 @@ namespace AplusCoreUnitTests.Dlr
         public void ExtendedSlotFillerDifferentLength1()
         {
             ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
+            scriptscope.SetVariable("issf", issf);
 
             AType expected = AInteger.Create(0);
-            AType result = this.engine.Execute<AType>("_issf{(2 3 rho `a`b`c`d;(10;20;30;40))}", scriptscope);
+            AType result = this.engine.Execute<AType>("issf{(2 3 rho `a`b`c`d;(10;20;30;40))}", scriptscope);
 
             Assert.AreEqual(expected, result);
         }
@@ -106,10 +104,10 @@ namespace AplusCoreUnitTests.Dlr
         public void ExtendedSlotFillerDifferentLength2()
         {
             ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
+            scriptscope.SetVariable("issf", issf);
 
             AType expected = AInteger.Create(0);
-            AType result = this.engine.Execute<AType>("_issf{(2 2 rho `a`b`c`d; 2 3 rho (3;4))}", scriptscope);
+            AType result = this.engine.Execute<AType>("issf{(2 2 rho `a`b`c`d; 2 3 rho (3;4))}", scriptscope);
 
             Assert.AreEqual(expected, result);
         }
