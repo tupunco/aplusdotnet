@@ -439,33 +439,30 @@ namespace AplusCore.Types
             return argumentLength;
         }
 
-        // TODO: make it to handle all ATypes not just array
         /// <summary>
-        /// Converts array's elements to float
+        /// Converts AType elements to float
         /// </summary>
-        public static AType ConvertToFloat(this AType array)
+        public static AType ConvertToFloat(this AType input)
         {
-            // TODO: no array type check
-            array.Type = ATypes.AFloat;
-
-            for (int i = 0; i < array.Length; i++)
+            if (input.Type != ATypes.AFloat && input.Type != ATypes.AInteger && input.Type != ATypes.AArray)
             {
-                if (array[i].Type != ATypes.AInteger)
-                {
-                    continue;
-                }
-
-                if (array[i].IsArray)
-                {
-                    array[i] = Utils.ConvertToFloat(array[i]);
-                }
-                else
-                {
-                    array[i] = AFloat.Create(array[i].asFloat);
-                }
+                throw new Error.Type("Conversion");
             }
 
-            return array;
+            if (input.IsArray)
+            {
+                for (int i = 0; i < input.Length; i++)
+                {
+                    input[i] = Utils.ConvertToFloat(input[i]);
+                }
+
+                input.Type = ATypes.AFloat;
+                return input;
+            }
+            else
+            {
+                return AFloat.Create(input.asFloat);
+            }
         }
 
         public static bool EqualsWithTolerance(this AType lhs, AType rhs)
