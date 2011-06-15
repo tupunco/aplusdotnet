@@ -48,7 +48,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
                 //Convert the first item to AFloat.
                 if (item.Type == ATypes.AInteger)
                 {
-                    item = ConvertToFloat(item);
+                    item = Utils.ConvertToFloat(item);
                     type = ATypes.AFloat;
                 }
 
@@ -70,7 +70,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
                 {
                     if (type == ATypes.AFloat && item.Type == ATypes.AInteger)
                     {
-                        item = ConvertToFloat(item);
+                        item = Utils.ConvertToFloat(item);
                     }
                     else
                     {
@@ -117,33 +117,6 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
                 }
             }
             return false;
-        }
-
-        /// <summary>
-        /// Convert the argument to float array/scalar.
-        /// </summary>
-        /// <param name="argument"></param>
-        /// <returns></returns>
-        private AType ConvertToFloat(AType argument)
-        {
-            if (!argument.IsBox)
-            {
-                // TODO: remove is array logic from here => crate general to float converter
-                if (argument.IsArray)
-                {
-                    argument.ConvertToFloat();
-                }
-                else
-                {
-                    argument = AFloat.Create(argument.asFloat);
-                }
-
-                return argument;
-            }
-            else
-            {
-                throw new Error.Type(TypeErrorText);
-            }
         }
 
         /// <summary>
