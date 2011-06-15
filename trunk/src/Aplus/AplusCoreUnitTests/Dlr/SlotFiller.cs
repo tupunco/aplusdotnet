@@ -1,40 +1,18 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.Scripting.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using AplusCore.Types;
-using Microsoft.Scripting.Runtime;
-using Microsoft.Scripting.Hosting;
-using AplusCore.Runtime;
 
 namespace AplusCoreUnitTests.Dlr
 {
     [TestClass]
     public class SlotFiller : AbstractTest
     {
-        AType issf = AFunc.Create(
-            "_issf",
-            (Func<AplusEnvironment, AType, AType>)((scope, x) =>
-            {
-                if (x.IsArray)
-                {
-                    return AInteger.Create(x.IsSlotFiller() ? 1 : 0);
-                }
-                return AInteger.Create(0);
-            }),
-            2,
-            "checks if x is a slotfiller"
-        );
-
         [TestCategory("DLR"), TestCategory("SystemFunction"), TestCategory("SlotFiller"), TestMethod]
         public void SlotFiller1()
         {
-            ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
-
             AType expected = AInteger.Create(1);
-            AType result = this.engine.Execute<AType>("_issf{(`sym;<4)}", scriptscope);
+            AType result = this.engine.Execute<AType>("_issf{(`sym;<4)}");
 
             Assert.AreEqual(expected, result);
         }
@@ -42,33 +20,25 @@ namespace AplusCoreUnitTests.Dlr
         [TestCategory("DLR"), TestCategory("SystemFunction"), TestCategory("SlotFiller"), TestMethod]
         public void SlotFiller2()
         {
-            ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
-
             AType expected = AInteger.Create(1);
-            AType result = this.engine.Execute<AType>("_issf{(`small`medium`large`super;(16;32;64;72))}", scriptscope);
+            AType result = this.engine.Execute<AType>("_issf{(`small`medium`large`super;(16;32;64;72))}");
 
             Assert.AreEqual(expected, result);
         }
 
-        /*[TestCategory("DLR"), TestCategory("SystemFunction"), TestCategory("SlotFiller"), TestMethod]
+        [TestCategory("DLR"), TestCategory("SystemFunction"), TestCategory("SlotFiller"), TestMethod]
         public void SlotFiller3()
         {
-            ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
-
             AType expected = AInteger.Create(1);
-            AType result = this.engine.Execute<AType>("_issf{(`a`b`c;(10;(`x`y;(100;200));(`e`f;((`g`h;(1000;2000));'A+'))))}", scriptscope);
+            AType result = this.engine.Execute<AType>("_issf{(`a`b`c;(10;(`x`y;(100;200));(`e`f;((`g`h;(1000;2000));'A+'))))}");
 
             Assert.AreEqual(expected, result);
-        }*/
+        }
 
         [TestCategory("DLR"), TestCategory("SystemFunction"), TestCategory("SlotFiller"), TestMethod]
         public void SlotFiller4()
         {
             ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
-
             this.engine.Execute<AType>("a{b}: b+b", scriptscope);
 
             AType expected = AInteger.Create(1);
@@ -81,7 +51,6 @@ namespace AplusCoreUnitTests.Dlr
         public void SlotFiller5()
         {
             ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
             this.engine.Execute<AType>("a{b}: b+b", scriptscope);
             this.engine.Execute<AType>("b{a}: a*a", scriptscope);
 
@@ -95,7 +64,6 @@ namespace AplusCoreUnitTests.Dlr
         public void SlotFiller6()
         {
             ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
             this.engine.Execute<AType>("a{b}: b+b", scriptscope);
             this.engine.Execute<AType>("b{a}: a*a", scriptscope);
 
@@ -105,41 +73,32 @@ namespace AplusCoreUnitTests.Dlr
             Assert.AreEqual(expected, result);
         }
 
-        //The input is not Array box.
         [TestCategory("DLR"), TestCategory("SystemFunction"), TestCategory("SlotFiller"), TestMethod]
         public void SlotFillerSimpleArray()
         {
-            ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
-
             AType expected = AInteger.Create(0);
-            AType result = this.engine.Execute<AType>("_issf{`small`medium`large`super}", scriptscope);
+            // input is not an array of boxes
+            AType result = this.engine.Execute<AType>("_issf{`small`medium`large`super}");
 
             Assert.AreEqual(expected, result);
         }
 
-        //The keys and values lenght different.
         [TestCategory("DLR"), TestCategory("SystemFunction"), TestCategory("SlotFiller"), TestMethod]
         public void SlotFillerDifferentLength1()
         {
-            ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
-
             AType expected = AInteger.Create(0);
-            AType result = this.engine.Execute<AType>("_issf{(`small;(16;32;64;72))}", scriptscope);
+            // mismatch in the length of the keys and values
+            AType result = this.engine.Execute<AType>("_issf{(`small;(16;32;64;72))}");
 
             Assert.AreEqual(expected, result);
         }
 
-        //The keys and values lenght different.
         [TestCategory("DLR"), TestCategory("SystemFunction"), TestCategory("SlotFiller"), TestMethod]
         public void SlotFillerDifferentLength2()
         {
-            ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
-
             AType expected = AInteger.Create(0);
-            AType result = this.engine.Execute<AType>("_issf{(`small`medium`large`super;(64;72))}", scriptscope);
+            // mismatch in the length of the keys and values
+            AType result = this.engine.Execute<AType>("_issf{(`small`medium`large`super;(64;72))}");
 
             Assert.AreEqual(expected, result);
         }
@@ -148,36 +107,28 @@ namespace AplusCoreUnitTests.Dlr
         [TestCategory("DLR"), TestCategory("SystemFunction"), TestCategory("SlotFiller"), TestMethod]
         public void SlotFillerKeysNotSymbolConstant()
         {
-            ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
-
             AType expected = AInteger.Create(0);
-            AType result = this.engine.Execute<AType>("_issf{(2 3 1 4;(16;32;64;72))}", scriptscope);
+            AType result = this.engine.Execute<AType>("_issf{(2 3 1 4;(16;32;64;72))}");
 
             Assert.AreEqual(expected, result);
         }
-        //The keys rank > 1.
+        
         [TestCategory("DLR"), TestCategory("SystemFunction"), TestCategory("SlotFiller"), TestMethod]
         public void SlotFillerKeysMatrix()
         {
-            ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
-
             AType expected = AInteger.Create(0);
-            AType result = this.engine.Execute<AType>("_issf{(4 1 rho `small`medium`large`super;(16;32;64;72))}", scriptscope);
+            // the rank of the keys is greater then 1            
+            AType result = this.engine.Execute<AType>("_issf{(4 1 rho `small`medium`large`super;(16;32;64;72))}");
 
             Assert.AreEqual(expected, result);
         }
 
-        //The keys contains same key.
         [TestCategory("DLR"), TestCategory("SystemFunction"), TestCategory("SlotFiller"), TestMethod]
         public void SlotFillerSameKeys()
         {
-            ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
-
             AType expected = AInteger.Create(0);
-            AType result = this.engine.Execute<AType>("_issf{(`small`medium`large`super`large;(16;32;64;72;64))}", scriptscope);
+            // duplicate elements inside the keys vector
+            AType result = this.engine.Execute<AType>("_issf{(`small`medium`large`super`large;(16;32;64;72;64))}");
 
             Assert.AreEqual(expected, result);
         }
@@ -185,11 +136,8 @@ namespace AplusCoreUnitTests.Dlr
         [TestCategory("DLR"), TestCategory("SystemFunction"), TestCategory("SlotFiller"), TestMethod]
         public void SlotFillerValueIntegerList()
         {
-            ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
-
             AType expected = AInteger.Create(0);
-            AType result = this.engine.Execute<AType>("_issf{(`x`y`z; 32 64 72)}", scriptscope);
+            AType result = this.engine.Execute<AType>("_issf{(`x`y`z; 32 64 72)}");
 
             Assert.AreEqual(expected, result);
         }
@@ -198,7 +146,6 @@ namespace AplusCoreUnitTests.Dlr
         public void SlotFillerValueUserDefinedAndPrimitiveFunctions()
         {
             ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
             this.engine.Execute<AType>("a{b}: b+b", scriptscope);
             this.engine.Execute<AType>("b{a}: a*a", scriptscope);
 
@@ -211,11 +158,8 @@ namespace AplusCoreUnitTests.Dlr
         [TestCategory("DLR"), TestCategory("SystemFunction"), TestCategory("SlotFiller"), TestMethod]
         public void SlotFillerFunctionScalarKey()
         {
-            ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("_issf", issf);
-
             AType expected = AInteger.Create(0);
-            AType result = this.engine.Execute<AType>("_issf{(`a ,<{+};(3;5))}", scriptscope);
+            AType result = this.engine.Execute<AType>("_issf{(`a ,<{+};(3;5))}");
 
             Assert.AreEqual(expected, result);
         }
