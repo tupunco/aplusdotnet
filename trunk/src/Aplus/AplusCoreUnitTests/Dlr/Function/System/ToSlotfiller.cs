@@ -129,11 +129,9 @@ namespace AplusCoreUnitTests.Dlr.Function.System
             scope.SetVariable(".inp", input);
 
             this.engine.Execute<AType>("x := _alsf{inp}", scope);
-
             this.engine.Execute<AType>("((1;0) pick x) := -200", scope);
 
-            AType result = scope.GetVariable<AType>(".x");
-            Assert.AreNotEqual(input, result);
+            Assert.AreEqual(AInteger.Create(1), input[1].NestedItem);
         }
 
         #endregion
