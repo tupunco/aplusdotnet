@@ -1,3 +1,4 @@
+using AplusCore.Runtime.Function.Monadic;
 using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function
@@ -13,8 +14,6 @@ namespace AplusCore.Runtime.Function
         [SystemFunction("_alsf", "_alsf{x}: returns with a slotfiller")]
         internal static AType Alsf(AplusEnvironment environment, AType input)
         {
-            AType result;
-
             if (input.Rank > 1)
             {
                 throw new Error.Rank("_alsf");
@@ -22,41 +21,78 @@ namespace AplusCore.Runtime.Function
 
             if (input.IsSlotFiller())
             {
-                result = input.Clone();
+                return input.Clone();
+            }
+
+            return (input.IsArray) ? ArrayInput(input) : NotArrayInput(input);
+        }
+
+        private static AType NotArrayInput(AType input)
+        {
+            AType result;
+
+            if (input.Type == ATypes.ABox)
+            {
+                result = AArray.Create(ATypes.ABox, ABox.Create(Utils.ANull()), ABox.Create(Utils.ANull()));
+            }
+            else if (input.Type == ATypes.ASymbol)
+            {
+                result = AArray.Create(ATypes.ABox, ABox.Create(input), ABox.Create(Utils.ANull()));
             }
             else
             {
-                if (input.Type != ATypes.ABox && input.Type != ATypes.ASymbol && input.Type != ATypes.ANull)
-                {
-                    throw new Error.Type("_alsf");
-                }
-
-                AType titlesArray = AArray.Create(ATypes.ANull);
-                AType elements = AArray.Create(ATypes.ANull);
-                int odd = input.Length % 2;
-
-                for (int i = 0; i < input.Length - odd; i += 2)
-                {
-                    if (input[i].NestedItem.Type != ATypes.ASymbol)
-                    {
-                        throw new Error.Domain("_alsf");
-                    }
-
-                    titlesArray.Add(input[i].NestedItem);
-                    elements.Add(input[i + 1]);
-                }
-
-                if (odd != 0 && input[input.Length - 1].NestedItem.Type != ATypes.ANull)
-                {
-                    titlesArray.Add(input[input.Length - 1].NestedItem);
-                    elements.Add(ABox.Create(AArray.Create(ATypes.ANull)));
-                }
-
-                result = AArray.Create(ATypes.AType, ABox.Create(titlesArray), ABox.Create(elements));
+                throw new Error.Type("_alsf");
             }
 
             return result;
         }
 
+        private static AType ArrayInput(AType input)
+        {
+            AType result;
+            AType titles = AArray.Create(ATypes.ANull);
+            AType elements = AArray.Create(ATypes.ANull);
+            int odd = input.Length % 2;
+
+            for (int i = 0; i < input.Length - odd; i += 2)
+            {
+                AType key = MonadicFunctionInstance.Disclose.Execute(input[i]);
+                AType value = input[i + 1];
+
+                if (key.Type != ATypes.ASymbol)
+                {
+                    throw new Error.Domain("_alsf");
+                }
+
+                if (!value.IsBox)
+                {
+                    value = ABox.Create(value);
+                }
+
+                titles.Add(key);
+                elements.Add(value);
+            }
+
+            AType lastItem;
+
+            if (input.Length == 0)
+            {
+                lastItem = input;
+            }
+            else
+            {
+                lastItem = MonadicFunctionInstance.Disclose.Execute(input[input.Length - 1]);
+            }
+
+            if (odd != 0 && lastItem.Type != ATypes.ANull)
+            {
+                titles.Add(lastItem);
+                elements.Add(ABox.Create(AArray.Create(ATypes.ANull)));
+            }
+
+            result = AArray.Create(ATypes.AType, ABox.Create(titles), ABox.Create(elements));
+
+            return result;
+        }
     }
 }
