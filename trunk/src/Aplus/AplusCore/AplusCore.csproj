@@ -211,6 +211,7 @@
     <Compile Include="Runtime\Function\Dyadic\Scalar\Relational\LessThan.cs" />
     <Compile Include="Runtime\Function\Dyadic\Scalar\Relational\LessThanOrEqualTo.cs" />
     <Compile Include="Runtime\Function\Dyadic\Scalar\Relational\NotEqualTo.cs" />
+    <Compile Include="Runtime\Function\Monadic\NonScalar\Computational\MatrixInverse.cs" />
     <Compile Include="Runtime\Function\System\Alsf.cs" />
     <Compile Include="Runtime\Function\System\Dependency.cs" />
     <Compile Include="Runtime\Function\System\IsaSlotfiller.cs" />

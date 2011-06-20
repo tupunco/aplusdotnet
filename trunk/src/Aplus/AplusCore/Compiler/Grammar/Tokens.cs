@@ -53,6 +53,7 @@ namespace AplusCore.Compiler.Grammar
         INTERVAL,
         ITEMRAVEL,
         MAPIN,
+        MATRIXINVERSE,
         NULL,
         PACK,
         PARTITIONCOUNT,
