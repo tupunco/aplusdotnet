@@ -73,6 +73,7 @@ Identity:			'+';
 Interval:			'iota';
 ItemRavel:			'!';
 MapIn:				'beam';
+MatrixInverse:		'mdiv';
 NaturalLog:			'log';
 Negate:				'-';
 Not:				'~';

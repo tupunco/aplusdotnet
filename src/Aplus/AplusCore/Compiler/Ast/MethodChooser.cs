@@ -119,6 +119,8 @@ namespace AplusCore.Compiler.AST
                     return MonadicFunctionInstance.ItemRavel;
                 case Tokens.MAPIN:
                     return MonadicFunctionInstance.MapIn;
+                case Tokens.MATRIXINVERSE:
+                    return MonadicFunctionInstance.MatrixInverse;
                 case Tokens.NULL:
                     return MonadicFunctionInstance.NullFunction;
                 case Tokens.PACK:

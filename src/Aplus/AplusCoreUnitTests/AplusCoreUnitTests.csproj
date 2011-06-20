@@ -141,6 +141,7 @@
     <Compile Include="Dlr\Function\Monadic\NonScalar\GradeDown.cs" />
     <Compile Include="Dlr\Function\Monadic\NonScalar\GradeUp.cs" />
     <Compile Include="Dlr\Function\Monadic\NonScalar\ItemRavel.cs" />
+    <Compile Include="Dlr\Function\Monadic\NonScalar\MatrixInverse.cs" />
     <Compile Include="Dlr\Function\Monadic\NonScalar\NullFunction.cs" />
     <Compile Include="Dlr\Function\Monadic\NonScalar\Pack.cs" />
     <Compile Include="Dlr\Function\Monadic\NonScalar\PartitionCount.cs" />

@@ -63,6 +63,7 @@ namespace AplusCore.Runtime.Function.Monadic
 
         #region Computational
 
+        internal static readonly AbstractMonadicFunction MatrixInverse = new MatrixInverse();
         internal static readonly AbstractMonadicFunction Pack = new Pack();
         internal static readonly AbstractMonadicFunction Unpack = new Unpack();
 

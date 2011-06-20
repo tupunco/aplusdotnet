@@ -211,6 +211,7 @@ functionSymbol returns [AST.Token token]
 	|	t=Interval							{ token = new AST.Token(Tokens.INTERVAL, $t.Text); }
 	|	t=ItemRavel							{ token = new AST.Token(Tokens.ITEMRAVEL, $t.Text); }
 	|	t=MapIn								{ token = new AST.Token(Tokens.MAPIN, $t.Text); }
+	|	t=MatrixInverse						{ token = new AST.Token(Tokens.MATRIXINVERSE, $t.Text); }
 	|	t=NaturalLog						{ token = new AST.Token(Tokens.NATURALLOG, $t.Text); }
 	|	t=Negate							{ token = new AST.Token(Tokens.NEGATE, $t.Text); }
 	|	t=Not								{ token = new AST.Token(Tokens.NOT, $t.Text); }
