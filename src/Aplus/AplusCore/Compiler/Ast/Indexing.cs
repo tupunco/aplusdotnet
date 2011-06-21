@@ -110,26 +110,6 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        private static int counter = 0;
-        internal override string ToDot(string parent, System.Text.StringBuilder textBuilder)
-        {
-            string name = String.Format("Idexing{0}", counter++);
-            string itemName = this.item.ToDot(name, textBuilder);
-            string indexExprName = this.indexExpression.ToDot(name, textBuilder);
-
-            textBuilder.AppendFormat("  {0} [label=\"Indexing\"];", name);
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, itemName);
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, indexExprName);
-
-            return name;
-        }
-#endif
-
-        #endregion
     }
 
     #region Construction helper

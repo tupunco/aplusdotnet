@@ -19,6 +19,7 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        public Token Token { get { return this.token; } }
         public Tokens TokenType { get { return this.token.Type; } }
         public Node Expression { get { return this.expression; } }
 
@@ -127,25 +128,6 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        static int counter = 0;
-        internal override string ToDot(string parent, System.Text.StringBuilder textBuilder)
-        {
-            string name = String.Format("Monadic{0}", counter++);
-            string exprName = this.expression.ToDot(name, textBuilder);
-
-            textBuilder.AppendFormat("  {0} [label=\"{1} ({2})\"];\n", name, this.token.Text, this.token.Type.ToString());
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, exprName);
-
-            return name;
-        }
-#endif
-
-        #endregion
-
     }
 
     #region Construction helper

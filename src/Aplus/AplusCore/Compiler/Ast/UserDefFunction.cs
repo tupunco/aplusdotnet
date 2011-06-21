@@ -25,6 +25,8 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        public Node Codeblock { get { return this.codeblock; } }
+        public ExpressionList Parameters { get { return this.parameters; } }
         public Variables Variables { get; set; }
 
         #endregion
@@ -176,32 +178,6 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        private static int counter = 0;
-        internal override string ToDot(string parent, StringBuilder textBuilder)
-        {
-            string name = String.Format("FunctionDef{0}", counter++);
-
-            textBuilder.AppendFormat("  subgraph cluster_{0}_cond {{ style=dotted; color=lightgrey; label=\"Parameters\";\n", name);
-            string parametersName = this.parameters.ToDot(name, textBuilder);
-            textBuilder.AppendFormat("  }}\n");
-
-            textBuilder.AppendFormat("  subgraph cluster_{0}_true {{ style=dotted; color=lightgrey; label=\"CodeBlock\";\n", name);
-            string codeblockName = this.codeblock.ToDot(name, textBuilder);
-            textBuilder.AppendFormat("  }}\n");
-
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, parametersName);
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, codeblockName);
-
-            return name;
-        }
-#endif
-
-        #endregion
-
     }
 
     #region Construction helper

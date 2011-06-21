@@ -26,6 +26,12 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
+        #region Properties
+
+        public LinkedList<Constant> List { get { return this.list; } }
+
+        #endregion
+
         #region Constructor
 
         public ConstantList()
@@ -167,24 +173,6 @@ namespace AplusCore.Compiler.AST
             }
             return hash;
         }
-
-        #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        static int counter = 0;
-        internal override string ToDot(string parent, System.Text.StringBuilder textBuilder)
-        {
-            string name = String.Format("ConstantList{0}", counter++);
-            foreach (Constant item in this.list)
-            {
-                string itemName = item.ToDot(name, textBuilder);
-                textBuilder.AppendFormat("  {0} -> {1};\n", name, itemName);
-            }
-            return name;
-        }
-#endif
 
         #endregion
     }

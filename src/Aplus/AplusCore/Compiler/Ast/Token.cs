@@ -59,20 +59,6 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        static int counter = 0;
-        internal override string ToDot(string parent, System.Text.StringBuilder text)
-        {
-            string name = String.Format("Token{0}", counter++);
-            text.AppendFormat(" {0} [label=\"{1}\"]", name, this.ToString());
-            return this.ToString();
-        }
-#endif
-
-        #endregion
     }
 
     #region Construction helper

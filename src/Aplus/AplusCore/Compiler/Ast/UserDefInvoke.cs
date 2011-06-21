@@ -20,6 +20,13 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
+        #region Properties
+
+        public ExpressionList Arguments { get { return this.arguments; } }
+        public Identifier Method { get { return this.method; } }
+
+        #endregion
+
         #region Constructor
 
         public UserDefInvoke(Identifier method, ExpressionList arguments)
@@ -138,28 +145,6 @@ namespace AplusCore.Compiler.AST
         {
             return this.method.GetHashCode() ^ this.arguments.GetHashCode();
         }
-
-        #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        private static int counter = 0;
-        internal override string ToDot(string parent, StringBuilder textBuilder)
-        {
-            string name = String.Format("FunctionInvoke{0}", counter++);
-
-            textBuilder.AppendFormat("  {0} [label=\"Invoke: {1}\"]", name, this.method.Name);
-
-            textBuilder.AppendFormat("  subgraph cluster_{0}_args {{ style=dotted; color=lightgrey; label=\"Arguments\";\n", name);
-            string argumentsName = this.arguments.ToDot(name, textBuilder);
-            textBuilder.AppendFormat("  }}\n");
-
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, argumentsName);
-
-            return name;
-        }
-#endif
 
         #endregion
     }

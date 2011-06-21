@@ -20,6 +20,8 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        public string Command { get { return this.command; } }
+
         public string Argument
         {
             get { return this.argument; }
@@ -180,25 +182,6 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        private static int counter = 0;
-        internal override string ToDot(string parent, System.Text.StringBuilder textBuilder)
-        {
-            string name = String.Format("SystemCommand{0}", counter++);
-            textBuilder.AppendFormat("  {0}_cmd [label=\"{1}\"];\n", name, this.command);
-            textBuilder.AppendFormat("  {0}_arg [label=\"{1}\"];\n", name, this.argument);
-            textBuilder.AppendFormat("  {0} -> {0}_cmd;\n", name);
-            textBuilder.AppendFormat("  {0} -> {0}_arg;\n", name);
-
-            return name;
-        }
-#endif
-
-        #endregion
-
     }
 
     #region Construction helper

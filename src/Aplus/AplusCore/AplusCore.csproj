@@ -87,6 +87,7 @@
     <Compile Include="Compiler\Ast\Operator\RankOperator.cs" />
     <Compile Include="Compiler\Ast\Strand.cs" />
     <Compile Include="Compiler\Ast\SystemCommand.cs" />
+    <Compile Include="Compiler\Ast\DotGenerator.cs" />
     <Compile Include="Compiler\Ast\UserDefFunction.cs" />
     <Compile Include="Compiler\Ast\ControlFlow\While.cs" />
     <Compile Include="Compiler\Ast\Token.cs" />

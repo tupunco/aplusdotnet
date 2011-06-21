@@ -117,26 +117,6 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        private static int counter = 0;
-        internal override string ToDot(string parent, System.Text.StringBuilder textBuilder)
-        {
-            string name = String.Format("ExpressionList{0}", counter++);
-
-            foreach (Node node in this.nodeList)
-            {
-                string nodeName = node.ToDot(name, textBuilder);
-                textBuilder.AppendFormat("  {0} -> {1};\n", name, nodeName);
-            }
-
-            return name;
-        }
-#endif
-
-        #endregion
     }
 
     #region Construction helper
