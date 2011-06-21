@@ -26,6 +26,7 @@ namespace AplusCore.Compiler.AST
         #region Properties
 
         public Node Target { get { return this.target; } }
+        public Node Expression { get { return this.expression; } }
 
         #endregion
 
@@ -708,26 +709,6 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        static int counter = 0;
-        internal override string ToDot(string parent, System.Text.StringBuilder text)
-        {
-            string thisID = String.Format("Assign{0}", counter++);
-            string targetID = target.ToDot(thisID, text);
-            string expressionID = expression.ToDot(thisID, text);
-
-            //text.AppendFormat("{0} -> {1}", parent, thisNode);
-            text.AppendFormat("  {0} [label=\":=\"];\n", thisID);
-            text.AppendFormat("  {0} -> {1};\n", thisID, targetID);
-            text.AppendFormat("  {0} -> {1};\n", thisID, expressionID);
-
-            return thisID;
-        }
-#endif
-
-        #endregion
     }
 
     #region Construction helper

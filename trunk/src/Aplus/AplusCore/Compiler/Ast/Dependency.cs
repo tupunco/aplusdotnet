@@ -26,6 +26,9 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        internal Identifier Variable { get { return this.variable; } }
+        internal Node FunctionBody { get { return this.functionBody; } }
+
         internal Identifier Indexer
         {
             get { return this.indexer; }

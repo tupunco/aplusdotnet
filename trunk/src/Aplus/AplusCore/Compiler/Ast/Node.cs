@@ -127,17 +127,6 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        internal virtual string ToDot(string parent, System.Text.StringBuilder text)
-        {
-            throw new NotImplementedException("Should !NEVER! reach this point. ONLY for DEBUG!");
-        }
-#endif
-
-        #endregion
-
         #region Operator overloads
 
         public static bool operator ==(Node left, Node right)

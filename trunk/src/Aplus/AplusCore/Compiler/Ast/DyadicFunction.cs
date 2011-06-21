@@ -20,6 +20,7 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        public Token Token { get { return this.token; } }
         public Tokens TokenType { get { return this.token.Type; } }
         public Node Left { get { return this.leftExpression; } }
         public Node Right { get { return this.rightExpression; } }
@@ -185,26 +186,6 @@ namespace AplusCore.Compiler.AST
         {
             return this.token.GetHashCode() ^ this.leftExpression.GetHashCode() ^ this.rightExpression.GetHashCode();
         }
-
-        #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        private static int counter = 0;
-        internal override string ToDot(string parent, System.Text.StringBuilder textBuilder)
-        {
-            string name = String.Format("Dyadic{0}", counter++);
-            string leftName = this.leftExpression.ToDot(name, textBuilder);
-            string rightName = this.rightExpression.ToDot(name, textBuilder);
-
-            textBuilder.AppendFormat("  {0} [label=\"{1} ({2})\"];\n", name, this.token.Text, this.token.Type.ToString());
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, leftName);
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, rightName);
-
-            return name;
-        }
-#endif
 
         #endregion
     }
