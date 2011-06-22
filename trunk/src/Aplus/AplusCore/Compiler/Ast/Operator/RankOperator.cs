@@ -124,37 +124,6 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        static int counter = 0;
-        internal override string ToDot(string parent, System.Text.StringBuilder text)
-        {
-            string name = String.Format("RankOP{0}", counter++);
-            string funcDot = this.function.ToDot(name, text);
-            text.AppendFormat(" {0} -> {1};\n", name, funcDot);
-
-            if (isDyadic)
-            {
-                string leftArg = this.leftarg.ToDot(name, text);
-                text.AppendFormat("  {0} -> {1};\n", name, leftArg);
-            }
-            string conditionArg = this.condition.ToDot(name, text);
-            text.AppendFormat("  {0} -> {1};\n", name, conditionArg);
-
-            if (rightarg != null)
-            {
-                string rightArg = this.rightarg.ToDot(name, text);
-                text.AppendFormat(" {0} -> {1};\n", name, rightArg);
-                text.AppendFormat(" {0} [label=\"{1} Rank\"]", name, this.function);
-            }
-
-            return name;
-        }
-#endif
-
-        #endregion
     }
 
     #region Construction helper

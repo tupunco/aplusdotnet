@@ -16,6 +16,12 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
+        #region Properties
+
+        public Node Codeblock { get { return this.codeblock; } }
+
+        #endregion
+
         #region Constructor
 
         public MonadicDo(Node codeblock)
@@ -118,28 +124,6 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        private static int counter = 0;
-        internal override string ToDot(string parent, StringBuilder textBuilder)
-        {
-            string name = String.Format("MonadicDo{0}", counter++);
-            textBuilder.AppendFormat("  subgraph cluster_{0}_block {{ style=dotted; color=black; label=\"Protected Block\";\n", name);
-            string codeBlockName = this.codeblock.ToDot(name, textBuilder);
-            textBuilder.AppendFormat("  }}\n");
-
-            textBuilder.AppendFormat("  {0} [label=\"DO\"];\n", name);
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, codeBlockName);
-
-
-            return name;
-        }
-#endif
-
-        #endregion
-
     }
 
     #region Construction helper

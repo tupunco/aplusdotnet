@@ -1,8 +1,5 @@
-﻿using System;
-using System.IO;
-#if DEBUG
+﻿using System.IO;
 using System.Text;
-#endif
 
 using Antlr.Runtime;
 
@@ -62,28 +59,5 @@ namespace AplusCore.Compiler
                 return Parse.String(file.ReadToEnd(), mode);
             }
         }
-
-#if DEBUG
-        public static void CreateDotFile(string input, string outputFileName)
-        {
-            Antlr.Runtime.Lexer lexer = new Grammar.Ascii.AplusLexer(new ANTLRStringStream(input ?? ""));
-            Grammar.AplusParser parser = new Grammar.AplusParser(new CommonTokenStream(lexer));
-
-            bool parseOk = parser.Parse();
-
-            Console.WriteLine(parser.tree);
-            Console.WriteLine("ok? {0}", parseOk);
-
-            StringBuilder dotString = new StringBuilder();
-            dotString.Append("digraph APlus {\n");
-            parser.tree.ToDot("", dotString);
-            dotString.Append("\n}");
-
-            using (StreamWriter writer = new StreamWriter(new FileStream(outputFileName, FileMode.Create)))
-            {
-                writer.Write(dotString);
-            }
-        }
-#endif
     }
 }
