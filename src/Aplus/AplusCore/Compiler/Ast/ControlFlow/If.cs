@@ -20,6 +20,9 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        public Node Expression { get { return this.expression; } }
+        public Node TrueCase { get { return this.trueCase; } }
+        public Node FalseCase { get { return this.falseCase; } }
         public bool HaveFalseCase { get { return this.falseCase != Node.NullConstant(); } }
 
         #endregion
@@ -113,45 +116,6 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        private static int counter = 0;
-        internal override string ToDot(string parent, StringBuilder textBuilder)
-        {
-            string name = String.Format("IF{0}", counter++);
-
-            textBuilder.AppendFormat("  subgraph cluster_{0}_cond {{ style=dotted; color=blue; label=\"Condition\";\n", name);
-            string exprName = this.expression.ToDot(name, textBuilder);
-            textBuilder.AppendFormat("  }}\n");
-
-            textBuilder.AppendFormat("  subgraph cluster_{0}_true {{ style=dotted; color=green; label=\"True\";\n", name);
-            string trueCaseName = this.trueCase.ToDot(name, textBuilder);
-            textBuilder.AppendFormat("  }}\n");
-
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, exprName);
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, trueCaseName);
-
-            if (this.HaveFalseCase)
-            {
-                textBuilder.AppendFormat("  {0} [label=\"IF-Else\"];\n", name);
-                textBuilder.AppendFormat("  subgraph cluster_{0}_false {{ style=dotted; color=red; label=\"False\";\n", name);
-                string falseCaseName = this.falseCase.ToDot(name, textBuilder);
-                textBuilder.AppendFormat("  }}\n");
-                textBuilder.AppendFormat("  {0} -> {1};\n", name, falseCaseName);
-            }
-            else
-            {
-                textBuilder.AppendFormat("  {0} [label=\"IF\"];\n", name);
-            }
-
-            return name;
-        }
-#endif
-
-        #endregion
-
     }
 
     #region Construction helper

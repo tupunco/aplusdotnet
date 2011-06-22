@@ -19,6 +19,13 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
+        #region Properties
+
+        public Node Codeblock { get { return this.codeblock; } }
+        public Node Expression { get { return this.expression; } }
+
+        #endregion
+
         #region Constructor
 
         public DyadicDo(Node expression, Node codeblock)
@@ -268,33 +275,6 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        private static int counter = 0;
-        internal override string ToDot(string parent, StringBuilder textBuilder)
-        {
-            string name = String.Format("DyadicDo{0}", counter++);
-            textBuilder.AppendFormat("  subgraph cluster_{0}_cond {{ style=dotted; color=blue; label=\"Condition\";\n", name);
-            string exprName = this.expression.ToDot(name, textBuilder);
-            textBuilder.AppendFormat("  }}\n");
-
-            textBuilder.AppendFormat("  subgraph cluster_{0}_code {{ style=dotted; color=black; label=\"Code Block\";\n", name);
-            string codeBlockName = this.codeblock.ToDot(name, textBuilder);
-            textBuilder.AppendFormat("  }}\n");
-
-            textBuilder.AppendFormat("  {0} [label=\"DO\"];\n", name);
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, exprName);
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, codeBlockName);
-
-
-            return name;
-        }
-#endif
-
-        #endregion
-
     }
 
     #region Construction helper

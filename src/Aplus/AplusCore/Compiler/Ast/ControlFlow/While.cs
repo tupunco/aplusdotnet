@@ -17,6 +17,13 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
+        #region Properties
+
+        public Node Expression { get { return this.expression; } }
+        public Node CodeBlock { get { return this.codeBlock; } }
+
+        #endregion
+
         #region Constructor
 
         public While(Node expression, Node codeBlock)
@@ -93,28 +100,6 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        private static int counter = 0;
-        internal override string ToDot(string parent, StringBuilder textBuilder)
-        {
-            string name = String.Format("While{0}", counter++);
-            string exprName = this.expression.ToDot(name, textBuilder);
-            string codeBlockName = this.codeBlock.ToDot(name, textBuilder);
-
-            textBuilder.AppendFormat("  {0} [label=\"While\"];\n", name);
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, exprName);
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, codeBlockName);
-
-
-            return name;
-        }
-#endif
-
-        #endregion
-
     }
 
 

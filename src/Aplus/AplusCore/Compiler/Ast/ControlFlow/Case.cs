@@ -19,6 +19,13 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
+        #region Properties
+
+        public Node Expression { get { return this.expression; } }
+        public ExpressionList CaseList { get { return this.caseList; } }
+
+        #endregion
+
         #region Constructor
 
         public Case(Node expression, ExpressionList caseList)
@@ -133,26 +140,6 @@ namespace AplusCore.Compiler.AST
         {
             return this.expression.GetHashCode() ^ this.caseList.GetHashCode();
         }
-
-        #endregion
-
-        #region GraphViz output (Only in DEBUG)
-
-#if DEBUG
-        private static int counter = 0;
-        internal override string ToDot(string parent, System.Text.StringBuilder textBuilder)
-        {
-            string name = String.Format("Case{0}", counter++);
-            string exprName = this.expression.ToDot(name, textBuilder);
-            string casesName = this.caseList.ToDot(name, textBuilder);
-
-            textBuilder.AppendFormat("  {0} [label=\"Case\"];\n", name);
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, exprName);
-            textBuilder.AppendFormat("  {0} -> {1};\n", name, casesName);
-
-            return name;
-        }
-#endif
 
         #endregion
     }
