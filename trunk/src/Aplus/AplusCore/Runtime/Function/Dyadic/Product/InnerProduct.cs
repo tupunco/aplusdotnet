@@ -16,7 +16,6 @@ namespace AplusCore.Runtime.Function.Dyadic.Product
     /// </remarks>
     abstract class InnerProduct : AbstractDyadicFunction
     {
-       
         #region Entry Point
 
         public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
@@ -99,6 +98,5 @@ namespace AplusCore.Runtime.Function.Dyadic.Product
         }
         
         #endregion
-
     }
 }

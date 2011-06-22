@@ -7,46 +7,39 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 {
     class Take : AbstractDyadicFunction
     {
-        #region Variables
-
-        private int desiredcount;
-        private AType items;
-
-        #endregion
-
         #region Entry point
 
         public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
         {
-            PrepareDesiredCount(left);
-            PrepareInputItems(right);
+            int desiredCount = PrepareDesiredCount(left);
+            AType items = PrepareInputItems(right);
 
-            return Compute();
+            return Compute(items, desiredCount);
         }
 
         #endregion
 
         #region Computation
 
-        private AType Compute()
+        private AType Compute(AType items, int desiredCount)
         {
             AType result = AArray.Create(items.Type);
 
-            if (this.desiredcount > 0)
+            if (desiredCount > 0)
             {
                 // Check how many we can copy from the right argument
-                int count = (this.desiredcount <= this.items.Length) ? this.desiredcount : this.items.Length;
-                int remainder = this.desiredcount - count;
+                int count = (desiredCount <= items.Length) ? desiredCount : items.Length;
+                int remainder = desiredCount - count;
 
                 for (int i = 0; i < count; i++)
                 {
-                    result.AddWithNoUpdate(this.items[i].Clone());
+                    result.AddWithNoUpdate(items[i].Clone());
                 }
 
                 // Check if there is some leftover we need to fill
                 if (remainder > 0)
                 {
-                    AType filler = FillElement();
+                    AType filler = FillElement(items);
 
                     for (; remainder > 0; remainder--)
                     {
@@ -58,14 +51,14 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
             {
                 // set the start point, which is the difference between the length of the items and
                 //  the count we want to take from the end of the list
-                // NOTE: + is used because in this case the 'desiredcount' variable is a negative number
-                int start = this.items.Length + this.desiredcount;
+                // NOTE: + is used because in this case the 'desiredCount' variable is a negative number
+                int start = items.Length + desiredCount;
 
                 if (start < 0)
                 {
                     // This case we need to add fill elements to the start of the array
 
-                    AType filler = FillElement();
+                    AType filler = FillElement(items);
                     for(;start < 0; start++)
                     {
                         result.AddWithNoUpdate(filler.Clone());
@@ -73,24 +66,24 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                     // Now the 'start' is 0
                 }
 
-                for (; start < this.items.Length; start++)
+                for (; start < items.Length; start++)
                 {
-                    result.AddWithNoUpdate(this.items[start].Clone());
+                    result.AddWithNoUpdate(items[start].Clone());
                 }
             }
 
-            result.Length = Math.Abs(this.desiredcount);
+            result.Length = Math.Abs(desiredCount);
             result.Shape = new List<int>() { result.Length };
 
-            if (this.items.Rank > 1)
+            if (items.Rank > 1)
             {
-                result.Shape.AddRange(this.items.Shape.GetRange(1, this.items.Shape.Count - 1));
+                result.Shape.AddRange(items.Shape.GetRange(1, items.Shape.Count - 1));
             }
-            result.Rank = this.items.Rank;
+            result.Rank = items.Rank;
 
-            if (this.desiredcount == 0)
+            if (desiredCount == 0)
             {
-                result.Type = this.items.MixedType() ? ATypes.ANull : this.items.Type;
+                result.Type = items.MixedType() ? ATypes.ANull : items.Type;
             }
             else
             {
@@ -108,16 +101,16 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
         /// otherwise create an array from the filler element with the required shape
         /// </remarks>
         /// <returns></returns>
-        private AType FillElement()
+        private AType FillElement(AType items)
         {
             // Input is a vector, so return a simple element
-            if (this.items.Rank == 1)
+            if (items.Rank == 1)
             {
-                return Utils.FillElement(this.items.Type);
+                return Utils.FillElement(items.Type);
             }
             else // Input is not a vector, reshape the filler element
             {
-                return Utils.FillElement(this.items.Type, this.items.Shape.GetRange(1, items.Shape.Count - 1).ToAArray());
+                return Utils.FillElement(items.Type, items.Shape.GetRange(1, items.Shape.Count - 1).ToAArray());
             }
         }
 
@@ -129,23 +122,28 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
         /// Convert the input argument to an array.
         /// </summary>
         /// <param name="argument"></param>
-        private void PrepareInputItems(AType argument)
+        /// <returns></returns>
+        private AType PrepareInputItems(AType argument)
         {
+            AType result;
+
             if (argument.Type == ATypes.ANull)
             {
-                this.items = AArray.Create(ATypes.ABox, ABox.Create(argument));
+                result = AArray.Create(ATypes.ABox, ABox.Create(argument));
             }
             else if (argument.IsArray)
             {
-                this.items = argument;
+                result = argument;
             }
             else
             {
-                this.items = AArray.Create(argument.Type, argument);
+                result = AArray.Create(argument.Type, argument);
             }
+
+            return result;
         }
 
-        private void PrepareDesiredCount(AType element)
+        private int PrepareDesiredCount(AType element)
         {
             if (element.Type == ATypes.AFloat || element.Type == ATypes.AInteger)
             {
@@ -157,11 +155,14 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                     throw new Error.Nonce(this.NonceErrorText);
                 }
 
+                int desiredCount;
                 // Check if the scalar is a whole number and set the desired count of items
-                if (!scalar.ConvertToRestrictedWholeNumber(out this.desiredcount))
+                if (!scalar.ConvertToRestrictedWholeNumber(out desiredCount))
                 {
                     throw new Error.Type(this.TypeErrorText);
                 }
+
+                return desiredCount;
             }
             else if (element.Type == ATypes.ANull)
             {

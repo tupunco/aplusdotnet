@@ -15,21 +15,12 @@ namespace AplusCore.Runtime.Function.Monadic.Operator.Reduction
         protected override AType Process(AType argument)
         {
             int result;
-            if (argument.ConvertToRestrictedWholeNumber(out result))
-            {
-                if (result != 0)
-                {
-                    return AInteger.Create(1);
-                }
-                else
-                {
-                    return AInteger.Create(0);
-                }
-            }
-            else
+            if (!argument.ConvertToRestrictedWholeNumber(out result))
             {
                 throw new Error.Type(TypeErrorText);
             }
+
+            return AInteger.Create((result != 0) ? 1 : 0);
         }
     }
 }

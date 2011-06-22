@@ -1,13 +1,11 @@
-﻿using System.Linq;
-
-using AplusCore.Types;
+﻿using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function
 {
     internal static partial class SystemFunction
     {
         /// <summary>
-        /// System function to get the dependency definition for the supplied symbol.
+        /// System function to get the dependency definition for the given symbol.
         /// </summary>
         /// <param name="environment"><see cref="AplusEnvironment"/></param>
         /// <param name="symbol"><see cref="AType"/> symbol containing the name of the dependency.</param>
@@ -16,9 +14,9 @@ namespace AplusCore.Runtime.Function
         internal static AType DependencyDefinition(AplusEnvironment environment, AType symbol)
         {
             AType result;
-            DependencyManager manager = environment.Runtime.DependencyManager;
-            DependencyItem dependency;
             string variableName;
+            DependencyItem dependency;
+            DependencyManager manager = environment.Runtime.DependencyManager;
 
             if (!TryQualifiedName(environment, symbol, out variableName))
             {
