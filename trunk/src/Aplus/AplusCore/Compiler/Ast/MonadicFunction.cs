@@ -19,7 +19,7 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
-        public Token Token { get { return this.token; } }
+        public new Token Token { get { return this.token; } }
         public Tokens TokenType { get { return this.token.Type; } }
         public Node Expression { get { return this.expression; } }
 
