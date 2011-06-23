@@ -34,5 +34,27 @@ namespace AplusCore.Runtime.Function
 
             return result;
         }
+
+        /// <summary>
+        /// Remove dependency definition for the given global name.
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <param name="symbol">Global name of the defined dependency.</param>
+        /// <returns>0 if a definition was removed, and 0 otherwise.</returns>
+        [SystemFunction("_undef", "_undef{x}: removes the dependency definition for x global name.")]
+        internal static AType DependencyUndef(AplusEnvironment environment, AType symbol)
+        {
+            DependencyManager manager = environment.Runtime.DependencyManager;
+            string variableName;
+
+            if (!TryQualifiedName(environment, symbol, out variableName))
+            {
+                throw new Error.Domain("_undef");
+            }
+
+            AType result =  AInteger.Create(manager.Remove(variableName) ? 0 : 1);
+
+            return result;
+        }
     }
 }
