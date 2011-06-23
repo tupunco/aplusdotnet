@@ -64,6 +64,17 @@ namespace AplusCore.Runtime
         }
 
         /// <summary>
+        /// Removes the dependency for the given variableName.
+        /// </summary>
+        /// <param name="variableName"></param>
+        /// <returns>True if the dependency is successfully found and removed; otherwise, false.</returns>
+        public bool Remove(string variableName)
+        {
+            return this.mapping.Remove(variableName);
+        }
+
+
+        /// <summary>
         /// Check if the variable's dependency is invalid.
         /// </summary>
         /// <param name="variableName">The name of the variable to check for.</param>
