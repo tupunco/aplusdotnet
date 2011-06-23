@@ -9,6 +9,9 @@ using AplusCore.Types.MemoryMapped;
 
 namespace AplusCore.Runtime
 {
+    /// <summary>
+    /// Represent a memory-mapped file.
+    /// </summary>
     public class MappedFile
     {
         #region Variables
@@ -48,18 +51,27 @@ namespace AplusCore.Runtime
             get { return this.memoryMappedFileMode; }
         }
 
+        /// <summary>
+        /// Read and set Rank in the memory-mapped file.
+        /// </summary>
         public int Rank
         {
             get { return this.ReadInt32(RankPosition); }
             set { this.WriteInt32(RankPosition, value); }
         }
 
+        /// <summary>
+        /// Read and set Type.
+        /// </summary>
         public ATypes Type
         {
             get { return (ATypes)this.ReadInt32(TypePosition); }
             set { this.WriteInt32(TypePosition, (int)value); }
         }
 
+        /// <summary>
+        /// Read and set Shape.
+        /// </summary>
         public List<int> Shape
         {
             get
@@ -84,6 +96,9 @@ namespace AplusCore.Runtime
             }
         }
 
+        /// <summary>
+        /// Read the Shape without the first axes length.
+        /// </summary>
         private List<int> CellShape
         {
             get
@@ -104,6 +119,9 @@ namespace AplusCore.Runtime
             }
         }
 
+        /// <summary>
+        /// Length of the Shape without the first axes length.
+        /// </summary>
         private int CellShapeCount
         {
             get
@@ -123,18 +141,27 @@ namespace AplusCore.Runtime
             }
         }
 
+        /// <summary>
+        /// Read and set of the */Shape
+        /// </summary>
         public int ItemCount
         {
             get { return this.ReadInt32(ItemCountPosition); }
             set { this.WriteInt32(ItemCountPosition, value); }
         }
 
+        /// <summary>
+        /// Read and set the leading axes size (_items modify this value)
+        /// </summary>
         public int LeadingAxes
         {
             get { return this.ReadInt32(LeadingAxesPosition); }
             set { this.WriteInt32(LeadingAxesPosition, value); }
         }
 
+        /// <summary>
+        /// Read and set Length 
+        /// </summary>
         public int Length
         {
             get { return ReadInt32(ShapePosition); }
@@ -146,6 +173,9 @@ namespace AplusCore.Runtime
             }
         }
 
+        /// <summary>
+        /// It gives back the Size depends on the type (AFloat,AInteger,AChar)
+        /// </summary>
         public int Size
         {
             get
@@ -241,6 +271,9 @@ namespace AplusCore.Runtime
 
         #region Destruction
 
+        /// <summary>
+        /// Release the memory-mapped file.
+        /// </summary>
         public void Dispose()
         {
             this.accessor.Dispose();
@@ -256,31 +289,61 @@ namespace AplusCore.Runtime
 
         #region Write/Read With Accessor
 
+        /// <summary>
+        /// Read char from the given position.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public char ReadChar(long position)
         {
             return Convert.ToChar(this.accessor.ReadByte(position));
         }
 
+        /// <summary>
+        /// Read integer from the given position.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public int ReadInt32(long position)
         {
             return this.accessor.ReadInt32(position);
         }
 
+        /// <summary>
+        /// Read double from the given position.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public double ReadDouble(long position)
         {
             return this.accessor.ReadDouble(position);
         }
 
+        /// <summary>
+        /// Write integer to the given position.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="value"></param>
         public void WriteInt32(long position, int value)
         {
             this.accessor.Write(position, value);
         }
 
+        /// <summary>
+        /// Write double to the given position.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="value"></param>
         public void WriteDouble(long position, double value)
         {
             this.accessor.Write(position, value);
         }
 
+        /// <summary>
+        /// Write char to the given position.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="value"></param>
         public void WriteChar(long position, char value)
         {
             this.accessor.Write(position, Convert.ToByte(value));
@@ -290,6 +353,11 @@ namespace AplusCore.Runtime
 
         #region Write
 
+        /// <summary>
+        /// Compute the size of a memory-mapped file for argument.
+        /// </summary>
+        /// <param name="argument"></param>
+        /// <returns></returns>
         public static long ComputeSize(AType argument)
         {
             int size;
@@ -310,6 +378,10 @@ namespace AplusCore.Runtime
             return HeaderSize + size * AllItem(argument);
         }
 
+        /// <summary>
+        /// Write argument to the memory-mapped file.
+        /// </summary>
+        /// <param name="argument"></param>
         public void Create(AType argument)
         {
             WriteInt32(0,0);
@@ -338,6 +410,11 @@ namespace AplusCore.Runtime
             return allItem;
         }
 
+        /// <summary>
+        /// Recursive procedure to write all item to the memory-mapped file.
+        /// </summary>
+        /// <param name="argument"></param>
+        /// <param name="position"></param>
         private void Write(AType argument, ref long position)
         {
             if (argument.Rank > 0)
@@ -354,16 +431,31 @@ namespace AplusCore.Runtime
             }
         }
 
+        /// <summary>
+        /// Write value to the position as integer.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="value"></param>
         private void WriteInteger(long position, AType value)
         {
             WriteInt32(position, value.asInteger);
         }
 
+        /// <summary>
+        /// Write value to the position as float.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="value"></param>
         private void WriteFloat(long position, AType value)
         {
             WriteDouble(position, value.asFloat);
         }
 
+        /// <summary>
+        /// Write value to the position as char.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="value"></param>
         private void WriteChar(long position, AType value)
         {
             WriteChar(position, value.asChar);
@@ -373,6 +465,12 @@ namespace AplusCore.Runtime
 
         #region Read
 
+        /// <summary>
+        /// Bind a memory-mapped file to a MappedFile instance.
+        /// </summary>
+        /// <param name="memoryMappedFile"></param>
+        /// <param name="memoryMappedFileMode"></param>
+        /// <returns></returns>
         public static AType Read(MemoryMappedFile memoryMappedFile, MemoryMappedFileMode memoryMappedFileMode)
         {
             MappedFile mappedFile = new MappedFile(memoryMappedFile, memoryMappedFileMode);
@@ -382,6 +480,11 @@ namespace AplusCore.Runtime
                 mappedFile.Reader(ItemPosition);
         }
 
+        /// <summary>
+        /// Create AArray cell from the index place.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public AType ReadCell(int index)
         {
             long position = ItemPosition + (index * this.CellShapeCount * this.Size);
@@ -389,6 +492,12 @@ namespace AplusCore.Runtime
             return CreateAArray(this.CellShape, ref position);
         }
 
+        /// <summary>
+        /// Create AArray with the given shape. 
+        /// </summary>
+        /// <param name="shape"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         private AType CreateAArray(List<int> shape, ref long position)
         {
             if (shape.Count > 0)
@@ -414,16 +523,31 @@ namespace AplusCore.Runtime
             }
         }
 
+        /// <summary>
+        /// Create MMAInteger, what is store the position (to be able to read integer from memory)
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         private AType ReadMMAInteger(long position)
         {
             return MMAInteger.Create(position, this);
         }
 
+        /// <summary>
+        /// Create MMFloat, what is store the position (to be able to read float from memory)
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         private AType ReadMMAFloat(long position)
         {
             return MMAFloat.Create(position, this);
         }
 
+        /// <summary>
+        /// Create MMChar, what is store the position (to be able to read char from memory)
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         private AType ReadMMAChar(long position)
         {
             return MMAChar.Create(position, this);
@@ -433,11 +557,20 @@ namespace AplusCore.Runtime
 
         #region Add
 
+        /// <summary>
+        /// Compute the new size of the memory-mapped file.
+        /// </summary>
+        /// <param name="newLength"></param>
+        /// <returns></returns>
         public int ComputeNewSize(int newLength)
         {
             return HeaderSize + IntSize * this.CellShapeCount * newLength;
         }
 
+        /// <summary>
+        /// Append argument to the memory-mapped file.
+        /// </summary>
+        /// <param name="argument"></param>
         public void Add(AType argument)
         {
             if((this.Length + 1) > this.LeadingAxes)
