@@ -6,7 +6,6 @@ using AplusCore.Types;
 
 namespace AplusCore.Runtime
 {
-
     public enum MemoryMappedFileMode
     {
         Read,
@@ -14,11 +13,15 @@ namespace AplusCore.Runtime
         LocalWrite
     }
 
-
     public class MemoryMappedFileManager
     {
         #region Encode
 
+        /// <summary>
+        /// Encode the name (= file name with path), result is the name of a memory-mapped file.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private string EncodeName(string name)
         {
             return System.Convert.ToBase64String(
@@ -30,6 +33,11 @@ namespace AplusCore.Runtime
 
         #region Create
 
+        /// <summary>
+        /// Create a memory-mapped file with the given path and argument.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="argument"></param>
         public void CreateMemmoryMappedFile(string path, AType argument)
         {
             GC.Collect();
@@ -66,6 +74,12 @@ namespace AplusCore.Runtime
 
         #region Read
 
+        /// <summary>
+        /// Read memory-mapped file from a file with the mode, and result is an AType.
+        /// </summary>
+        /// <param name="memoryMappadFilePath"></param>
+        /// <param name="memoryMappedFileMode"></param>
+        /// <returns></returns>
         public AType Read(string memoryMappadFilePath, MemoryMappedFileMode memoryMappedFileMode)
         {
             MemoryMappedFile memoryMappedFile;
@@ -75,6 +89,12 @@ namespace AplusCore.Runtime
             return MappedFile.Read(memoryMappedFile, memoryMappedFileMode);
         }
 
+        /// <summary>
+        /// Create a Memory-mapped file from file in out parameter, and the result is true, if exist.
+        /// </summary>
+        /// <param name="memoryMappadFilePath"></param>
+        /// <param name="memoryMappedFile"></param>
+        /// <returns></returns>
         private bool GetMemoryMappedFile(string memoryMappadFilePath, out MemoryMappedFile memoryMappedFile)
         {
             string memoryMappedFileName = EncodeName(memoryMappadFilePath);
@@ -93,6 +113,11 @@ namespace AplusCore.Runtime
             return exist;
         }
 
+        /// <summary>
+        /// Return true, if the memory-mapped file is exist.
+        /// </summary>
+        /// <param name="memoryMappedFilePath"></param>
+        /// <returns></returns>
         public bool ExistMemoryMappedFile(string memoryMappedFilePath)
         {
             MemoryMappedFile memoryMappedFile;
@@ -108,6 +133,11 @@ namespace AplusCore.Runtime
 
         #region Expand/Decrease
 
+        /// <summary>
+        /// It gives back the leading axes (_Items function modify this value) of a memory-mapped file.
+        /// </summary>
+        /// <param name="memoryMappedFilePath"></param>
+        /// <returns></returns>
         public AType GetLeadingAxesLength(string memoryMappedFilePath)
         {
             MemoryMappedFile memoryMappedFile;
@@ -123,6 +153,12 @@ namespace AplusCore.Runtime
             return result;
         }
 
+        /// <summary>
+        /// Increase or decreade the size of a memory-mapped file.
+        /// </summary>
+        /// <param name="memoryMappedFilePath"></param>
+        /// <param name="newLeadingAxesLength"></param>
+        /// <returns></returns>
         public AType ExpandOrDecrease(string memoryMappedFilePath, int newLeadingAxesLength)
         {
             string memoryMappedFileName = EncodeName(memoryMappedFilePath);
