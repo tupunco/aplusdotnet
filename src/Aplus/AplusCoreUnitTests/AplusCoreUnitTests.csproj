@@ -159,6 +159,7 @@
     <Compile Include="Dlr\Function\Monadic\NonScalar\Value.cs" />
     <Compile Include="Dlr\Function\Monadic\Scalar\Identity.cs" />
     <Compile Include="Dlr\Function\Monadic\Scalar\Roll.cs" />
+    <Compile Include="Dlr\Function\System\Exit.cs" />
     <Compile Include="Dlr\Function\System\IsaSlotfiller.cs" />
     <Compile Include="Dlr\Function\System\Items.cs" />
     <Compile Include="Dlr\Function\System\PermissiveIndexing.cs" />
