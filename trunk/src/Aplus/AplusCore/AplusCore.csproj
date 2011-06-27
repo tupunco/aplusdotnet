@@ -215,6 +215,7 @@
     <Compile Include="Runtime\Function\Monadic\NonScalar\Computational\MatrixInverse.cs" />
     <Compile Include="Runtime\Function\System\Alsf.cs" />
     <Compile Include="Runtime\Function\System\Dependency.cs" />
+    <Compile Include="Runtime\Function\System\Exit.cs" />
     <Compile Include="Runtime\Function\System\IsaSlotfiller.cs" />
     <Compile Include="Runtime\Function\System\Items.cs" />
     <Compile Include="Runtime\Function\System\PermissiveIndexing.cs" />
