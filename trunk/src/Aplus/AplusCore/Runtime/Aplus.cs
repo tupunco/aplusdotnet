@@ -74,6 +74,7 @@ namespace AplusCore.Runtime
         {
             this.sysvars = new SystemVariables();
             this.dependencies = new DependencyManager();
+            this.callbackManager = new CallbackManager();
 
             this.dlrglobals = dlrglobals;
             this.globals = new DYN.ExpandoObject();
