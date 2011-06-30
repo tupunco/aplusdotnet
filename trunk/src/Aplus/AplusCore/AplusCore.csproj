@@ -216,6 +216,7 @@
     <Compile Include="Runtime\Function\Dyadic\Scalar\Relational\NotEqualTo.cs" />
     <Compile Include="Runtime\Function\Monadic\NonScalar\Computational\MatrixInverse.cs" />
     <Compile Include="Runtime\Function\System\Alsf.cs" />
+    <Compile Include="Runtime\Function\System\Callback.cs" />
     <Compile Include="Runtime\Function\System\Dependency.cs" />
     <Compile Include="Runtime\Function\System\Exit.cs" />
     <Compile Include="Runtime\Function\System\IsaSlotfiller.cs" />

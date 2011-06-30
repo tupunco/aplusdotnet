@@ -82,6 +82,7 @@
     <Compile Include="Dlr\Assignments\Strand.cs" />
     <Compile Include="Dlr\Assignments\UserDefined.cs" />
     <Compile Include="Dlr\Assignments\ValueInContext.cs" />
+    <Compile Include="Dlr\Callback.cs" />
     <Compile Include="Dlr\ControlFlow\Case.cs" />
     <Compile Include="Dlr\ControlFlow\If.cs" />
     <Compile Include="Dlr\ControlFlow\DyadicDo.cs" />
