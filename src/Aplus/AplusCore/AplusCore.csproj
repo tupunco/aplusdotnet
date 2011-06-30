@@ -132,6 +132,8 @@
     <Compile Include="Runtime\Binder\InvokeBinder.cs" />
     <Compile Include="Runtime\Binder\SetIndexBinder.cs" />
     <Compile Include="Runtime\Binder\SetMemberBinder.cs" />
+    <Compile Include="Runtime\Callback\CallbackItem.cs" />
+    <Compile Include="Runtime\Callback\CallbackManager.cs" />
     <Compile Include="Runtime\DependencyState.cs" />
     <Compile Include="Runtime\DependencyItem.cs" />
     <Compile Include="Runtime\DependencyManager.cs" />

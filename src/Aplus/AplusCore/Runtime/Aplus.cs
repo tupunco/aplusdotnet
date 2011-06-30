@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.Scripting.Runtime;
 
 using AplusCore.Compiler;
+using AplusCore.Runtime.Callback;
 using AplusCore.Types;
 
 using DYN = System.Dynamic;
@@ -20,6 +21,7 @@ namespace AplusCore.Runtime
         private SystemVariables sysvars;
         private MemoryMappedFileManager mmfmanager;
         private DependencyManager dependencies;
+        private CallbackManager callbackManager;
 
         private Dictionary<string, AType> systemFunctions;
 
@@ -40,6 +42,11 @@ namespace AplusCore.Runtime
         public DependencyManager DependencyManager
         {
             get { return this.dependencies; }
+        }
+
+        public CallbackManager CallbackManager
+        {
+            get { return this.callbackManager; }
         }
 
         public LexerMode LexerMode
