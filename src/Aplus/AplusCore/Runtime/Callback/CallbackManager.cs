@@ -39,6 +39,17 @@ namespace AplusCore.Runtime.Callback
         }
 
         /// <summary>
+        /// Gets the <see cref="CallbackItem"/> for the given global variable name.
+        /// </summary>
+        /// <param name="variableName">Global variable name.</param>
+        /// <param name="callback"></param>
+        /// <returns>True if the is a callback for the given global variable, otherwise false.</returns>
+        public bool TryGetCallback(string variableName, out CallbackItem callback)
+        {
+            return this.mapping.TryGetValue(variableName, out callback);
+        }
+
+        /// <summary>
         /// Register a callback to a global variable.
         /// </summary>
         /// <param name="variableName">Global variable name.</param>
