@@ -126,6 +126,7 @@
     <Compile Include="Runtime\AplusEnvironment.cs" />
     <Compile Include="Runtime\AplusLanguageContext.cs" />
     <Compile Include="Compiler\AplusScope.cs" />
+    <Compile Include="Runtime\Binder\CallbackBinder.cs" />
     <Compile Include="Runtime\Binder\ConvertBinder.cs" />
     <Compile Include="Runtime\Binder\GetIndexBinder.cs" />
     <Compile Include="Runtime\Binder\GetMemberBinder.cs" />

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using AplusCore.Runtime;
+using AplusCore.Runtime.Callback;
 using AplusCore.Runtime.Function.Dyadic;
 using AplusCore.Runtime.Function.Dyadic.NonScalar.Other;
 using AplusCore.Runtime.Function.Monadic;
@@ -578,6 +579,7 @@ namespace AplusCore.Compiler.AST
         {
             // Build the ET for updating the dependency
             DLR.Expression dependencyCall;
+            string qualifiedName = target.BuildQualifiedName(runtime.CurrentContext);
 
             if (isStrand)
             {
@@ -592,12 +594,43 @@ namespace AplusCore.Compiler.AST
                 dependencyCall = DLR.Expression.Call(
                     dependencyManager,
                     typeof(DependencyManager).GetMethod("InvalidateDependencies", new Type[] { typeof(string) }),
-                    DLR.Expression.Constant(target.BuildQualifiedName(runtime.CurrentContext))
+                    DLR.Expression.Constant(qualifiedName)
                 );
             }
 
             DLR.ParameterExpression valueParam = DLR.Expression.Parameter(typeof(object), "__VALUE__");
 
+            // callback
+            /* 
+             * CallbackItem callback;
+             * if(CallbackManager.TryGetCallback(globalName, out callback)
+             * {
+             *     CallbackBinder.Invoke(...);
+             * }
+             */
+            DLR.ParameterExpression callbackParameter = DLR.Expression.Parameter(typeof(CallbackItem), "__CALLBACK__");
+            DLR.Expression callback = DLR.Expression.Block(
+                new DLR.ParameterExpression[] { callbackParameter },
+                DLR.Expression.IfThen(
+                    DLR.Expression.Call(
+                        scope.GetRuntimeExpression().Property("CallbackManager"),
+                        typeof(CallbackManager).GetMethod("TryGetCallback"),
+                        DLR.Expression.Constant(qualifiedName),
+                        callbackParameter
+                    ),
+                    DLR.Expression.Dynamic(
+                        // TODO: do not instantiate the binder here
+                        new Runtime.Binder.CallbackBinder(),
+                        typeof(object),
+                        callbackParameter,
+                        scope.GetAplusEnvironment(),
+                        valueParam
+                    )
+                )
+            );
+
+
+            // value assignment
             DLR.Expression result = DLR.Expression.Block(
                 new DLR.ParameterExpression[] { valueParam },
                 DLR.Expression.Assign(valueParam, value),
@@ -608,6 +641,7 @@ namespace AplusCore.Compiler.AST
                     valueParam
                 ),
                 dependencyCall,
+                callback,
                 valueParam
             );
 
