@@ -1,4 +1,5 @@
-﻿using Microsoft.Scripting.Hosting;
+﻿using System;
+using Microsoft.Scripting.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AplusCore.Runtime;
@@ -19,6 +20,21 @@ namespace AplusCoreUnitTests.Dlr
             Aplus runtime = this.engine.GetService<Aplus>();
 
             Assert.IsTrue(runtime.CallbackManager.Contains(".a"), "Callback not found.");
+        }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        public void BasicCallbackInvoke()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>(
+                "f{static; newvalue}: {" +
+                "drop(static; newvalue);" +
+                "if(newvalue~=-4) { take `incorrectNewValue };" +
+                "if((static=='fuuu') == 0) { take `incorrectStaticData }" +
+                "}",
+                scope);
+            this.engine.Execute<AType>("_scb{`a; (f;'fuuu')}", scope);
+            this.engine.Execute<AType>("a:=-4", scope);
         }
 
         [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
