@@ -139,6 +139,9 @@
     <Compile Include="Runtime\DependencyItem.cs" />
     <Compile Include="Runtime\DependencyManager.cs" />
     <Compile Include="Runtime\Error.cs" />
+    <Compile Include="Runtime\Function\ADAP\ATypeConverter.cs" />
+    <Compile Include="Runtime\Function\ADAP\SysExp.cs" />
+    <Compile Include="Runtime\Function\ADAP\SysImp.cs" />
     <Compile Include="Runtime\Function\Dyadic\AbstractDyadicFunction.cs" />
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Comparison\Bins.cs" />
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Comparison\Find.cs" />
