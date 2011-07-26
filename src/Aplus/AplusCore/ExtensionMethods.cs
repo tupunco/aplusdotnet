@@ -108,5 +108,20 @@ namespace AplusCore
 
             return index.ToAArray();
         }
+
+        /// <summary>
+        /// Calculates the product of the items.
+        /// </summary>
+        /// <param name="items">Series of integers.</param>
+        /// <returns>Product of the items or 1 if there is no element.</returns>
+        public static int Product(this IList<int> items)
+        {
+            if (items.Count == 0)
+            {
+                return 1;
+            }
+
+            return items.Aggregate((actualProduct, nextFactor) => actualProduct * nextFactor);
+        }
     }
 }

@@ -140,6 +140,7 @@
     <Compile Include="Runtime\DependencyManager.cs" />
     <Compile Include="Runtime\Error.cs" />
     <Compile Include="Runtime\Function\ADAP\ATypeConverter.cs" />
+    <Compile Include="Runtime\Function\ADAP\CDRConstants.cs" />
     <Compile Include="Runtime\Function\ADAP\SysExp.cs" />
     <Compile Include="Runtime\Function\ADAP\SysImp.cs" />
     <Compile Include="Runtime\Function\Dyadic\AbstractDyadicFunction.cs" />
