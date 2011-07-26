@@ -7,21 +7,8 @@ using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.ADAP
 {
-    class SysExp
+    public class SysExp
     {
-        #region Constants
-
-        // FIX #4: Move these constants to a separate class.
-
-        static readonly byte CDRFlag = 0x82; // by default 80, +2 for little endian (more: impexp.c 774)
-        static readonly byte[] CDRInt = { 0x49, 0x04 }; // I4
-        static readonly byte[] CDRChar = { 0x43, 0x01 }; // C1
-        static readonly byte[] CDRFloat = { 0x45, 0x08 }; // E8
-        static readonly byte[] CDRBox = { 0x47, 0x00 }; // G0
-        static readonly byte[] CDRSym = { 0x53, 0x01 }; // S1
-
-        #endregion
-
         #region Variables
 
         private static SysExp instance = new SysExp();
@@ -55,7 +42,7 @@ namespace AplusCore.Runtime.Function.ADAP
             int networkOrderHeaderLength = IPAddress.HostToNetworkOrder(headerLength);
 
             byte[] CDRMagic = BitConverter.GetBytes(networkOrderHeaderLength);
-            CDRMagic[0] = CDRFlag;
+            CDRMagic[0] = CDRConstants.CDRFlag;
 
             result.AddRange(CDRMagic);
             result.AddRange(header);
@@ -69,13 +56,7 @@ namespace AplusCore.Runtime.Function.ADAP
             List<byte> result = new List<byte>();
 
             byte[] flag;
-            int length = 1;
-
-            if (argument.Shape.Count != 0)
-            {
-                // FIX #1 (see ATypeConverter.cs)
-                length = argument.Shape.Aggregate((actualProduct, nextFactor) => actualProduct * nextFactor);
-            }
+            int length = argument.Shape.Product();
 
             int networkOrderLength = IPAddress.HostToNetworkOrder(length);
             short networkOrderRank = IPAddress.HostToNetworkOrder((short)argument.Rank);
@@ -84,22 +65,22 @@ namespace AplusCore.Runtime.Function.ADAP
             switch (argument.Type)
             {
                 case ATypes.ABox:
-                    flag = CDRBox;
+                    flag = CDRConstants.CDRBox;
                     break;
                 case ATypes.AChar:
-                    flag = CDRChar;
+                    flag = CDRConstants.CDRChar;
                     break;
                 case ATypes.AFloat:
-                    flag = CDRFloat;
+                    flag = CDRConstants.CDRFloat;
                     break;
                 case ATypes.AInteger:
-                    flag = CDRInt;
+                    flag = CDRConstants.CDRInt;
                     break;
                 case ATypes.ASymbol:
-                    flag = CDRBox; // symbols must be boxed
+                    flag = CDRConstants.CDRBox; // symbols must be boxed
                     break;
                 case ATypes.ANull:
-                    flag = CDRBox;
+                    flag = CDRConstants.CDRBox;
                     break;
                 default:
                     throw new Error.Type("sys.exp");
@@ -148,10 +129,10 @@ namespace AplusCore.Runtime.Function.ADAP
                     List<byte> nullRepresentation = new List<byte>();
 
                     nullRepresentation.AddRange(BitConverter.GetBytes(IPAddress.NetworkToHostOrder(1)));
-                    nullRepresentation.AddRange(CDRBox);
+                    nullRepresentation.AddRange(CDRConstants.CDRBox);
                     nullRepresentation.AddRange(BitConverter.GetBytes(IPAddress.NetworkToHostOrder((short)0)));
                     nullRepresentation.AddRange(BitConverter.GetBytes(0));
-                    nullRepresentation.AddRange(CDRInt);
+                    nullRepresentation.AddRange(CDRConstants.CDRInt);
                     nullRepresentation.AddRange(BitConverter.GetBytes(IPAddress.NetworkToHostOrder((short)1)));
                     nullRepresentation.AddRange(BitConverter.GetBytes(0));
 
@@ -175,7 +156,7 @@ namespace AplusCore.Runtime.Function.ADAP
             }
             else
             {
-                byte[] flag = CDRSym;
+                byte[] flag = CDRConstants.CDRSym;
                 int length = argument.asString.Length;
                 int networkOrderLength = IPAddress.HostToNetworkOrder(length);
                 short networkOrderRank = IPAddress.HostToNetworkOrder((short)1);

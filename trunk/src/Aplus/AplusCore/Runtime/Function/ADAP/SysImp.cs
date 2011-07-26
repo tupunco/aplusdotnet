@@ -2,44 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text;
 
 using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.ADAP
 {
-    class SysImp
+    public class SysImp
     {
-        #region Constants
-
-        // FIX #4: Move these constants to a separate class.
-
-        private const byte CDRFlag = 0x82; // by default 80, +2 for little endian (more: impexp.c 774)
-
-        private static readonly List<short> integerTypes = new List<short>(){
-                                                             0x4201, // B1
-                                                             0x4204, // B4
-                                                             0x4208, // B8
-                                                             0x4902, // I2
-                                                             0x4904, // I4
-                                                            };
-
-        private static readonly List<short> floatTypes = new List<short>(){ 
-                                                                   0x4504, // E4
-                                                                   0x4508, // E8
-                                                                  };
-
-        private const short CDRCharShort = (0x4301); // C1
-        private const short CDRBoxShort = 0x4700; // G0
-        private const short CDRSymShort = 0x5301; // S1
-
-        #endregion
-
         #region Variables
 
-        // FIX #5: This class is a singleton, should't be these two initialised in the Import method? 
         // FIX #6: Do we need these two at all?
-        private int headerIndex = 4;
-        private int dataIndex = 0;
+        private int headerIndex;
+        private int dataIndex;
 
         private static SysImp instance = new SysImp();
 
@@ -61,9 +36,11 @@ namespace AplusCore.Runtime.Function.ADAP
 
         public AType Import(byte[] argument)
         {
+            headerIndex = 4;
+            dataIndex = 0;
             int messageLength = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(argument, 0));
 
-            byte[] headerByteLength = { 0, argument[5], argument[6], argument[7] };
+            byte[] headerByteLength = { 0, argument[1], argument[2], argument[3] };
             int headerLength = BitConverter.ToInt32(headerByteLength, 0);
             headerLength = IPAddress.NetworkToHostOrder(headerLength);
 
@@ -79,13 +56,12 @@ namespace AplusCore.Runtime.Function.ADAP
             int count = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(argument, headerIndex));
             headerIndex += 4;
 
-            short type = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(argument, headerIndex));
+            short typeCode = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(argument, headerIndex));
             headerIndex += 2;
             short rank = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(argument, headerIndex));
             headerIndex += 2;
 
             List<int> shape = new List<int>();
-            int length = 0;
 
             for (short i = 0; i < rank; i++)
             {
@@ -93,160 +69,114 @@ namespace AplusCore.Runtime.Function.ADAP
                 headerIndex += 4;
             }
 
-            if (type == CDRBoxShort)
+            if (typeCode == CDRConstants.CDRBoxShort)
             {
-                AType items = Utils.ANull();
-
                 if (count == 0)
                 {
-                    items = Utils.ANull();
-                    headerIndex += 20; // if an item is ANull, the header contains 20 bytes (more in CDR spec)
+                    // if an item is ANull, the header contains 20 bytes (more in CDR spec)
+                    headerIndex += 20; 
                 }
                 else
                 {
                     short nestedType = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(argument, headerIndex + 4));
 
-                    if (nestedType == CDRSymShort)
+                    if (nestedType == CDRConstants.CDRSymShort)
                     {
-                        items = HelperFunction(shape, argument);
+                        result = BuildSymbol(shape, argument);
                     }
                     else
                     {
                         for (int i = 0; i < count; i++)
                         {
-                            items.Add(ABox.Create(GetItems(argument)));
+                            result.Add(ABox.Create(GetItems(argument)));
                         }
                     }
                 }
-
-                result = items;
             }
-            else if (integerTypes.Contains(type))
+            else if (typeCode == CDRConstants.CDRSymShort)
             {
-                // FIX #1 (see ATypeConverter.cs)
-                // FIX #2
-                if (shape.Count == 0)
+                result = BuildSymbol(shape, argument);
+            }
+            else
+            {
+                int length = shape.Product();
+                ATypes type;
+
+                if (CDRConstants.IntegerTypes.Contains(typeCode))
                 {
-                    length = sizeof(System.Int32);
+                    length *= sizeof(Int32);
+                    type = ATypes.AInteger;
+                }
+                else if (CDRConstants.FloatTypes.Contains(typeCode))
+                {
+                    length *= sizeof(Double);
+                    type = ATypes.AFloat;
+                }
+                else if (typeCode == CDRConstants.CDRCharShort)
+                {
+                    length *= sizeof(Char);
+                    type = ATypes.AChar;
                 }
                 else
                 {
-                    length = shape.Aggregate((actualProduct, nextFactor) => actualProduct * nextFactor) * sizeof(System.Int32);
+                    throw new NotSupportedException("Should never reach this!");
                 }
 
-                result = ATypeConverter.Instance.BuildIntegerArray(shape, argument.Skip(dataIndex).Take(length));
+                result = ATypeConverter.Instance.BuildArray(shape, argument.Skip(dataIndex).Take(length), type);
                 dataIndex += length;
-            }
-            else if (floatTypes.Contains(type))
-            {
-                // FIX #1 (see ATypeConverter.cs)
-                // FIX #2
-                if (shape.Count == 0)
-                {
-                    length = sizeof(System.Double);
-                }
-                else
-                {
-                    length = shape.Aggregate((actualProduct, nextFactor) => actualProduct * nextFactor) * sizeof(System.Double);
-                }
-
-                result = ATypeConverter.Instance.BuildFloatArray(shape, argument.Skip(dataIndex).Take(length));
-                dataIndex += length;
-            }
-            else if (type == CDRCharShort)
-            {
-                // FIX #1 (see ATypeConverter.cs)
-                // FIX #2
-                if (shape.Count == 0)
-                {
-                    length = sizeof(System.Int32);
-                }
-                else
-                {
-                    length = shape.Aggregate((actualProduct, nextFactor) => actualProduct * nextFactor) * sizeof(System.Char);
-                }
-
-                result = ATypeConverter.Instance.BuildCharArray(shape, argument.Skip(dataIndex).Take(length));
-                dataIndex += length;
-            }
-            else if (type == CDRSymShort)
-            {
-                result = HelperFunction(shape, argument);
             }
 
             return result;
-
         }
 
-        // FIX #7: Helper for what?
-        private AType HelperFunction(List<int> shape, byte[] argument)
+        private AType BuildSymbol(List<int> shape, byte[] argument)
         {
-            int numberOfSymbols = 1;
-
-            if (shape.Count > 1)
-            {
-                // FIX #1 (see ATypeConverter.cs)
-                numberOfSymbols = shape.Aggregate((actualProduct, nextFactor) => actualProduct * nextFactor);
-            }
-
+            int numberOfSymbols = shape.Product();
             int totalLength = 0;
             List<int> symbolLengths = new List<int>();
 
             for (int i = 0; i < numberOfSymbols; i++)
             {
-                int actualLength = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(argument, headerIndex + i * 12)); // because of the structure of the CDR type descriptor
+                // because of the structure of the CDR type descriptor
+                int actualLength = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(argument, headerIndex + i * 12));
+
                 totalLength += actualLength;
                 symbolLengths.Add(actualLength);
             }
 
-
-            AType result = BuildSymArray(shape, symbolLengths, argument.Skip(dataIndex).Take(totalLength));
+            AType result = BuildSymbolArray(shape, symbolLengths, argument.Skip(dataIndex).Take(totalLength));
             dataIndex += totalLength;
             return result;
         }
 
-        private AType BuildSymArray(List<int> shape, IEnumerable<int> symbolLengths, IEnumerable<byte> data)
+        private AType BuildSymbolArray(List<int> shape, IEnumerable<int> symbolLengths, IEnumerable<byte> data)
         {
             AType result = Utils.ANull();
 
             if (shape.Count == 0)
             {
-                // FIX #6: use StringBuilder
-                string toSymbol = "";
+                StringBuilder toSymbol = new StringBuilder();
 
                 foreach (byte b in data)
                 {
-                    toSymbol += (char)b;
+                    toSymbol.Append((char)b);
                 }
 
-                result = ASymbol.Create(toSymbol);
+                result = ASymbol.Create(toSymbol.ToString());
             }
             else
             {
-                if (shape.Count == 1)
-                {
-                    IEnumerable<byte> dataClone = data;
+                List<int> nextShape = (shape.Count > 1) ? shape.GetRange(1, shape.Count - 1) : new List<int>();
+                int subDimensionLength = nextShape.Product();
 
-                    for (int i = 0; i < shape[0]; i++)
-                    {
-                        result.Add(BuildSymArray(new List<int>(), new List<int>(), dataClone.Take(symbolLengths.ElementAt(i))));
-                        dataClone = dataClone.Take(symbolLengths.ElementAt(i));
-                    }
-
-                }
-                else
+                for (int i = 0; i < shape[0]; i++)
                 {
-                    IEnumerable<byte> dataClone = data;
-                    for (int i = 0; i < shape[0]; i++)
-                    {
-                        List<int> nextShape = shape.GetRange(1, shape.Count - 1);
-                        int subDimensionLength = nextShape.Aggregate((actualProduct, nextFactor) => actualProduct * nextFactor);
-                        List<byte> nextData = new List<byte>();
-                        IEnumerable<int> nextSymbolLengths = symbolLengths.Skip(i * subDimensionLength).Take(subDimensionLength);
-                        int dataLength = nextSymbolLengths.Sum(n => n);
-                        result.Add(BuildSymArray(nextShape, nextSymbolLengths, dataClone.Take(dataLength)));
-                        dataClone = dataClone.Skip(dataLength);
-                    }
+                    IEnumerable<int> nextSymbolLengths = symbolLengths.Skip(i * subDimensionLength).Take(subDimensionLength);
+                    int dataLength = nextSymbolLengths.Sum();
+
+                    result.Add(BuildSymbolArray(nextShape, nextSymbolLengths, data.Take(dataLength)));
+                    // advance the bytestream further.
+                    data = data.Skip(dataLength);
                 }
             }
 

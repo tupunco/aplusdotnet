@@ -30,75 +30,52 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #region Methods
 
-        // FIX #3: (Proposal) Can we somehow merge these methods?
+        private delegate AType ItemConstructDelegate(IEnumerable<byte> data);
 
-        public AType BuildIntegerArray(List<int> shape, IEnumerable<byte> data)
+        private AType ConstructAInteger(IEnumerable<byte> data)
         {
-            AType result = AArray.Create(ATypes.AInteger);
-
-            if (shape.Count <= 1)
-            {
-                for (int i = 0; i < data.Count<byte>(); i += 4)
-                {
-                    result.Add(AInteger.Create((BitConverter.ToInt32(data.ToArray(), i))));
-                }
-            }
-            else
-            {
-                for (int i = 0; i < shape[0]; i++)
-                {
-                    List<int> nextShape = shape.GetRange(1, shape.Count - 1);
-                    // FIX #1: Create a 'Product' extension method.
-                    // FIX #2: Int32 is enough no need for the fully qualified System.Int32 name
-                    int subDimensionLength = nextShape.Aggregate((actualProduct, nextFactor) => actualProduct * nextFactor) * sizeof(System.Int32);
-                    List<byte> nextData = new List<byte>();
-                    nextData.AddRange(data.Skip(i * subDimensionLength).Take(subDimensionLength));
-                    result.Add(BuildIntegerArray(nextShape, nextData));
-                }
-            }
-
-            return result;
+            return AInteger.Create(BitConverter.ToInt32(data.ToArray(), 0));
         }
 
-        public AType BuildFloatArray(List<int> shape, IEnumerable<byte> data)
+        private AType ConstructAChar(IEnumerable<byte> data)
         {
-            AType result = AArray.Create(ATypes.AFloat);
-
-            if (shape.Count <= 1)
-            {
-                for (int i = 0; i < data.Count<byte>(); i += 8)
-                {
-                    AType element = AFloat.Create(BitConverter.ToDouble(data.ToArray(), i));
-                    result.Add(element);
-                }
-            }
-            else
-            {
-                for (int i = 0; i < shape[0]; i++)
-                {
-                    List<int> nextShape = shape.GetRange(1, shape.Count - 1);
-                    // FIX #1: Create a 'Product' extension method.
-                    // FIX #2: Int32 is enough no need for the fully qualified System.Int32 name
-                    int subDimensionLength = nextShape.Aggregate((actualProduct, nextFactor) => actualProduct * nextFactor) * sizeof(System.Double);
-                    List<byte> nextData = new List<byte>();
-                    nextData.AddRange(data.Skip(i * subDimensionLength).Take(subDimensionLength));
-                    result.Add(BuildFloatArray(nextShape, nextData));
-                }
-            }
-
-            return result;
+            return AChar.Create((char)data.ToArray<byte>()[0]);
         }
 
-        public AType BuildCharArray(List<int> shape, IEnumerable<byte> data)
+        private AType ConstructAFloat(IEnumerable<byte> data)
         {
-            AType result = AArray.Create(ATypes.AChar);
+            return AFloat.Create(BitConverter.ToDouble(data.ToArray(), 0));
+        }
+
+        public AType BuildArray(List<int> shape, IEnumerable<byte> data, ATypes type)
+        {
+            AType result = Utils.ANull();
+            int typeSize;
+            ItemConstructDelegate itemConstruct;
+
+            switch (type)
+            {
+                case ATypes.AInteger:
+                    typeSize = sizeof(Int32);
+                    itemConstruct = ConstructAInteger;
+                    break;
+                case ATypes.AChar:
+                    typeSize = sizeof(Char);
+                    itemConstruct = ConstructAChar;
+                    break;
+                case ATypes.AFloat:
+                    typeSize = sizeof(Double);
+                    itemConstruct = ConstructAFloat;
+                    break;
+                default: 
+                    throw new Error.Type("");
+            }
 
             if (shape.Count <= 1)
             {
-                for (int i = 0; i < data.Count<byte>(); i++)
+                for (int i = 0; i < data.Count(); i += typeSize)
                 {
-                    AType element = AChar.Create((char)data.ElementAt(i));
-                    result.Add(element);
+                    result.Add(itemConstruct(data.Skip(i).Take(typeSize)));
                 }
             }
             else
@@ -106,12 +83,11 @@ namespace AplusCore.Runtime.Function.ADAP
                 for (int i = 0; i < shape[0]; i++)
                 {
                     List<int> nextShape = shape.GetRange(1, shape.Count - 1);
-                    // FIX #1: Create a 'Product' extension method.
-                    // FIX #2: Int32 is enough no need for the fully qualified System.Int32 name
-                    int subDimensionLength = nextShape.Aggregate((actualProduct, nextFactor) => actualProduct * nextFactor) * sizeof(System.Char);
+                    int subDimensionLength = nextShape.Product() * typeSize;
                     List<byte> nextData = new List<byte>();
+
                     nextData.AddRange(data.Skip(i * subDimensionLength).Take(subDimensionLength));
-                    result.Add(BuildCharArray(nextShape, nextData));
+                    result.Add(BuildArray(nextShape, nextData, type));
                 }
             }
 
