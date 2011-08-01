@@ -135,6 +135,9 @@
     <Compile Include="Runtime\Binder\SetMemberBinder.cs" />
     <Compile Include="Runtime\Callback\CallbackItem.cs" />
     <Compile Include="Runtime\Callback\CallbackManager.cs" />
+    <Compile Include="Runtime\Context\AplusContextFunctionAttribute.cs" />
+    <Compile Include="Runtime\Context\AplusContextAttribute.cs" />
+    <Compile Include="Runtime\Context\ContextLoader.cs" />
     <Compile Include="Runtime\DependencyState.cs" />
     <Compile Include="Runtime\DependencyItem.cs" />
     <Compile Include="Runtime\DependencyManager.cs" />
