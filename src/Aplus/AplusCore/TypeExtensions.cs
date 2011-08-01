@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
+
+using AplusCore.Types;
+
+using DLR = System.Linq.Expressions;
 
 namespace AplusCore
 {
@@ -27,6 +30,24 @@ namespace AplusCore
             }
 
             return firstAttribute;
+        }
+
+        /// <summary>
+        /// Build an AFunction for the given method.
+        /// </summary>
+        /// <param name="method">The method to wrap inside an AFunction.</param>
+        /// <param name="name">The name of AFunction.</param>
+        /// <param name="description">Description for the AFunction.</param>
+        /// <returns>Returns an AFunction for the given method.</returns>
+        internal static AType BuildAFunction(this MethodInfo method, string name, string description)
+        {
+            ParameterInfo[] parameters = method.GetParameters();
+            List<Type> types = new List<Type>(parameters.Select(parameter => parameter.ParameterType));
+            types.Add(method.ReturnType);
+
+            Delegate methodDelegate = Delegate.CreateDelegate(DLR.Expression.GetFuncType(types.ToArray()), method);
+
+            return AFunc.Create(name, methodDelegate, parameters.Length, description);
         }
     }
 }
