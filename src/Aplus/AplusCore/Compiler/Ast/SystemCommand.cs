@@ -57,19 +57,33 @@ namespace AplusCore.Compiler.AST
 
                 case "$laod": // Compatibility with original A+ interpreter
                 case "$load":
-                    if (!File.Exists(this.argument))
+                    IDictionary<string, AType> items = Runtime.Context.ContextLoader.FindContextElements(this.argument);;
+
+                    if (items.Count > 0)
                     {
-                        break;
+                        foreach (KeyValuePair<string, AType> item in items)
+                        {
+                            codeBlock.AddFirst(
+                                VariableHelper.SetVariable(
+                                    runtime,
+                                    scope.GetModuleExpression(),
+                                    new string[] { this.argument, item.Key },
+                                    DLR.Expression.Constant(item.Value)
+                                )
+                            );
+                        }
                     }
-                    codeBlock.Clear();
+                    else if(!File.Exists(this.argument))
+                    {
+                        codeBlock.Clear();
 
-                    // Create the AST from file 
-                    Node fileAST = Parse.LoadFile(this.argument, runtime.LexerMode);
-                    // And generate the DLR tree
-                    codeBlock.AddFirst(
-                        fileAST.Generate(scope)
-                    );
-
+                        // Create the AST from file 
+                        Node fileAST = Parse.LoadFile(this.argument, runtime.LexerMode);
+                        // And generate the DLR tree
+                        codeBlock.AddFirst(
+                            fileAST.Generate(scope)
+                        );
+                    }
                     break;
 
                 case "$mode":

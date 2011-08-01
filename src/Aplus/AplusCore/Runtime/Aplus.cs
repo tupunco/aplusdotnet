@@ -25,6 +25,9 @@ namespace AplusCore.Runtime
 
         private Dictionary<string, AType> systemFunctions;
 
+        private bool isAutoLoaded;
+        private string[] autoloadContexts;
+
         #endregion
 
         #region Properties
@@ -89,6 +92,9 @@ namespace AplusCore.Runtime
             {
                 Environment.SetEnvironmentVariable("APATH", ".", EnvironmentVariableTarget.User);
             }
+
+            // TODO: Move this to app.config?
+            this.autoloadContexts = new string[] { };
         }
 
         #endregion
@@ -98,6 +104,41 @@ namespace AplusCore.Runtime
         public void SwitchLexerMode(string mode)
         {
             this.sysvars["mode"] = ASymbol.Create(ConvertToLexerMode(mode).ToString().ToLower());
+        }
+
+        /// <summary>
+        /// Loads default contexts into the provided <see cref="Scope"/>Scope.
+        /// </summary>
+        /// <param name="scope">Scope where the contexts will be loaded.</param>
+        /// <remarks>
+        /// Warning! This method will overwrite the context if there is already one.
+        /// </remarks>
+        /// <returns>On the first call it will return true, otherwise false.</returns>
+        public bool AutoloadContext(Scope scope)
+        {
+            if (this.isAutoLoaded)
+            {
+                return false;
+            }
+
+            foreach (string contextName in this.autoloadContexts)
+            {
+                IDictionary<string, object> context = new DYN.ExpandoObject();
+                IDictionary<string, AType> contextElements = Context.ContextLoader.FindContextElements(contextName);
+
+                foreach (KeyValuePair<string, AType> item in contextElements)
+                {
+                    context[item.Key] = item.Value;
+                }
+
+                if (context.Count > 0)
+                {
+                    // TODO: ? is it ok to replace the whole context or replace only individual elements?
+                    scope.Storage[contextName] = context;
+                }
+            }
+
+            return true;
         }
 
         #endregion

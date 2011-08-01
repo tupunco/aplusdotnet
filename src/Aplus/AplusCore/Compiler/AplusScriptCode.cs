@@ -44,6 +44,8 @@ namespace AplusCore.Compiler
 
         public override object Run(Scope scope)
         {
+            this.aplus.AutoloadContext(scope);
+
             Func<Runtime.AplusEnvironment, AType> compiled = this.lambda.Compile();
             object result = compiled(new AplusEnvironment(this.aplus, scope));
 
