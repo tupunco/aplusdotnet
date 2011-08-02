@@ -138,6 +138,8 @@ namespace AplusCore.Runtime
                 }
             }
 
+            this.isAutoLoaded = true;
+
             return true;
         }
 
