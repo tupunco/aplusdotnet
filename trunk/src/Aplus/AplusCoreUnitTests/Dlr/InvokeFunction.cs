@@ -31,6 +31,18 @@ namespace AplusCoreUnitTests.Dlr
         }
 
         [TestCategory("DLR"), TestCategory("InvokeFunction"), TestMethod]
+        public void EmptyFunction()
+        {
+            AType expected = Utils.ANull();
+            ScriptScope scope = this.engine.CreateScope();
+
+            this.engine.Execute<AType>("f{}: { }", scope);
+            AType result = this.engine.Execute<AType>("f{}", scope);
+
+            Assert.AreEqual<AType>(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("InvokeFunction"), TestMethod]
         public void FunctionCallInsideEval()
         {
             ScriptScope scope = this.engine.CreateScope();
