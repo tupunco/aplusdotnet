@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Collections.Generic;
 
+using AplusCore.Types;
+
 using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
@@ -49,24 +51,18 @@ namespace AplusCore.Compiler.AST
 
         public override DLR.Expression Generate(AplusScope scope)
         {
-            // Optimization: if there is only one subnode, return that one
-            if (this.nodeList.Count == 1)
-            {   
-                return this.nodeList.First.Value.Generate(scope);
-            }
+            DLR.Expression result;
 
-            int count = 0;
-            DLR.Expression[] bodyArguments = new DLR.Expression[this.nodeList.Count];
-            foreach (Node node in this.nodeList)
+            if (this.nodeList.Count > 0)
             {
-                bodyArguments[count++] = node.Generate(scope);
+                result = DLR.Expression.Block(this.nodeList.Select(node => node.Generate(scope)));
+            }
+            else
+            {
+                result = DLR.Expression.Constant(Utils.ANull());
             }
 
-            DLR.BlockExpression body = DLR.Expression.Block(
-                bodyArguments
-            );
-
-            return body;
+            return result;
         }
 
         #endregion
