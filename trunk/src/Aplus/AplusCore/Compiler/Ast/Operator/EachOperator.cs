@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 
+using AplusCore.Runtime;
 using AplusCore.Runtime.Function.Operator.Dyadic;
 using AplusCore.Runtime.Function.Operator.Monadic;
 using AplusCore.Types;
@@ -10,11 +12,28 @@ namespace AplusCore.Compiler.AST
 {
     public class EachOperator : Operator
     {
+        #region Variables
+
+        private bool isgeneralapply;
+
+        #endregion
+
+        #region Properties
+
+        public bool IsGeneralApply
+        {
+            get { return this.isgeneralapply; }
+            set { this.isgeneralapply = value; }
+        }
+
+        #endregion
+
         #region Constructor
 
         public EachOperator(Node function)
             : base(function)
         {
+            this.isgeneralapply = false;
         }
 
         #endregion
@@ -35,15 +54,52 @@ namespace AplusCore.Compiler.AST
                 func = this.function.Generate(scope);
             }
 
-            DLR.Expression right = this.rightarg.Generate(scope);
             DLR.ParameterExpression environment = scope.GetAplusEnvironment();
 
             DLR.ParameterExpression functionParam = DLR.Expression.Variable(typeof(AType), "$$functionParam");
             DLR.ParameterExpression rightParam = DLR.Expression.Variable(typeof(AType), "$$rightParam");
             DLR.ParameterExpression valueParam = DLR.Expression.Variable(typeof(AType), "$$valueParam");
 
-            if (isDyadic)
+            // TODO: rewrite this
+            if (this.IsGeneralApply)
             {
+                ExpressionList argumnets = (ExpressionList)this.rightarg;
+                LinkedList<DLR.Expression> callArguments = new LinkedList<DLR.Expression>();
+
+                // 2. Add the parameters in !reverse! order
+                foreach (Node item in argumnets.Items)
+                {
+                    callArguments.AddFirst(item.Generate(scope));
+                }
+
+                // 0. Add A+ environment as first argument for user defined functions
+                callArguments.AddFirst(scope.GetAplusEnvironment());
+
+                // 1. Construct the method body
+                callArguments.AddFirst(functionParam.Property("NestedItem"));
+
+                result = DLR.Expression.Block(
+                    new DLR.ParameterExpression[] { functionParam, valueParam },
+                    DLR.Expression.Assign(functionParam, func),
+                    DLR.Expression.IfThenElse(
+                            DLR.Expression.PropertyOrField(functionParam, "IsFunctionScalar"),
+                            DLR.Expression.Assign(
+                                valueParam,
+                                AST.UserDefInvoke.BuildInvoke(scope.GetRuntime(), callArguments)
+                            ),
+                            DLR.Expression.Throw(
+                                DLR.Expression.New(
+                                    typeof(Error.Valence).GetConstructor(new Type[] { typeof(string) }),
+                                    DLR.Expression.Constant("apply")
+                                )
+                            )
+                        ),
+                    valueParam
+                    );
+            }
+            else if (isDyadic)
+            {
+                DLR.Expression right = this.rightarg.Generate(scope);
                 DLR.Expression left = this.leftarg.Generate(scope);
                 DLR.ParameterExpression leftParam = DLR.Expression.Variable(typeof(AType), "$$leftParam");
 
@@ -78,6 +134,7 @@ namespace AplusCore.Compiler.AST
             }
             else
             {
+                DLR.Expression right = this.rightarg.Generate(scope);
                 result = DLR.Expression.Block(
                     new DLR.ParameterExpression[] { functionParam, rightParam, valueParam },
                     DLR.Expression.Assign(functionParam, func),
