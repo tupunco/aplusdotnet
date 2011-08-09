@@ -169,6 +169,7 @@
     <Compile Include="Dlr\MemoryMappedFile\Map.cs" />
     <Compile Include="Dlr\MemoryMappedFile\MapIn.cs" />
     <Compile Include="Dlr\MemoryMappedFile\Operations.cs" />
+    <Compile Include="Dlr\Operator\Apply.cs" />
     <Compile Include="Dlr\Operator\Dyadic\Apply.cs" />
     <Compile Include="Dlr\Operator\Dyadic\Each.cs" />
     <Compile Include="Dlr\Operator\Dyadic\InnerProduct\IPAddMultiply.cs" />

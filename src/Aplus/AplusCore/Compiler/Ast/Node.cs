@@ -60,7 +60,15 @@ namespace AplusCore.Compiler.AST
                     op.LeftArgument = expressionList[0];
                     break;
                 default:
-                    throw new ParseException("Valence", false);
+                    if (!(op is EachOperator))
+                    {
+                        throw new ParseException("Valence", false);
+                    }
+
+                    EachOperator eachOp = (EachOperator)op;
+                    eachOp.IsGeneralApply = true;
+                    eachOp.RightArgument = expressionList;
+                    break;
             }
 
             return op;
