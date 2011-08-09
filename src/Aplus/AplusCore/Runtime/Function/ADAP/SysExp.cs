@@ -126,17 +126,7 @@ namespace AplusCore.Runtime.Function.ADAP
                 }
                 else
                 {
-                    List<byte> nullRepresentation = new List<byte>();
-
-                    nullRepresentation.AddRange(BitConverter.GetBytes(IPAddress.NetworkToHostOrder(1)));
-                    nullRepresentation.AddRange(CDRConstants.CDRBox);
-                    nullRepresentation.AddRange(BitConverter.GetBytes(IPAddress.NetworkToHostOrder((short)0)));
-                    nullRepresentation.AddRange(BitConverter.GetBytes(0));
-                    nullRepresentation.AddRange(CDRConstants.CDRInt);
-                    nullRepresentation.AddRange(BitConverter.GetBytes(IPAddress.NetworkToHostOrder((short)1)));
-                    nullRepresentation.AddRange(BitConverter.GetBytes(0));
-
-                    result.AddRange(nullRepresentation);
+                    result.AddRange(CDRConstants.CDRNull);
                 }
             }
 
