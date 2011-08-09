@@ -38,7 +38,6 @@ namespace AplusCore.Runtime.Function.ADAP
         {
             headerIndex = 4;
             dataIndex = 0;
-            int messageLength = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(argument, 0));
 
             byte[] headerByteLength = { 0, argument[1], argument[2], argument[3] };
             int headerLength = BitConverter.ToInt32(headerByteLength, 0);
@@ -119,7 +118,7 @@ namespace AplusCore.Runtime.Function.ADAP
                 }
                 else
                 {
-                    throw new NotSupportedException("Should never reach this!");
+                    throw new Error.Invalid("readImport");
                 }
 
                 result = ATypeConverter.Instance.BuildArray(shape, argument.Skip(dataIndex).Take(length), type);

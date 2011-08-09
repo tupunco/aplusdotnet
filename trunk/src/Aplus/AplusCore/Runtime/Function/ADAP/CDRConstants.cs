@@ -31,6 +31,10 @@ namespace AplusCore.Runtime.Function.ADAP
         public static readonly byte[] CDRBox = { 0x47, 0x00 }; // G0
         public static readonly byte[] CDRSym = { 0x53, 0x01 }; // S1
 
+        public static readonly byte[] CDRNull = { 0x00, 0x00, 0x00, 0x01, 0x47, 0x00, 0x00, 0x00,
+                                                  0x00, 0x00, 0x00, 0x00, 0x49, 0x04, 0x00, 0x01,
+                                                  0x00, 0x00, 0x00, 0x00} ; // see more in adap documentation
+
         #endregion
     }
 }

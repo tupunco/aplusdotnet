@@ -60,7 +60,7 @@ namespace AplusCore.Runtime.Function.ADAP
                     itemConstruct = ConstructAInteger;
                     break;
                 case ATypes.AChar:
-                    typeSize = sizeof(Char);
+                    typeSize = sizeof(Char) / 2; // FIXMEEE!!!!! sizeof(Char) == 2 in C#!!!!!
                     itemConstruct = ConstructAChar;
                     break;
                 case ATypes.AFloat:
