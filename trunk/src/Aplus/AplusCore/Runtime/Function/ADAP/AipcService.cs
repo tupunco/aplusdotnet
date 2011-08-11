@@ -367,7 +367,7 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #region i context connection handling
 
-        public int Listen(AType func, AType name, AType host, int port, AType protocol, AipcAttributes aipcAttributes = null)
+        public AType Listen(AType func, AType name, AType host, int port, AType protocol, AipcAttributes aipcAttributes = null)
         {
             AipcConnection connection;
             ConnectionAttribute attribute = new ConnectionAttribute()
@@ -407,10 +407,10 @@ namespace AplusCore.Runtime.Function.ADAP
                 AddToRoster(connection);
             }
 
-            return attribute.HandleNumber;
+            return AInteger.Create(attribute.HandleNumber);
         }
 
-        public int Listen(AType func, AType name)
+        public AType Listen(AType func, AType name)
         {
             return Listen(
                 func,
@@ -421,7 +421,7 @@ namespace AplusCore.Runtime.Function.ADAP
             );
         }
 
-        public int Listen(AType func, AType name, AType protocol)
+        public AType Listen(AType func, AType name, AType protocol)
         {
             return Listen(func, name, ConnectionAttribute.DEFAULT_HOST, ConnectionAttribute.DEFAULT_PORT, protocol);
         }
@@ -429,11 +429,11 @@ namespace AplusCore.Runtime.Function.ADAP
         public void InitFromListener(ConnectionAttribute attribute, Socket socket, AipcAttributes aipcAttributes)
         {
             int handleNumber = Connect(
-                attribute.Function, attribute.Name, attribute.Host, attribute.Port, attribute.Protocol, socket, aipcAttributes);
+                attribute.Function, attribute.Name, attribute.Host, attribute.Port, attribute.Protocol, socket, aipcAttributes).asInteger;
             Console.WriteLine("Call connect callback here with {0}", handleNumber);
         }
 
-        public int Connect(
+        public AType Connect(
             AType func, AType name, AType host, int port, AType protocol,
             Socket socket = null, AipcAttributes aipcAttributes = null)
         {
@@ -473,10 +473,10 @@ namespace AplusCore.Runtime.Function.ADAP
                 AddToRoster(connection);
             }
 
-            return attribute.HandleNumber;
+            return AInteger.Create(attribute.HandleNumber);
         }
 
-        public int Connect(AType func, AType name)
+        public AType Connect(AType func, AType name)
         {
             return Connect(
                 func,
@@ -487,7 +487,7 @@ namespace AplusCore.Runtime.Function.ADAP
             );
         }
 
-        public int Connect(AType func, AType name, AType protocol)
+        public AType Connect(AType func, AType name, AType protocol)
         {
             return Connect(
                 func,
@@ -498,17 +498,17 @@ namespace AplusCore.Runtime.Function.ADAP
             );
         }
 
-        public int Open(int handle)
+        public AType Open(int handle)
         {
             AipcConnection connection = Lookup(handle);
 
             if (connection == null)
             {
-                return -1;
+                return AInteger.Create(-1);
             }
 
             connection.Open();
-            return 0;
+            return AInteger.Create(0);
         }
 
         public int Destroy(int handle)
@@ -525,13 +525,13 @@ namespace AplusCore.Runtime.Function.ADAP
             return 0;
         }
 
-        public int Close(int handle)
+        public AType Close(int handle)
         {
             AipcConnection connection = Lookup(handle);
 
             if (connection == null)
             {
-                return -1;
+                return AInteger.Create(-1);
             }
 
             if (!connection.ConnectionAttributes.IsListener && connection.AipcAttributes.Listener == 0)
@@ -543,7 +543,7 @@ namespace AplusCore.Runtime.Function.ADAP
                 connection.Close();
             }
 
-            return 0;
+            return AInteger.Create(0);
         }
 
         public AType SyncSend(int handle, AType message, AType timeout)
