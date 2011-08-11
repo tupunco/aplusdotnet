@@ -39,6 +39,11 @@ namespace AplusCore.Runtime.Function.ADAP
             headerIndex = 4;
             dataIndex = 0;
 
+            if (argument[0] != CDRConstants.CDRFlag)
+            {
+                throw new Error.Domain("sys.imp");
+            }
+
             byte[] headerByteLength = { 0, argument[1], argument[2], argument[3] };
             int headerLength = BitConverter.ToInt32(headerByteLength, 0);
             headerLength = IPAddress.NetworkToHostOrder(headerLength);
@@ -50,7 +55,7 @@ namespace AplusCore.Runtime.Function.ADAP
 
         private AType GetItems(byte[] argument)
         {
-            AType result = Utils.ANull();
+            AType result;
 
             int count = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(argument, headerIndex));
             headerIndex += 4;
@@ -73,7 +78,8 @@ namespace AplusCore.Runtime.Function.ADAP
                 if (count == 0)
                 {
                     // if an item is ANull, the header contains 20 bytes (more in CDR spec)
-                    headerIndex += 20; 
+                    result = Utils.ANull();
+                    headerIndex += 20;
                 }
                 else
                 {
@@ -85,10 +91,7 @@ namespace AplusCore.Runtime.Function.ADAP
                     }
                     else
                     {
-                        for (int i = 0; i < count; i++)
-                        {
-                            result.Add(ABox.Create(GetItems(argument)));
-                        }
+                        result = BuildBoxArray(shape, argument);
                     }
                 }
             }
@@ -118,11 +121,30 @@ namespace AplusCore.Runtime.Function.ADAP
                 }
                 else
                 {
-                    throw new Error.Invalid("readImport");
+                    throw new Error.Domain("sys.imp");
                 }
 
                 result = ATypeConverter.Instance.BuildArray(shape, argument.Skip(dataIndex).Take(length), type);
                 dataIndex += length;
+            }
+
+            return result;
+        }
+
+        private AType BuildBoxArray(List<int> shape, byte[] argument)
+        {
+            AType result = Utils.ANull();
+            
+            if (shape.Count == 0)
+            {
+                result = ABox.Create(GetItems(argument));
+            }
+            else
+            {
+                for (int i = 0; i < shape[0]; i++)
+                {
+                    result.Add(BuildBoxArray(shape.GetRange(0, shape.Count - 1), argument));
+                }
             }
 
             return result;
