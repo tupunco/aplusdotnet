@@ -34,7 +34,7 @@ namespace AplusCore.Runtime.Function.ADAP
         public byte[] Format(AType argument)
         {
             List<byte> result = new List<byte>();
-            List<byte> header = FormatHeader(argument);
+            List<byte> header = FormatHeader(argument, true);
 
             int headerLength = header.Count;
             headerLength += 4;
@@ -51,48 +51,52 @@ namespace AplusCore.Runtime.Function.ADAP
             return result.ToArray();
         }
 
-        private List<byte> FormatHeader(AType argument)
+        private List<byte> FormatHeader(AType argument, bool addTypeHeaderInfo)
         {
             List<byte> result = new List<byte>();
 
             byte[] flag;
-            int length = argument.Shape.Product();
-
-            int networkOrderLength = IPAddress.HostToNetworkOrder(length);
-            short networkOrderRank = IPAddress.HostToNetworkOrder((short)argument.Rank);
-            IEnumerable<int> networkOrderShape = argument.Shape.Select(item => IPAddress.HostToNetworkOrder(item));
-
-            switch (argument.Type)
+            
+            if (addTypeHeaderInfo)
             {
-                case ATypes.ABox:
-                    flag = CDRConstants.CDRBox;
-                    break;
-                case ATypes.AChar:
-                    flag = CDRConstants.CDRChar;
-                    break;
-                case ATypes.AFloat:
-                    flag = CDRConstants.CDRFloat;
-                    break;
-                case ATypes.AInteger:
-                    flag = CDRConstants.CDRInt;
-                    break;
-                case ATypes.ASymbol:
-                    flag = CDRConstants.CDRBox; // symbols must be boxed
-                    break;
-                case ATypes.ANull:
-                    flag = CDRConstants.CDRBox;
-                    break;
-                default:
-                    throw new Error.Type("sys.exp");
-            }
+                switch (argument.Type)
+                {
+                    case ATypes.ABox:
+                        flag = CDRConstants.CDRBox;
+                        break;
+                    case ATypes.AChar:
+                        flag = CDRConstants.CDRChar;
+                        break;
+                    case ATypes.AFloat:
+                        flag = CDRConstants.CDRFloat;
+                        break;
+                    case ATypes.AInteger:
+                        flag = CDRConstants.CDRInt;
+                        break;
+                    case ATypes.ASymbol:
+                        flag = CDRConstants.CDRBox; // symbols must be boxed
+                        break;
+                    case ATypes.ANull:
+                        flag = CDRConstants.CDRBox;
+                        break;
+                    default:
+                        throw new Error.Nonce("sys.exp");
+                }
+                
+                int length = argument.Shape.Product();
 
-            result.AddRange(BitConverter.GetBytes(networkOrderLength));
-            result.AddRange(flag);
-            result.AddRange(BitConverter.GetBytes(networkOrderRank));
+                int networkOrderLength = IPAddress.HostToNetworkOrder(length);
+                short networkOrderRank = IPAddress.HostToNetworkOrder((short)argument.Rank);
+                IEnumerable<int> networkOrderShape = argument.Shape.Select(item => IPAddress.HostToNetworkOrder(item));
 
-            foreach (int item in networkOrderShape)
-            {
-                result.AddRange(BitConverter.GetBytes(item));
+                result.AddRange(BitConverter.GetBytes(networkOrderLength));
+                result.AddRange(flag);
+                result.AddRange(BitConverter.GetBytes(networkOrderRank));
+
+                foreach (int item in networkOrderShape)
+                {
+                    result.AddRange(BitConverter.GetBytes(item));
+                }
             }
 
             if (argument.Type == ATypes.ASymbol)
@@ -106,12 +110,19 @@ namespace AplusCore.Runtime.Function.ADAP
                 {
                     foreach (AType item in argument)
                     {
-                        result.AddRange(FormatHeader(item.NestedItem));
+                        if (item.IsArray)
+                        {
+                            result.AddRange(FormatHeader(item, false));
+                        }
+                        else
+                        {
+                            result.AddRange(FormatHeader(item.NestedItem, true));
+                        }
                     }
                 }
                 else
                 {
-                    result.AddRange(FormatHeader(argument.NestedItem));
+                    result.AddRange(FormatHeader(argument.NestedItem, true));
                 }
             }
 
@@ -121,7 +132,7 @@ namespace AplusCore.Runtime.Function.ADAP
                 {
                     foreach (AType item in argument)
                     {
-                        result.AddRange(FormatHeader(item));
+                        result.AddRange(FormatHeader(item, true));
                     }
                 }
                 else
@@ -181,6 +192,7 @@ namespace AplusCore.Runtime.Function.ADAP
                 switch (argument.Type)
                 {
                     case ATypes.AChar:
+                        // FIX ##? try something simpler.
                         foreach (byte b in BitConverter.GetBytes(argument.asChar))
                         {
                             if (b != 0)

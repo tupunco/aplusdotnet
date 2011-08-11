@@ -71,7 +71,11 @@ namespace AplusCore.Runtime.Function.ADAP
                     throw new Error.Type("");
             }
 
-            if (shape.Count <= 1)
+            if (shape.Count == 0)
+            {
+                result = itemConstruct(data);
+            }
+            else if (shape.Count == 1)
             {
                 for (int i = 0; i < data.Count(); i += typeSize)
                 {

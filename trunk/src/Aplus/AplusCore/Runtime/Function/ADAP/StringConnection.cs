@@ -66,9 +66,19 @@ namespace AplusCore.Runtime.Function.ADAP
 
         protected AType DoRead()
         {
+            AType message;
             int length = ReadMessageLength();
             byte[] messageByte = ReadMessageData(length);
-            AType message = ConvertToAObject(messageByte);
+            
+            try
+            {
+                message = ConvertToAObject(messageByte);
+            }
+            catch (Error)
+            {
+                throw new Error.Invalid("readImport");
+            }
+
             return message;
         }
 
