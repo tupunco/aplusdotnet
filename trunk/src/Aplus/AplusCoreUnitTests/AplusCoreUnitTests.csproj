@@ -90,6 +90,9 @@
     <Compile Include="Dlr\ControlFlow\While.cs" />
     <Compile Include="Dlr\Dependencies.cs" />
     <Compile Include="Dlr\ExtendedSlotFiller.cs" />
+    <Compile Include="Dlr\Function\ADAP\CDRExportTest.cs" />
+    <Compile Include="Dlr\Function\ADAP\CDRImportExportTest.cs" />
+    <Compile Include="Dlr\Function\ADAP\CDRImportTest.cs" />
     <Compile Include="Dlr\Function\Dyadic\NonScalar\Bins.cs" />
     <Compile Include="Dlr\Function\Dyadic\NonScalar\Cast.cs" />
     <Compile Include="Dlr\Function\Dyadic\NonScalar\Catenate.cs" />
@@ -229,6 +232,59 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <None Include="Dlr\Function\ADAP\Expected\box.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\boxmatrix.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\boxvector.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\float.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\floatmatrix.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\floatvector.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\null.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\nullmatrix.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\nullvector.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\number.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\numbermatrix.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\numbervector.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\string.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\stringmatrix.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\symbol.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\symbolmatrix.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Dlr\Function\ADAP\Expected\symbolvector.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

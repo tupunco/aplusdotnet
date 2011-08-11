@@ -1,12 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 using Microsoft.Scripting.Hosting;
 
 using AplusCore.Types;
-
 
 namespace AplusCoreUnitTests.Dlr
 {
@@ -121,6 +119,32 @@ namespace AplusCoreUnitTests.Dlr
                     File.Delete(files[i]);
                 }
             }
+        }
+
+        #endregion
+
+        #region CDR related
+
+        /// <summary>
+        /// Function to get byte array from a file
+        /// </summary>
+        /// <param name="fileName">File name to get byte array</param>
+        /// <returns>Byte Array</returns>
+        public static byte[] FileToByteArray(string fileName)
+        {
+            string testCasePath = Path.Combine("Function", "ADAP", "Expected", fileName);
+
+            byte[] buffer;
+
+            using (FileStream fileStream = new FileStream(testCasePath, FileMode.Open))
+            {
+                long totalBytes = new FileInfo(testCasePath).Length - 1; // /n at the and is not needed
+                buffer = new byte[totalBytes];
+
+                fileStream.Read(buffer, 0, (int)totalBytes);
+            }
+
+            return buffer;
         }
 
         #endregion
