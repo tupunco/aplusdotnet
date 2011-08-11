@@ -73,15 +73,18 @@ namespace AplusCore.Compiler.AST
                             );
                         }
                     }
-                    else if(!File.Exists(this.argument))
+                    else if (File.Exists(this.argument))
                     {
-                        codeBlock.Clear();
-
                         // Create the AST from file 
                         Node fileAST = Parse.LoadFile(this.argument, runtime.LexerMode);
                         // And generate the DLR tree
+                        codeBlock.AddFirst(fileAST.Generate(scope));
+                    }
+                    else
+                    {
+                        codeBlock.Clear();
                         codeBlock.AddFirst(
-                            fileAST.Generate(scope)
+                            DLR.Expression.Constant(Helpers.BuildString(String.Format("Invalid file: {0}", this.argument)))
                         );
                     }
                     break;

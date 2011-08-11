@@ -1,0 +1,186 @@
+$cx adap
+
+ltoa{list}:(>list[;0];(list?2!list)[;1])
+
+getopt{list;key;default}:if (key?0?list) key?list else default
+
+getretryarg{service}:4?if (`retry?0?sf?_alsf{service}){ `retry?sf } else{ 1 }
+
+
+CBFunctions?();
+CBHandles??0;
+
+TweakAArgument{a}:{
+  newsyms?`opened`closed;
+  oldsyms?`connected`reset;
+  if((~`sym??a)?(~(?0)??a)) a else if (a?newsyms) oldsyms[newsyms?a] else a
+} 
+
+ConnectionCallbackPassthru{h;a;d}:{
+  a?TweakAArgument{a};
+  if (`connected?a) {
+    if (~h?adap.CBHandles) {
+      lstn?i.getattr{h;`listener};
+      if ((~0?lstn)^(~()?lstn)) {
+        adap.CBHandles?adap.CBHandles,h;
+        adap.CBFunctions?adap.CBFunctions,adap.CBFunctions[adap.CBHandles?lstn];
+      } else {
+        ?"? Warning `connect event received for an unknown possibly closed handle:",?h;
+        ?();
+      };
+    };
+  };
+?FIX!!!
+?  if (h?adap.CBHandles) {(adap.CBFunctions[adap.CBHandles?h])?{h;a;d}}
+?  else adap.ConnectCBFunction{h;a;d};
+}
+
+filterConnectArgs{name;host;port;protocol}:{
+  if(protocol?`RAW) protocol?`raw;
+  if(host?()) host?`localhost;
+  (name;host;port;protocol)
+}
+
+Connect{service_descriptor;callbackfn}:{
+  servicearg?_alsf { service_descriptor };
+  host?getopt{servicearg;`host;`localhost};
+  port?getopt{servicearg;`port;};
+  protocol?getopt{servicearg;`protocol;`A};
+  name?getopt{servicearg;`name;`None};
+  (name;host;port;protocol)?filterConnectArgs{name;host;port;protocol};
+
+  adap.ConnectCBFunction?callbackfn;
+  if(()?port) {
+    if(^/`name`protocol?0?servicearg) {
+      h?i.connectNP{adap.ConnectionCallbackPassthru;name;protocol};
+    } else if (`name?0?servicearg) {
+      h?i.connectN{adap.ConnectionCallbackPassthru;name}
+    } else h??1;
+  } else {
+    h?i.connectNHPP{adap.ConnectionCallbackPassthru;name;host;port;protocol}
+ };
+  if(?1?h) {
+    adap.CBHandles?adap.CBHandles,h;
+    adap.CBFunctions?adap.CBFunctions,<{callbackfn};
+    i.open{ h };
+  };
+  h
+}
+
+Listen{service_descriptor;callbackfn}:{
+  servicearg?_alsf{ service_descriptor};
+  retryarg?getopt{servicearg;`retry;1};
+  port?getopt{servicearg;`port;};
+  protocol?getopt{servicearg;`protocol;`A};
+  name?getopt{servicearg;`name;`None};
+  (name;junk;port;protocol)?filterConnectArgs{name;`localhost;port;protocol};
+
+  adap.ConnectCBFunction?callbackfn;
+????????????????
+  if(()?port) {
+    if(^/`name`protocol?0?servicearg) {
+      h?i.listenNP{adap.ConnectionCallbackPassthru;name;protocol};
+    } else if (`name?0?servicearg) {
+      h?i.listenN{adap.ConnectionCallbackPassthru;name}
+    } else h??1;
+  } else {
+    h?i.listenNPP{adap.ConnectionCallbackPassthru;name;port;protocol}
+  };
+????????????????
+?   h?i.listenNPP{adap.ConnectionCallbackPassthru;name;port;protocol};
+????????????????
+  if(?1?h) {
+    i.setattr{h;`retry;retryarg};
+    adap.CBHandles?adap.CBHandles,h;
+    adap.CBFunctions?adap.CBFunctions,<{callbackfn};
+    i.open{h};
+  };
+  h
+}
+
+Export a:if(()?a?sys.exp{a}){''} else {a}
+
+Import a:if(()?a?sys.imp{a}){''} else {a}
+
+adap.SyncXch{h;outgoing;to}:{
+  timeout? to;
+  if ((()?timeout)^~()?to) ?`domain;
+
+  readPause?i.getattr{h;`readPause};
+  if(readPause=0) i.setattr{h;`readPause;1};
+  res?i.syncsend{h;outgoing;timeout};
+  if(`error?0?res) {
+      if(readPause=0) i.setattr{h;`readPause;readPause};
+     ?res,<`send;
+  };
+
+  res?i.syncread{h;timeout};
+  if(readPause=0) i.setattr{h;`readPause;readPause};
+  if(`error?0?res) ?res,<`read;
+
+  0 1#res
+}
+
+WriteQueueStatus{h}:{i.getattr{h;`writeStatus}}
+
+ReadQueueStatus{h}:{i.getattr{h;`readStatus}}
+
+SetDebug{h;val}: i.setdebug{h;val}
+
+Debug{val}: i.debug{val}
+
+Reset{h}: i.close{h}
+
+Send{h;msg}: i.send{h;msg}
+
+Close{h}: {
+  z?i.destroy{h};
+  if(0?b?adap.CBHandles?h) {
+    adap.CBFunctions?b/adap.CBFunctions;
+    adap.CBHandles?b/adap.CBHandles;
+  };
+  z
+}
+
+SetClientData{h;val}: {
+  attr?`clientData`eventData[`timer?0#i.whatis{h}];
+  i.setattr{h;attr;val}
+}
+
+GetClientData{h}:{
+  attr?`clientData`eventData[`timer?0#i.whatis{h}];
+  i.getattr{h;attr}
+}
+
+Syncread{h;timeout}: i.syncread{h;timeout}
+
+Syncsend{h;msg;timeout}: i.syncsend{h;msg;timeout}
+
+Getfd{h}: i.getattr{h;`fd}
+
+GetPort{h}: i.getattr{h;`port}
+
+ATTRMAT?2!(`rPriority `readPriority `wPriority `writePriority
+  `rQueueStatus `readStatus `wQueueStatus `writeStatus
+  `rPause `readPause `wPause `writePause
+  `rBufsize `readBufsize `wBufsize `writeBufsize
+  `rEventMode `burstMode `wNoDelay `noDelay)
+
+adap2ipc{attr}:if((#ATTRMAT)>idx?ATTRMAT[;0]?attr) ATTRMAT[idx;1] else attr
+
+Of{h;arg}:{
+  z?if (`list?arg) { i.attrs{h} } else {i.getattr{h;adap2ipc { arg }} };
+  if((`rEventMode?arg)^(z?0)?z?1)z?`single`burst[z];
+  z
+}
+
+setattrCover{h;arg;val}:{
+  if(`rEventMode?arg)val?val?`burst;
+  i.setattr{h;adap2ipc {arg};val}
+}
+
+
+Has{h;arg}:{
+  sf?_alsf{arg};
+  (i?#0?sf) do setattrCover{h;i?0?sf;i?1?sf};
+}

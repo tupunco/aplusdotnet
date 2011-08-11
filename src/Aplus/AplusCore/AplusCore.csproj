@@ -347,7 +347,11 @@
       <OutputFiles>Compiler\Grammar\Apl\AplusLexer.cs</OutputFiles>
     </Antlr3>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Runtime\Context\adap.a+">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <!-- ANTLR HACK #3 Antlr generator :) -->
   <Target Name="GenerateParser" Inputs="@(Antlr3)" Outputs="%(Antlr3.OutputFiles)">
     <!-- <Message Text="$(MSBuildProjectDirectory)"/> -->
