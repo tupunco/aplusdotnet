@@ -8,6 +8,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
 {
     class Member : AbstractDyadicFunction
     {
+        #region Variables
+
         /// <summary>
         /// Stores the resulting AArray
         /// </summary>
@@ -18,19 +20,25 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
         /// </summary>
         private AType searchWhere;
 
+        #endregion
+
+        #region DLR entry point
+
         public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
         {
-            if (right.Type == ATypes.ANull)
+            if (right.Length == 0)
             {
-                return DyadicFunctionInstance.Reshape.Execute(AInteger.Create(0), left.Shape.ToAArray());
+                switch (left.Rank)
+	            {
+                    case 0:
+                        return AInteger.Create(0);
+		            default:
+                        return DyadicFunctionInstance.Reshape.Execute(AInteger.Create(0), left.Shape.ToAArray());
+	            }
             }
             else if (!(left.IsNumber && right.IsNumber) && (right.Type != left.Type))
             {
                 throw new Error.Type(this.TypeErrorText);
-            }
-            else if (left.Type == ATypes.ANull)
-            {
-                return Utils.ANull();
             }
 
             // Convert the right argument to an array (make life easier..)
@@ -69,6 +77,9 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
             return DyadicFunctionInstance.Reshape.Execute(this.result, desiredShape.ToAArray());
         }
 
+        #endregion
+
+        #region Utility
 
         private void ProcessMatrix(AType searchWhat)
         {
@@ -132,5 +143,6 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
             return AInteger.Create(value);
         }
 
+        #endregion
     }
 }
