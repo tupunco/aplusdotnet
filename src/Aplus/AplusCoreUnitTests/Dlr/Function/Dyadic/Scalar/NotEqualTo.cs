@@ -98,9 +98,41 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
+        public void NotEqualToIntNull2Int()
+        {
+            AType result = this.engine.Execute<AType>("(`int?()) ~= 1");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Incorrect type");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
         public void NotEqualToNull2Null()
         {
             AType result = this.engine.Execute<AType>("() ~= ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Incorrect type");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
+        public void NotEqualToIntNull2IntNull()
+        {
+            AType result = this.engine.Execute<AType>("(`int?()) ~= (`int?())");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Incorrect type");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
+        public void NotEqualToIntNull2Null()
+        {
+            AType result = this.engine.Execute<AType>("(`int?()) ~= ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Incorrect type");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
+        public void NotEqualToNull2IntNull()
+        {
+            AType result = this.engine.Execute<AType>("() ~= (`int?())");
 
             Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Incorrect type");
         }

@@ -131,7 +131,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar
                 }
                 result.UpdateInfo();
 
-                if (leftArgument.Type == ATypes.ANull && rightArgument.Type == ATypes.ANull)
+                if (leftArgument.Length == 0 && rightArgument.Length == 0)
                 {
                     result.Type = 
                         (this.defaultResultType != ATypes.AType) ? this.defaultResultType : ATypes.ANull;
@@ -165,7 +165,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar
                 }
                 result.UpdateInfo();
 
-                if (leftArgument.Type == ATypes.ANull)
+                if (leftArgument.Length == 0)
                 {
                     result.Type =
                         (this.defaultResultType != ATypes.AType) ? this.defaultResultType : rightArgument.Type;
@@ -197,7 +197,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar
                 }
                 result.UpdateInfo();
 
-                if (rightArgument.Type == ATypes.ANull)
+                if (rightArgument.Length == 0)
                 {
                     result.Type =
                         (this.defaultResultType != ATypes.AType) ? this.defaultResultType : leftArgument.Type;
