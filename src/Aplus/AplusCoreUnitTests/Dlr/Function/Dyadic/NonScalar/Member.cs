@@ -1,11 +1,8 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.Scripting.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AplusCore.Types;
+
 using AplusCore.Runtime;
-using Microsoft.Scripting.Hosting;
+using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
 {
@@ -225,6 +222,24 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
             AType expected = AInteger.Create(0);
 
             AType result = this.engine.Execute<AType>("1 in 0 1 3 in iota 3 3");
+
+            Assert.AreEqual<AType>(expected, result, "Invalid value produced");
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Member"), TestMethod]
+        public void NullInNullMember()
+        {
+            AType result = this.engine.Execute<AType>("() in ()");
+
+            Assert.AreEqual(ATypes.AInteger, result.Type);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Member"), TestMethod]
+        public void ScalarInNullMember()
+        {
+            AType expected = AInteger.Create(0);
+            AType result = this.engine.Execute<AType>("1 in ()");
 
             Assert.AreEqual<AType>(expected, result, "Invalid value produced");
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
