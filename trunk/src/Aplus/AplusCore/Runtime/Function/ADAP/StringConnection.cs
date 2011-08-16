@@ -26,7 +26,7 @@ namespace AplusCore.Runtime.Function.ADAP
 
             receivedLength = connectionSocket.Receive(lengthBytes);
 
-            if (receivedLength != 4)
+            if (receivedLength == 0)
             {
                 throw new SocketException((int)SocketError.ConnectionAborted);
             }
@@ -74,7 +74,7 @@ namespace AplusCore.Runtime.Function.ADAP
             {
                 message = ConvertToAObject(messageByte);
             }
-            catch (Error)
+            catch (Error.Invalid)
             {
                 throw new Error.Invalid("readImport");
             }
@@ -89,12 +89,6 @@ namespace AplusCore.Runtime.Function.ADAP
         public override AType Read()
         {
             AType message = Utils.ANull();
-
-            if (!this.isOpen)
-            {
-                // logically unreachable code
-                throw new Error.Invalid("");
-            }
 
             if (!this.AipcAttributes.ReadPause)
             {

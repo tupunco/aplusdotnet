@@ -90,9 +90,13 @@ namespace AplusCore.Runtime.Function.ADAP
                 this.connectionSocket.EndConnect(result);
                 Console.WriteLine("Call connect callback here with {0}", this.connectionAttributes.HandleNumber);
             }
-            catch (SocketException)
+            catch (SocketException e)
             {
-                this.connectionSocket.BeginConnect(stateObject.endpoint, new AsyncCallback(Connect), stateObject);
+                if (e.ErrorCode == (int)SocketError.ConnectionRefused)
+                {
+                    this.connectionSocket.BeginConnect(stateObject.endpoint, new AsyncCallback(Connect), stateObject);
+                }
+                // else?
             }
             catch (ObjectDisposedException)
             {
@@ -232,9 +236,13 @@ namespace AplusCore.Runtime.Function.ADAP
                 {
                     connectionAttributes.Port = port;
                 }
-                else
+                else if (connectionAttributes.Host.asString == "localhost")
                 {
                     AipcService.Instance.RetryList.Add(this);
+                    return 0;
+                }
+                else
+                {
                     return 0;
                 }
             }

@@ -11,10 +11,11 @@ namespace AplusCore.Runtime.Function.ADAP
     {
         #region Constants
 
-        static readonly int rankIndex = 12;
-        static readonly int shapeIndex = 20;
-        static readonly int typeIndex = 8;
-        static readonly int dataIndex = 60;
+        // The messageByte in ConvertToAObject doesn't contains the length of the message!!!
+        static readonly int rankIndex = 8;
+        static readonly int shapeIndex = 16;
+        static readonly int typeIndex = 4;
+        static readonly int dataIndex = 56;
 
         #endregion
         
@@ -29,44 +30,50 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #region StringConnection Members
 
-        protected override AType ConvertToAObject(byte[] messageByte)
+        protected override AType ConvertToAObject(byte[] message)
         {
-            AType result = Utils.ANull();
+            // FIX ##? Check the length of the message
 
-            int index = rankIndex;
-            int rank;
+            AType result;
             List<int> shape = new List<int>();
-
-            rank = BitConverter.ToInt32(messageByte, index);
-
-            index = shapeIndex;
+            int rank = BitConverter.ToInt32(message, rankIndex);
+            int index = shapeIndex;
+            ATypes type;
 
             for (int i = 0; i < rank; i++)
             {
-                shape.Add(BitConverter.ToInt32(messageByte, index));
+                shape.Add(BitConverter.ToInt32(message, index));
                 index += 4;
             }
 
-            List<byte> messageAsList = new List<byte>(messageByte);
+            // FIX ##?: ArrayCopy?
+            List<byte> messageAsList = new List<byte>(message);
             List<byte> data = messageAsList.GetRange(dataIndex, messageAsList.Count - dataIndex);
 
-            index = typeIndex;
-
-            switch (BitConverter.ToInt32(messageByte, index))
+            switch (BitConverter.ToInt32(message, typeIndex))
             {
                 case 0:
-                    result = ATypeConverter.Instance.BuildArray(shape, data, ATypes.AInteger);
+                    type = ATypes.AInteger;
                     break;
                 case 1:
-                    result = ATypeConverter.Instance.BuildArray(shape, data, ATypes.AFloat);
+                    type = ATypes.AFloat;
                     break;
                 case 2:
-                    result = ATypeConverter.Instance.BuildArray(shape, data, ATypes.AChar);
+                    type = ATypes.AChar;
                     break;
                 default:
                     throw new Error.Invalid("readImport");
             }
 
+            try
+            {
+                result = ATypeConverter.Instance.BuildArray(shape, data, type);
+            }
+            catch (Exception)
+            {
+                // FIX ##? Do we really need to catch all of the exceptions?
+                throw new Error.Invalid("readImport");
+            }
             return result;
         }
 
@@ -76,19 +83,11 @@ namespace AplusCore.Runtime.Function.ADAP
 
         protected override byte[] ConvertToByte(AType message)
         {
-            System.Text.ASCIIEncoding encoder = new System.Text.ASCIIEncoding();
             List<byte> byteMessage = new List<byte>();
             List<byte> byteHeader = new List<byte>();
             List<byte> byteBody = new List<byte>();
 
-            if (message.Rank > 1)
-            {
-                byteHeader.AddRange(BitConverter.GetBytes(3));
-            }
-            else
-            {
-                byteHeader.AddRange(BitConverter.GetBytes(2));
-            }
+            byteHeader.AddRange(BitConverter.GetBytes((message.Rank > 1) ? 2 : 3));
 
             switch (message.Type)
             {
