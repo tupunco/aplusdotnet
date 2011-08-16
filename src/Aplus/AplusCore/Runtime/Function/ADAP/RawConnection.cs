@@ -20,12 +20,6 @@ namespace AplusCore.Runtime.Function.ADAP
 
         public override AType Read()
         {
-            if (this.isOpen)
-            {
-                // this code is unreachable, a closed socket will never be selected by select
-                throw new Error.Invalid("");
-            }
-
             AType message = Utils.ANull();
 
             if (!AipcAttributes.ReadPause)

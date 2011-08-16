@@ -38,7 +38,7 @@ namespace AplusCore.Runtime.Context
         public static AType Destroy(AplusEnvironment envrionment, AType handle)
         {
             int handleNumber = IsScalarAInteger(handle, "i.destroy").asInteger;
-            return AInteger.Create(AipcService.Instance.Destroy(handleNumber));
+            return AipcService.Instance.Destroy(handleNumber);
         }
 
         [AplusContextFunction("close", "i.close{scalar int} returns scalar int")]

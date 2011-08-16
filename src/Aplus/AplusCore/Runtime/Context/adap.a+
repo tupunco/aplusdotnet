@@ -30,9 +30,8 @@ ConnectionCallbackPassthru{h;a;d}:{
       };
     };
   };
-„FIX!!!
-„  if (h≈adap.CBHandles) {(adap.CBFunctions[adap.CBHandles…h])°{h;a;d}}
-„  else adap.ConnectCBFunction{h;a;d};
+  if (h≈adap.CBHandles) {(adap.CBFunctions[adap.CBHandles…h])°{h;a;d}}
+  else adap.ConnectCBFunction{h;a;d};
 }
 
 filterConnectArgs{name;host;port;protocol}:{

@@ -97,7 +97,7 @@ namespace AplusCore.Runtime.Function.ADAP
                     AipcConnection connection =
                         connectionList.Where<AipcConnection>(conn => conn.Socket == socket).FirstOrDefault<AipcConnection>();
 
-                    if (connection == null)
+                    if (connection == null || !connection.isOpen)
                     {
                         continue;
                     }
@@ -113,10 +113,8 @@ namespace AplusCore.Runtime.Function.ADAP
                     catch (SocketException exception)
                     {
                         writeList.Remove(connection.Socket); // this should only happen at unknown state but...
-                        
-                        // FIX ##? pass the connection/attribute
-                        CallbackBySocketException(
-                            exception, connection.ConnectionAttributes.HandleNumber, connection.AipcAttributes.Listener != 0);
+
+                        CallbackBySocketException(connection, exception);
                     }
                 }
 
@@ -125,7 +123,7 @@ namespace AplusCore.Runtime.Function.ADAP
                     AipcConnection connection =
                         connectionList.Where<AipcConnection>(conn => conn.Socket == socket).FirstOrDefault<AipcConnection>();
 
-                    if (connection == null)
+                    if (connection == null || !connection.isOpen)
                     {
                         continue;
                     }
@@ -136,9 +134,7 @@ namespace AplusCore.Runtime.Function.ADAP
                     }
                     catch (SocketException exception)
                     {
-                        // FIX ##? pass the connection/attribute
-                        CallbackBySocketException(
-                            exception, connection.ConnectionAttributes.HandleNumber, connection.AipcAttributes.Listener != 0);
+                        CallbackBySocketException(connection, exception);
                     }
                 }
 
@@ -319,7 +315,7 @@ namespace AplusCore.Runtime.Function.ADAP
             AType result;
             int seconds;
             int microseconds;
-            int nowSeconds = timestamp.Seconds;
+            int nowSeconds = Convert.ToInt32(Math.Floor(timestamp.TotalSeconds));
             int nowMicroSeconds = 1000 * timestamp.Milliseconds;
             int argumentLength = argument.Length;
 
@@ -338,13 +334,13 @@ namespace AplusCore.Runtime.Function.ADAP
             else if (argument.Type == ATypes.AInteger && argumentLength >= 1 && argumentLength <= 3)
             {
                 if (argumentLength == 3 && argument[2].asInteger == 1
-                    && argument[1].asInteger < 0)
+                    && argument[1].asInteger > 0)
                 {
                     result = argument;
                 }
                 else
                 {
-                    seconds = argument[0].asInteger;
+                    seconds = argument.IsArray ? argument[0].asInteger : argument.asInteger;
                     microseconds = (argumentLength >= 2) ? argument[1].asInteger * 1000 : 0;
 
                     result = AArray.Create(
@@ -511,18 +507,18 @@ namespace AplusCore.Runtime.Function.ADAP
             return AInteger.Create(0);
         }
 
-        public int Destroy(int handle)
+        public AType Destroy(int handle)
         {
             AipcConnection connection = Lookup(handle);
 
             if (connection == null)
             {
-                return -1;
+                return AInteger.Create(-1);
             }
 
             RemoveFromRoster(handle);
             connection.Destroy();
-            return 0;
+            return AInteger.Create(0);
         }
 
         public AType Close(int handle)
@@ -611,8 +607,10 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #region Utility
 
-        private void CallbackBySocketException(SocketException exception, int handle, bool listenerInitialized)
+        private static void CallbackBySocketException(AipcConnection connection, SocketException exception)
         {
+            int handle = connection.ConnectionAttributes.HandleNumber;
+
             switch (exception.SocketErrorCode)
             {
                 case SocketError.ConnectionReset:
@@ -634,8 +632,7 @@ namespace AplusCore.Runtime.Function.ADAP
                 default:
                     Console.WriteLine("call error callback here with unknown state {0}", handle);
 
-
-                    if (listenerInitialized)
+                    if (connection.AipcAttributes.Listener != 0)
                     {
                         AipcService.Instance.Destroy(handle);
                     }
