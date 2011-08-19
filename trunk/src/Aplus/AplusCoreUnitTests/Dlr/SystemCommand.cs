@@ -1,16 +1,71 @@
 ﻿using System;
+using System.IO;
 using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AplusCore.Types;
+
 using Microsoft.Scripting.Hosting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using AplusCore.Runtime;
+using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr
 {
     [TestClass]
     public class SystemCommand : AbstractTest
     {
+        #region Constants
+
+        private const string TEST_FILE = "testFile.a+";
+
+        #endregion
+
+        #region Test setup and cleanup
+
+        [TestInitialize]
+        public void SystemCommandSetup()
+        {
+            using (StreamWriter fileStream = new StreamWriter(TEST_FILE))
+            {
+                fileStream.WriteLine("$cx testContext");
+                fileStream.WriteLine("a := 0");
+            }
+        }
+
+        [TestCleanup]
+        public void SystemCommandCleanUp()
+        {
+            File.Delete(TEST_FILE);
+        }
+
+        #endregion
+
+        #region $load
+
+        [TestCategory("DLR"), TestCategory("System Command"), TestMethod]
+        public void ContextAfterLoadTextRootContext()
+        {
+            this.engine.Execute("$load " + TEST_FILE);
+
+            Aplus runtime = this.engine.GetService<Aplus>();
+
+            Assert.AreEqual(".", runtime.CurrentContext);
+        }
+        
+        [TestCategory("DLR"), TestCategory("System Command"), TestMethod]
+        public void ContextAfterLoadTextNotRootContext()
+        {
+            this.engine.Execute("$cx startingContext");
+            this.engine.Execute("$load " + TEST_FILE);
+
+            Aplus runtime = this.engine.GetService<Aplus>();
+
+            Assert.AreEqual("startingContext", runtime.CurrentContext);
+        }
+
+        #endregion
+
+        #region $cx
+
         [TestCategory("DLR"), TestCategory("System Command"), TestMethod]
         public void ContextTest()
         {
@@ -23,5 +78,7 @@ namespace AplusCoreUnitTests.Dlr
             Assert.IsTrue(scope.ContainsVariable("X.a"), "Variable not found");
             Assert.AreEqual(AInteger.Create(6), scope.GetVariable<AType>("X.a"));
         }
+
+        #endregion
     }
 }

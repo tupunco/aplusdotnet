@@ -75,10 +75,17 @@ namespace AplusCore.Compiler.AST
                     }
                     else if (File.Exists(this.argument))
                     {
+                        // TODO: Save working directory and restore.
+                        // Save the previous context.
+                        string previousContext = runtime.CurrentContext;
+
                         // Create the AST from file 
                         Node fileAST = Parse.LoadFile(this.argument, runtime.LexerMode);
                         // And generate the DLR tree
                         codeBlock.AddFirst(fileAST.Generate(scope));
+
+                        // Restore the previous context
+                        runtime.CurrentContext = previousContext;
                     }
                     else
                     {
