@@ -31,12 +31,6 @@ namespace AplusCore.Runtime.Function.ADAP
         {
             AType message;
 
-            if (!this.isOpen)
-            {
-                // logically unreachable code
-                throw new Error.Invalid("");
-            }
-
             if (this.AipcAttributes.ReadPause)
             {
                 return Utils.ANull();
@@ -55,7 +49,7 @@ namespace AplusCore.Runtime.Function.ADAP
                 message = DoRead();
             }
 
-            Console.WriteLine("Call read callback here with {0},{1}", message, ConnectionAttributes.HandleNumber);
+            this.MakeCallback("read", message);
 
             return message;
         }
@@ -74,7 +68,7 @@ namespace AplusCore.Runtime.Function.ADAP
             }
             catch (Exception)
             {
-                throw new Error.Invalid("readImport");
+                throw new ADAPException(ADAPExceptionType.Import);
             }
         }
 

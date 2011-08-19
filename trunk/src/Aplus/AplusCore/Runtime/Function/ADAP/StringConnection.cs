@@ -11,7 +11,7 @@ namespace AplusCore.Runtime.Function.ADAP
     {
         #region Constructors
 
-        public StringConnection(ConnectionAttribute attribute, AipcAttributes aipcAttributes, Socket socket = null)
+        public StringConnection(ConnectionAttribute attribute, AipcAttributes aipcAttributes = null, Socket socket = null)
             : base(attribute, aipcAttributes, socket)
         { }
 
@@ -29,6 +29,11 @@ namespace AplusCore.Runtime.Function.ADAP
             if (receivedLength == 0)
             {
                 throw new SocketException((int)SocketError.ConnectionAborted);
+            }
+
+            if (receivedLength != 4)
+            {
+                throw new ADAPException(ADAPExceptionType.Import);
             }
 
             int length = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(lengthBytes, 0));
@@ -52,13 +57,20 @@ namespace AplusCore.Runtime.Function.ADAP
             return messageByte;
         }
 
-        protected virtual AType ConvertToAObject(byte[] messageByte)
+        protected override AType ConvertToAObject(byte[] messageByte)
         {
             AType message = AArray.Create(ATypes.AChar);
 
             foreach (byte b in messageByte)
             {
-                message.Add(AChar.Create((char)b));
+                try
+                {
+                    message.Add(AChar.Create((char)b));
+                }
+                catch (InvalidCastException)
+                {
+                    throw new ADAPException(ADAPExceptionType.Import);
+                }
             }
 
             return message;
@@ -69,15 +81,8 @@ namespace AplusCore.Runtime.Function.ADAP
             AType message;
             int length = ReadMessageLength();
             byte[] messageByte = ReadMessageData(length);
-            
-            try
-            {
-                message = ConvertToAObject(messageByte);
-            }
-            catch (Error.Invalid)
-            {
-                throw new Error.Invalid("readImport");
-            }
+
+            message = ConvertToAObject(messageByte);
 
             return message;
         }
@@ -88,41 +93,48 @@ namespace AplusCore.Runtime.Function.ADAP
 
         public override AType Read()
         {
-            AType message = Utils.ANull();
+            AType message;
 
-            if (!this.AipcAttributes.ReadPause)
+            if (this.AipcAttributes.ReadPause)
+            {
+                message = Utils.ANull();
+            }
+            else
             {
                 message = DoRead();
-                Console.WriteLine("Call read callback here with {0},{1}", message, ConnectionAttributes.HandleNumber);
+                this.MakeCallback("read", message);
             }
 
             return message;
         }
-        
+
         public override AType SyncSend(AType message, AType timeout)
         {
-            AType result;
-            bool prevState = this.AipcAttributes.WritePause;
-            this.AipcAttributes.WritePause = true;
-
-            this.writeBuffer.AddLast(this.ConvertToByte(message));
+            AType result = null;
             int time = timeout.asInteger * 1000;
             int timeForAByte = time / this.WriteBufferContentSize;
             int messageSent = 0;
+            bool errorOccured = false;
+            bool previousWritePauseState = this.AipcAttributes.WritePause;
+
+            this.AipcAttributes.WritePause = true;
+            this.writeBuffer.AddLast(this.ConvertToByte(message));
 
             while (writeBuffer.Count > 0)
             {
                 byte[] item = writeBuffer.First.Value;
+                int sentBytes = 0;
 
                 connectionSocket.SendTimeout = item.Length * timeForAByte;
-                int sentBytes = 0;
+
                 try
                 {
                     sentBytes = connectionSocket.Send(item);
                 }
                 catch (SocketException e)
                 {
-                    result = SyncFillError(e);
+                    result = SyncFillError(e.SocketErrorCode, false);
+                    errorOccured = true;
                 }
 
                 writeBuffer.RemoveFirst();
@@ -138,19 +150,22 @@ namespace AplusCore.Runtime.Function.ADAP
             }
 
             connectionSocket.SendTimeout = 0;
-            this.AipcAttributes.WritePause = prevState;
+            this.AipcAttributes.WritePause = previousWritePauseState;
+            
+            if (!errorOccured)
+            {
+                result = SyncFillOk(AInteger.Create(messageSent), false);
+            }
 
-            result = SyncFillOk(AInteger.Create(messageSent));
             return result;
         }
 
         public override AType SyncRead(AType timeout)
         {
-            AType message = Utils.ANull();
-            bool prevState = this.AipcAttributes.ReadPause;
-            this.AipcAttributes.ReadPause = true;
-
+            
             byte[] messageByte;
+            bool previousReadPauseState = this.AipcAttributes.ReadPause;
+            this.AipcAttributes.ReadPause = true;
 
             try
             {
@@ -160,41 +175,45 @@ namespace AplusCore.Runtime.Function.ADAP
             }
             catch (SocketException e)
             {
-                return SyncFillError(e);
+                return SyncFillError(e.SocketErrorCode, true);
             }
             finally
             {
                 this.connectionSocket.ReceiveTimeout = 0;
             }
 
+            AType message;
             try
             {
                 message = ConvertToAObject(messageByte);
             }
-            catch (Error.Invalid)
+            catch (ADAPException)
             {
-                Console.WriteLine("Call error callback here readimport");
+                this.Reset();
+                this.MakeCallback("reset", ASymbol.Create("readImport"));
+                return SyncFillError(SocketError.ConnectionReset, true);
             }
 
-            this.AipcAttributes.ReadPause = prevState;
+            this.AipcAttributes.ReadPause = previousReadPauseState;
 
-            return AArray.Create(ATypes.ABox,
-                                 ABox.Create(ASymbol.Create("OK")),
-                                 ABox.Create(message),
-                                 ABox.Create(Utils.ANull())
-                                 );
+            return SyncFillOk(message, true);
         }
 
         protected override byte[] ConvertToByte(AType message)
         {
-            System.Text.ASCIIEncoding encoder = new System.Text.ASCIIEncoding();
-            List<byte> byteMessage = new List<byte>();
-            byte[] byteBody = encoder.GetBytes(message.ToString());
+            if (message.Type != ATypes.AChar)
+            {
+                throw new ADAPException(ADAPExceptionType.Export);
+            }
 
-            byteMessage.AddRange(BitConverter.GetBytes(IPAddress.HostToNetworkOrder(byteBody.Length)));
-            byteMessage.AddRange(encoder.GetBytes(message.ToString()));
+            byte[] messageBody = ASCIIEncoder.GetBytes(message.ToString());
+            byte[] messageHeader = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(messageBody.Length));
+            List<byte> result = new List<byte>();
+            
+            result.AddRange(messageHeader);
+            result.AddRange(messageBody);
 
-            return byteMessage.ToArray();
+            return result.ToArray();
         }
 
         #endregion

@@ -116,7 +116,7 @@ namespace AplusCore.Runtime.Function.ADAP
                 }
                 else if (typeCode == CDRConstants.CDRCharShort)
                 {
-                    length *= sizeof(Char);
+                    length *= sizeof(Char) / 2; // sizeof(Char) == 2 in C#
                     type = ATypes.AChar;
                 }
                 else
@@ -124,7 +124,7 @@ namespace AplusCore.Runtime.Function.ADAP
                     throw new Error.Domain("sys.imp");
                 }
 
-                result = ATypeConverter.Instance.BuildArray(shape, argument.Skip(dataIndex).Take(length), type);
+                result = ATypeConverter.Instance.BuildArray(shape, ref argument, type, dataIndex);
                 dataIndex += length;
             }
 
@@ -134,7 +134,7 @@ namespace AplusCore.Runtime.Function.ADAP
         private AType BuildBoxArray(List<int> shape, byte[] argument)
         {
             AType result = Utils.ANull();
-            
+
             if (shape.Count == 0)
             {
                 result = ABox.Create(GetItems(argument));

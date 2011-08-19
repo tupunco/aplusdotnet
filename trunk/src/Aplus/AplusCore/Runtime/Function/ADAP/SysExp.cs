@@ -192,14 +192,7 @@ namespace AplusCore.Runtime.Function.ADAP
                 switch (argument.Type)
                 {
                     case ATypes.AChar:
-                        // FIX ##? try something simpler.
-                        foreach (byte b in BitConverter.GetBytes(argument.asChar))
-                        {
-                            if (b != 0)
-                            {
-                                result.Add(b);
-                            }
-                        }
+                        result.Add((byte)argument.asChar);
                         break;
                     case ATypes.AFloat:
                         result.AddRange(BitConverter.GetBytes(argument.asFloat));

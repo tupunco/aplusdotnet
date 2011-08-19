@@ -18,7 +18,7 @@ namespace AplusCore.Runtime.Function.ADAP
         static readonly int dataIndex = 56;
 
         #endregion
-        
+
         #region Constructors
 
         public SimpleConnection(ConnectionAttribute attribute, AipcAttributes aipcAttributes = null, Socket socket = null)
@@ -32,7 +32,10 @@ namespace AplusCore.Runtime.Function.ADAP
 
         protected override AType ConvertToAObject(byte[] message)
         {
-            // FIX ##? Check the length of the message
+            if (message.Length < 56)
+            {
+                throw new ADAPException(ADAPExceptionType.Import);
+            }
 
             AType result;
             List<int> shape = new List<int>();
@@ -46,34 +49,36 @@ namespace AplusCore.Runtime.Function.ADAP
                 index += 4;
             }
 
-            // FIX ##?: ArrayCopy?
-            List<byte> messageAsList = new List<byte>(message);
-            List<byte> data = messageAsList.GetRange(dataIndex, messageAsList.Count - dataIndex);
+            int typeSize;
 
             switch (BitConverter.ToInt32(message, typeIndex))
             {
                 case 0:
                     type = ATypes.AInteger;
+                    typeSize = sizeof(Int32);
                     break;
                 case 1:
                     type = ATypes.AFloat;
+                    typeSize = sizeof(Double);
                     break;
                 case 2:
                     type = ATypes.AChar;
+                    typeSize = sizeof(Char) / 2; // sizeof(Char) == 2
                     break;
                 default:
-                    throw new Error.Invalid("readImport");
+                    throw new ADAPException(ADAPExceptionType.Import);
             }
 
-            try
+            int expectedLength = typeSize * shape.Product() + dataIndex;
+
+            if ((type == ATypes.AChar && message.Length != (expectedLength + 1)) ||
+                (type != ATypes.AChar && message.Length != expectedLength))
             {
-                result = ATypeConverter.Instance.BuildArray(shape, data, type);
+                throw new ADAPException(ADAPExceptionType.Import);
             }
-            catch (Exception)
-            {
-                // FIX ##? Do we really need to catch all of the exceptions?
-                throw new Error.Invalid("readImport");
-            }
+            
+            result = ATypeConverter.Instance.BuildArray(shape, ref message, type, dataIndex);
+
             return result;
         }
 
@@ -101,12 +106,12 @@ namespace AplusCore.Runtime.Function.ADAP
                     byteHeader.AddRange(BitConverter.GetBytes(2));
                     break;
                 default:
-                    throw new Error.Type("Not convertable type");
+                    throw new ADAPException(ADAPExceptionType.Import);
             }
 
             byteHeader.AddRange(BitConverter.GetBytes(message.Rank));
             byteHeader.AddRange(BitConverter.GetBytes(message.Shape.Product()));
-            
+
             foreach (int item in message.Shape)
             {
                 byteHeader.AddRange(BitConverter.GetBytes(item));
