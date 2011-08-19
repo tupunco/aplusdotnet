@@ -29,6 +29,8 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #region Properties
 
+        public bool Retry { get { return this.retry; } }
+
         public bool WritePause
         {
             get { return writePause; }

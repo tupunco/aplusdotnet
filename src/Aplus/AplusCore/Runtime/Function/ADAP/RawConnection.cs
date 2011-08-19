@@ -1,7 +1,7 @@
 using System;
 using System.Net.Sockets;
+using System.Text;
 
-using AplusCore.Runtime;
 using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.ADAP
@@ -18,6 +18,25 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #region AipcConnection Members
 
+        protected override AType ConvertToAObject(byte[] message)
+        {
+            AType result = Utils.ANull();
+
+            for (int i = 0; i < message.Length; i++)
+            {
+                try
+                {
+                    result.Add(AChar.Create((char)message[i]));
+                }
+                catch (InvalidCastException)
+                {
+                    throw new ADAPException(ADAPExceptionType.Import);
+                }
+            }
+
+            return result;
+        }
+        
         public override AType Read()
         {
             AType message = Utils.ANull();
@@ -33,13 +52,13 @@ namespace AplusCore.Runtime.Function.ADAP
                 {
                     throw new SocketException((int)SocketError.ConnectionAborted);
                 }
+                
+                byte[] messageByte = new byte[readLength];
+                Array.Copy(buffer, messageByte, readLength);
 
-                for (int i = 0; i < readLength; i++)
-                {
-                    message.Add(AChar.Create((char)buffer[i]));
-                }
+                message = ConvertToAObject(messageByte);
 
-                Console.WriteLine("Call read callback here with {0},{1}", message, ConnectionAttributes.HandleNumber);
+                this.MakeCallback("read", message);
             }
 
             return message;
@@ -57,16 +76,26 @@ namespace AplusCore.Runtime.Function.ADAP
 
         protected override byte[] ConvertToByte(AType message)
         {
+            if (message.Type != ATypes.AChar)
+            {
+                throw new ADAPException(ADAPExceptionType.Export);
+            }
+
+            byte[] result;
             try
             {
-                System.Text.ASCIIEncoding encoder = new System.Text.ASCIIEncoding();
-                byte[] result = encoder.GetBytes(message.ToString());
-                return result;
+                result = ASCIIEncoder.GetBytes(message.ToString());
             }
-            catch (Exception)
+            catch (ArgumentNullException)
             {
-                throw new Error.Invalid("readImport");
+                throw new ADAPException(ADAPExceptionType.Export);
             }
+            catch (EncoderFallbackException)
+            {
+                throw new ADAPException(ADAPExceptionType.Export);
+            }
+
+            return result;
         }
 
         #endregion

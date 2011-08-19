@@ -8,7 +8,7 @@ using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.ADAP
 {
-    public class AipcService
+    internal class AipcService
     {
         #region Variables
 
@@ -45,6 +45,14 @@ namespace AplusCore.Runtime.Function.ADAP
         #endregion
 
         #region Methods
+
+        internal void AddToRetryList(AipcConnection conn)
+        {
+            lock (mutex)
+            {
+                retryList.Add(conn);
+            }
+        }
 
         private void NetworkLoop()
         {
@@ -84,16 +92,14 @@ namespace AplusCore.Runtime.Function.ADAP
                     {
                         Socket.Select(readList, writeList, errorList, 100);
                     }
-                    catch (SocketException e)
+                    catch (SocketException)
                     {
-                        Console.WriteLine(e.StackTrace);
                         continue;
                     }
                 }
 
                 foreach (Socket socket in readList)
                 {
-
                     AipcConnection connection =
                         connectionList.Where<AipcConnection>(conn => conn.Socket == socket).FirstOrDefault<AipcConnection>();
 
@@ -106,15 +112,15 @@ namespace AplusCore.Runtime.Function.ADAP
                     {
                         AType message = connection.Read();
                     }
-                    catch (Error.Invalid)
+                    catch (ADAPException)
                     {
-                        Console.WriteLine("Call readImport callback here {0}", connection.ConnectionAttributes.HandleNumber);
+                        AipcService.Instance.Close(connection.ConnectionAttributes.HandleNumber);
+                        connection.MakeCallback("reset", ASymbol.Create("readImport"));
                     }
                     catch (SocketException exception)
                     {
                         writeList.Remove(connection.Socket); // this should only happen at unknown state but...
-
-                        CallbackBySocketException(connection, exception);
+                        CallbackBySocketException(connection, exception, true);
                     }
                 }
 
@@ -134,12 +140,17 @@ namespace AplusCore.Runtime.Function.ADAP
                     }
                     catch (SocketException exception)
                     {
-                        CallbackBySocketException(connection, exception);
+                        CallbackBySocketException(connection, exception, false);
                     }
                 }
 
-                HashSet<AipcConnection> actualRetryList = retryList;
-                retryList = new HashSet<AipcConnection>();
+                HashSet<AipcConnection> actualRetryList;
+
+                lock (mutex)
+                {
+                    actualRetryList = retryList;
+                    retryList = new HashSet<AipcConnection>();
+                }
 
                 foreach (AipcConnection item in actualRetryList)
                 {
@@ -197,8 +208,8 @@ namespace AplusCore.Runtime.Function.ADAP
             {
                 foreach (KeyValuePair<int, AipcConnection> item in roster)
                 {
-                    if (item.Value.ConnectionAttributes.IsListener &&
-                        item.Value.ConnectionAttributes.Name.asString == name.asString)
+                    ConnectionAttribute attrbiutes = item.Value.ConnectionAttributes;
+                    if (attrbiutes.IsListener && attrbiutes.Name.asString == name.asString)
                     {
                         return item.Value.ConnectionAttributes.Port;
                     }
@@ -243,36 +254,36 @@ namespace AplusCore.Runtime.Function.ADAP
         {
             AipcConnection connection = Lookup(handle);
 
-            if (connection != null)
+            if (connection == null)
             {
-                return connection.AipcAttributes.Attributes();
+                return Utils.ANull();
             }
 
-            return Utils.ANull();
+            return connection.AipcAttributes.Attributes();
         }
 
         public AType GetAttribute(int handle, AType attribute)
         {
             AipcConnection connection = Lookup(handle);
 
-            if (connection != null)
+            if (connection == null)
             {
-                return connection.AipcAttributes.GetAttribute(attribute);
+                return Utils.ANull();
             }
 
-            return Utils.ANull();
+            return connection.AipcAttributes.GetAttribute(attribute);
         }
 
         public AType SetAttribute(int handle, AType attribute, AType value)
         {
             AipcConnection connection = Lookup(handle);
 
-            if (connection != null)
+            if (connection == null)
             {
-                return connection.AipcAttributes.SetAttribute(attribute, value);
+                return AInteger.Create(-1);
             }
 
-            return AInteger.Create(-1);
+            return connection.AipcAttributes.SetAttribute(attribute, value);
         }
 
         public AType WhatIs(int handle)
@@ -305,6 +316,7 @@ namespace AplusCore.Runtime.Function.ADAP
                     result.Add(AInteger.Create(item.Key));
                 }
             }
+
             return result;
         }
 
@@ -340,7 +352,7 @@ namespace AplusCore.Runtime.Function.ADAP
                 }
                 else
                 {
-                    seconds = argument.IsArray ? argument[0].asInteger : argument.asInteger;
+                    seconds = (argument.IsArray) ? argument[0].asInteger : argument.asInteger;
                     microseconds = (argumentLength >= 2) ? argument[1].asInteger * 1000 : 0;
 
                     result = AArray.Create(
@@ -363,7 +375,7 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #region i context connection handling
 
-        public AType Listen(AType func, AType name, AType host, int port, AType protocol, AipcAttributes aipcAttributes = null)
+        public AType Listen(AType func, AType name, AType host, int port, AType protocol)
         {
             AipcConnection connection;
             ConnectionAttribute attribute = new ConnectionAttribute()
@@ -377,33 +389,14 @@ namespace AplusCore.Runtime.Function.ADAP
                 IsListener = true
             };
 
-            switch (attribute.Protocol.asString)
+            connection = Create(attribute, null, null);
+
+            if (connection == null)
             {
-                case "A":
-                    connection = new AConnection(attribute, aipcAttributes);
-                    break;
-                case "string":
-                    connection = new StringConnection(attribute, aipcAttributes);
-                    break;
-                case "raw":
-                    connection = new RawConnection(attribute, aipcAttributes);
-                    break;
-                case "simple":
-                    connection = new SimpleConnection(attribute, aipcAttributes);
-                    break;
-                default:
-                    attribute.HandleNumber = -1;
-                    connection = null;
-                    break;
+                return AInteger.Create(-1);
             }
 
-            if (attribute.HandleNumber != -1)
-            {
-                attribute.HandleNumber = NextHandleNumber();
-                AddToRoster(connection);
-            }
-
-            return AInteger.Create(attribute.HandleNumber);
+            return AInteger.Create(connection.ConnectionAttributes.HandleNumber);
         }
 
         public AType Listen(AType func, AType name)
@@ -422,16 +415,51 @@ namespace AplusCore.Runtime.Function.ADAP
             return Listen(func, name, ConnectionAttribute.DEFAULT_HOST, ConnectionAttribute.DEFAULT_PORT, protocol);
         }
 
-        public void InitFromListener(ConnectionAttribute attribute, Socket socket, AipcAttributes aipcAttributes)
+        public void InitFromListener(ConnectionAttribute connectionAttribute, Socket socket, AipcAttributes aipcAttributes)
         {
-            int handleNumber = Connect(
-                attribute.Function, attribute.Name, attribute.Host, attribute.Port, attribute.Protocol, socket, aipcAttributes).asInteger;
-            Console.WriteLine("Call connect callback here with {0}", handleNumber);
+            ConnectionAttribute attribute = new ConnectionAttribute(connectionAttribute);
+            attribute.IsListener = false;
+            AipcConnection connection = Create(attribute, aipcAttributes, socket);
+
+            connection.AipcAttributes.Listener = connectionAttribute.HandleNumber;
+            connection.MakeCallback("connected", AInteger.Create(connection.AipcAttributes.Listener));
+        }
+
+        private AipcConnection Create(ConnectionAttribute connectionAttribute, AipcAttributes aipcAttributes, Socket socket)
+        {
+            AipcConnection connection;
+
+            switch (connectionAttribute.Protocol.asString)
+            {
+                case "A":
+                    connection = new AConnection(connectionAttribute, aipcAttributes, socket);
+                    break;
+                case "string":
+                    connection = new StringConnection(connectionAttribute, aipcAttributes, socket);
+                    break;
+                case "raw":
+                    connection = new RawConnection(connectionAttribute, aipcAttributes, socket);
+                    break;
+                case "simple":
+                    connection = new SimpleConnection(connectionAttribute, aipcAttributes, socket);
+                    break;
+                default:
+                    connectionAttribute.HandleNumber = -1;
+                    connection = null;
+                    break;
+            }
+
+            if (connectionAttribute.HandleNumber != -1)
+            {
+                connectionAttribute.HandleNumber = NextHandleNumber();
+                AddToRoster(connection);
+            }
+
+            return connection;
         }
 
         public AType Connect(
-            AType func, AType name, AType host, int port, AType protocol,
-            Socket socket = null, AipcAttributes aipcAttributes = null)
+            AType func, AType name, AType host, int port, AType protocol)
         {
             AipcConnection connection;
             ConnectionAttribute attribute = new ConnectionAttribute
@@ -443,33 +471,14 @@ namespace AplusCore.Runtime.Function.ADAP
                 Host = host
             };
 
-            switch (attribute.Protocol.asString)
+            connection = Create(attribute, null, null);
+
+            if (connection == null)
             {
-                case "A":
-                    connection = new AConnection(attribute, aipcAttributes, socket);
-                    break;
-                case "string":
-                    connection = new StringConnection(attribute, aipcAttributes, socket);
-                    break;
-                case "raw":
-                    connection = new RawConnection(attribute, aipcAttributes, socket);
-                    break;
-                case "simple":
-                    connection = new SimpleConnection(attribute, aipcAttributes, socket);
-                    break;
-                default:
-                    attribute.HandleNumber = -1;
-                    connection = null;
-                    break;
+                return AInteger.Create(-1);
             }
 
-            if (attribute.HandleNumber != -1)
-            {
-                attribute.HandleNumber = NextHandleNumber();
-                AddToRoster(connection);
-            }
-
-            return AInteger.Create(attribute.HandleNumber);
+            return AInteger.Create(connection.ConnectionAttributes.HandleNumber);
         }
 
         public AType Connect(AType func, AType name)
@@ -547,7 +556,7 @@ namespace AplusCore.Runtime.Function.ADAP
             AipcConnection connection = Lookup(handle);
             AType result;
 
-            if (connection == null || !connection.isOpen)
+            if (connection == null)
             {
                 return Utils.ANull();
             }
@@ -559,7 +568,7 @@ namespace AplusCore.Runtime.Function.ADAP
             catch (NotImplementedException)
             {
                 Console.WriteLine("This protocol has no SyncSend.");
-                return Utils.ANull();
+                result = Utils.ANull();
             }
 
             return result;
@@ -570,7 +579,7 @@ namespace AplusCore.Runtime.Function.ADAP
             AipcConnection connection = Lookup(handle);
             AType result;
 
-            if (connection == null || !connection.isOpen)
+            if (connection == null)
             {
                 return Utils.ANull();
             }
@@ -582,7 +591,7 @@ namespace AplusCore.Runtime.Function.ADAP
             catch (NotImplementedException)
             {
                 Console.WriteLine("This protocol has no SyncRead");
-                return Utils.ANull();
+                result = Utils.ANull();
             }
 
             return result;
@@ -607,7 +616,7 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #region Utility
 
-        private static void CallbackBySocketException(AipcConnection connection, SocketException exception)
+        private static void CallbackBySocketException(AipcConnection connection, SocketException exception, bool isRead)
         {
             int handle = connection.ConnectionAttributes.HandleNumber;
 
@@ -617,30 +626,24 @@ namespace AplusCore.Runtime.Function.ADAP
                     Console.WriteLine("call reset? callback here with reset?! {0}", handle);
                     break;
                 case SocketError.TimedOut:
-                    Console.WriteLine("call error callback here with timeout");
+                    connection.MakeCallback("timeout", ASymbol.Create("Timeout"));
                     break;
                 case SocketError.Interrupted:
-                    Console.WriteLine("call error? callback here with interrupt {0}", handle);
+                    connection.MakeCallback("interrupt", ASymbol.Create("Interrupted"));
                     break;
                 case SocketError.NoBufferSpaceAvailable:
-                    Console.WriteLine("call error callback here with buffread {0}", handle);
+                    connection.MakeCallback(isRead ? "buffread" : "buffwrite",
+                                            ASymbol.Create(String.Concat(isRead ? "Read " : "Write ", "buffer is full")));
+                    AipcService.Instance.Close(connection.ConnectionAttributes.HandleNumber);
                     break;
                 case SocketError.NotInitialized:
                 case SocketError.NotConnected:
-                    Console.WriteLine("call error callback here with nochan {0}", handle);
+
+                    AipcService.Instance.Close(connection.ConnectionAttributes.HandleNumber);
                     break;
                 default:
-                    Console.WriteLine("call error callback here with unknown state {0}", handle);
-
-                    if (connection.AipcAttributes.Listener != 0)
-                    {
-                        AipcService.Instance.Destroy(handle);
-                    }
-                    else
-                    {
-                        AipcService.Instance.Close(handle);
-                    }
-
+                    connection.MakeCallback("reset", ASymbol.Create("unknown State"));
+                    AipcService.Instance.Close(connection.ConnectionAttributes.HandleNumber);
                     break;
             }
         }

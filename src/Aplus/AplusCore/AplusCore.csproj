@@ -144,6 +144,7 @@
     <Compile Include="Runtime\DependencyManager.cs" />
     <Compile Include="Runtime\Error.cs" />
     <Compile Include="Runtime\Function\ADAP\AConnection.cs" />
+    <Compile Include="Runtime\Function\ADAP\ADAPException.cs" />
     <Compile Include="Runtime\Function\ADAP\AipcAttributes.cs" />
     <Compile Include="Runtime\Function\ADAP\AipcConnection.cs" />
     <Compile Include="Runtime\Function\ADAP\AipcService.cs" />

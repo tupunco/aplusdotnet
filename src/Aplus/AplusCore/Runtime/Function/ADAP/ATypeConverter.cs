@@ -30,24 +30,24 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #region Methods
 
-        private delegate AType ItemConstructDelegate(IEnumerable<byte> data);
+        private delegate AType ItemConstructDelegate(ref byte[] data, int index);
 
-        private AType ConstructAInteger(IEnumerable<byte> data)
+        private AType ConstructAInteger(ref byte[] data, int index)
         {
-            return AInteger.Create(BitConverter.ToInt32(data.ToArray(), 0));
+            return AInteger.Create(BitConverter.ToInt32(data, index));
         }
 
-        private AType ConstructAChar(IEnumerable<byte> data)
+        private AType ConstructAChar(ref byte[] data, int index)
         {
-            return AChar.Create((char)data.ToArray<byte>()[0]);
+            return AChar.Create((char)data[index]);
         }
 
-        private AType ConstructAFloat(IEnumerable<byte> data)
+        private AType ConstructAFloat(ref byte[] data, int index)
         {
-            return AFloat.Create(BitConverter.ToDouble(data.ToArray(), 0));
+            return AFloat.Create(BitConverter.ToDouble(data, index));
         }
 
-        public AType BuildArray(List<int> shape, IEnumerable<byte> data, ATypes type)
+        public AType BuildArray(List<int> shape, ref byte[] data, ATypes type, int index)
         {
             AType result = Utils.ANull();
             int typeSize;
@@ -67,19 +67,25 @@ namespace AplusCore.Runtime.Function.ADAP
                     typeSize = sizeof(Double);
                     itemConstruct = ConstructAFloat;
                     break;
-                default: 
-                    throw new Error.Type("");
+                default:
+                    throw new ADAPException(ADAPExceptionType.Import);
+            }
+
+            if (data.Length < (typeSize * shape.Product() + index))
+            {
+                throw new ADAPException(ADAPExceptionType.Import);
             }
 
             if (shape.Count == 0)
             {
-                result = itemConstruct(data);
+                result = itemConstruct(ref data, index);
             }
             else if (shape.Count == 1)
             {
-                for (int i = 0; i < data.Count(); i += typeSize)
+                for (int i = 0; i < shape[0]; i++)
                 {
-                    result.Add(itemConstruct(data.Skip(i).Take(typeSize)));
+                    result.Add(itemConstruct(ref data, index));
+                    index += typeSize;
                 }
             }
             else
@@ -88,10 +94,9 @@ namespace AplusCore.Runtime.Function.ADAP
                 {
                     List<int> nextShape = shape.GetRange(1, shape.Count - 1);
                     int subDimensionLength = nextShape.Product() * typeSize;
-                    List<byte> nextData = new List<byte>();
 
-                    nextData.AddRange(data.Skip(i * subDimensionLength).Take(subDimensionLength));
-                    result.Add(BuildArray(nextShape, nextData, type));
+                    result.Add(BuildArray(nextShape, ref data, type, index));
+                    index += subDimensionLength;
                 }
             }
 
