@@ -15,11 +15,11 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
 
         #region Delegate helper
 
-        private delegate AType ItemSelectDelegate(AType arg, AType items, AplusEnvironment environment);
+        private delegate AType ItemSelectDelegate(AType arg, AType items, Aplus environment);
         private static ItemSelectDelegate SymbolConstant2SlotFillerDelegate;
         private static ItemSelectDelegate NestedPathNumber2NestedArrayDelegate;
 
-        private AType ItemSelectWalker(ItemSelectDelegate method, AType argument, AType items, AplusEnvironment environment)
+        private AType ItemSelectWalker(ItemSelectDelegate method, AType argument, AType items, Aplus environment)
         {
             AType result = items;
 
@@ -47,7 +47,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
 
         #region Entry point
 
-        public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
+        public override AType Execute(AType right, AType left, Aplus environment = null)
         {
             if (Pick.SymbolConstant2SlotFillerDelegate == null)
             {
@@ -64,7 +64,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
 
         #region Assign Entry point
 
-        public PickAssignmentTarget AssignExecute(AType right, AType left, AplusEnvironment environment = null)
+        public PickAssignmentTarget AssignExecute(AType right, AType left, Aplus environment = null)
         {
             AType result = Execute(right, left, environment);
             return new PickAssignmentTarget(result, this.resultFromBox);
@@ -76,7 +76,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
 
         #region Selection
 
-        public AType Compute(AType right, AType left, AplusEnvironment environment)
+        public AType Compute(AType right, AType left, Aplus environment)
         {
             //Type Error!
             if (left.Type == ATypes.AChar || 
@@ -133,7 +133,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
         /// <param name="symbol">Symbol to use for selecting from a slotfiller</param>
         /// <param name="items">Slotfiller</param>
         /// <returns></returns>
-        private AType SimpleSymbolConstant2SlotFiller(AType symbol, AType items, AplusEnvironment environment)
+        private AType SimpleSymbolConstant2SlotFiller(AType symbol, AType items, Aplus environment)
         {
             if (!items.IsSlotFiller(true))
             {
@@ -338,7 +338,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
         /// <param name="pathBox"></param>
         /// <param name="items"></param>
         /// <returns></returns>
-        private AType NestedPathNumber2NestedArray(AType pathBox, AType items, AplusEnvironment environment)
+        private AType NestedPathNumber2NestedArray(AType pathBox, AType items, Aplus environment)
         {
             AType path = MonadicFunctionInstance.Disclose.Execute(pathBox, environment);
 

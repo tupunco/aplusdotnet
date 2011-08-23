@@ -12,7 +12,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 
         #region Entry point
 
-        public override AType Execute(AType rightArgument, AType leftArgument, AplusEnvironment environment = null)
+        public override AType Execute(AType rightArgument, AType leftArgument, Aplus environment = null)
         {
             if (leftArgument.Type != ATypes.AInteger)
             {

@@ -8,7 +8,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Comprasion
     {
         #region Entry point
 
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             byte[] vector = PrepareVector(argument);
             return Compute(argument, vector);

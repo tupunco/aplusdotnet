@@ -15,7 +15,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
 
         #region Entry point
 
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             return Compute(argument);
         }

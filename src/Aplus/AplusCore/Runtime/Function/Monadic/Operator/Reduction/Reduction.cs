@@ -36,7 +36,7 @@ namespace AplusCore.Runtime.Function.Monadic.Operator.Reduction
 
         #region Entry point
 
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             SetVariables(argument.Type);
 

@@ -12,7 +12,7 @@ namespace AplusCore.Runtime.Function
         /// <param name="number"></param>
         /// <returns></returns>
         [SystemFunction("_items", "_items{y;x}: Increase/truncate the size of a memory-mapped file, or get the size of the file.")]
-        internal static AType Items(AplusEnvironment environment, AType memoryMappedFileName, AType number)
+        internal static AType Items(Aplus environment, AType memoryMappedFileName, AType number)
         {
             string resultPath = Util.GetPath(memoryMappedFileName, environment);
 
@@ -25,16 +25,16 @@ namespace AplusCore.Runtime.Function
 
             if (newLeadingAxesLength == -1)
             {
-                return environment.Runtime.MemoryMappedFileManager.GetLeadingAxesLength(resultPath);
+                return environment.MemoryMappedFileManager.GetLeadingAxesLength(resultPath);
             }
             else
             {
-                if (environment.Runtime.MemoryMappedFileManager.ExistMemoryMappedFile(resultPath))
+                if (environment.MemoryMappedFileManager.ExistMemoryMappedFile(resultPath))
                 {
                     throw new Error.Invalid("Items");
                 }
 
-                return environment.Runtime.MemoryMappedFileManager.ExpandOrDecrease(resultPath, newLeadingAxesLength);
+                return environment.MemoryMappedFileManager.ExpandOrDecrease(resultPath, newLeadingAxesLength);
             }
         }
 

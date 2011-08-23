@@ -9,7 +9,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
     {
         #region DLR Entry point
 
-        public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
+        public override AType Execute(AType right, AType left, Aplus environment = null)
         {
             // First we check if one side is an ANull
             if (right.Type == ATypes.ANull)

@@ -18,7 +18,7 @@ namespace AplusCore.Runtime.Function.Operator.Dyadic
 
         #region Entry point
 
-        public AType Execute(AType function, AType n, AType right, AType left, AplusEnvironment environment = null)
+        public AType Execute(AType function, AType n, AType right, AType left, Aplus environment = null)
         {
             if (!(function.Data is AFunc))
             {
@@ -53,7 +53,7 @@ namespace AplusCore.Runtime.Function.Operator.Dyadic
 
         #region Rank params
 
-        private List<int> GetNumberList(AType n, AType left, AType right, AplusEnvironment environment)
+        private List<int> GetNumberList(AType n, AType left, AType right, Aplus environment)
         {
             if (n.Type != ATypes.AInteger)
             {
@@ -139,7 +139,7 @@ namespace AplusCore.Runtime.Function.Operator.Dyadic
 
         #region Algorithm
 
-        private AType Walker(AType left, AType right, List<int> numberList, AFunc function, AplusEnvironment environment)
+        private AType Walker(AType left, AType right, List<int> numberList, AFunc function, Aplus environment)
         {
             int tx = Math.Min(numberList[2], right.Rank - numberList[1]);
             int ty = Math.Min(numberList[2], left.Rank - numberList[0]);
@@ -235,7 +235,7 @@ namespace AplusCore.Runtime.Function.Operator.Dyadic
             }
             else
             {
-                var method = (Func<AplusEnvironment, AType, AType, AType>)function.Method;
+                var method = (Func<Aplus, AType, AType, AType>)function.Method;
                 return method(environment, right, left);
             }
         }

@@ -6,7 +6,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
 {
     class Print : AbstractMonadicFunction
     {
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             Console.WriteLine(argument);
             return argument;

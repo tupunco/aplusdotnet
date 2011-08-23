@@ -7,12 +7,12 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar.Miscellaneous
     /// </summary>
     class BitwiseNot : MonadicScalar
     {
-        public override AType ExecutePrimitive(AInteger argument, AplusEnvironment environment = null)
+        public override AType ExecutePrimitive(AInteger argument, Aplus environment = null)
         {
             return AInteger.Create(~argument.asInteger);
         }
 
-        public override AType ExecutePrimitive(AFloat argument, AplusEnvironment environment = null)
+        public override AType ExecutePrimitive(AFloat argument, Aplus environment = null)
         {
             int number;
             if (!argument.ConvertToRestrictedWholeNumber(out number))

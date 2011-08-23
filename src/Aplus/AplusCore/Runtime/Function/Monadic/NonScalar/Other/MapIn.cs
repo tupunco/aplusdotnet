@@ -7,7 +7,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
 {
     class MapIn : AbstractMonadicFunction
     {
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             return DyadicFunctionInstance.Map.Execute(argument, AInteger.Create(0), environment);
         }

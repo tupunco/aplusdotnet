@@ -47,7 +47,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
             return Function.Dyadic.DyadicFunctionInstance.Reshape.Execute(range, arguments);
         }
 
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             if (argument.Rank > 1)
             {

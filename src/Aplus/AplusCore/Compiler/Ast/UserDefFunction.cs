@@ -59,7 +59,6 @@ namespace AplusCore.Compiler.AST
                     scope.GetRuntime(),
                     scope.GetRuntimeExpression(),
                     scope.Parent.GetModuleExpression(),
-                    scope.GetAplusEnvironment(),
                     scope.ReturnTarget,
                     isEval: true
                 );
@@ -70,9 +69,9 @@ namespace AplusCore.Compiler.AST
             // 1. Create a new scope for the function
             string scopename = String.Format("__method_{0}_scope__", this.name.Name);
             AplusScope methodScope = new AplusScope(scope, scopename,
+                runtimeParam: DLR.Expression.Parameter(typeof(Aplus), "_EXTERNAL_RUNTIME_"),
                 moduleParam: DLR.Expression.Parameter(typeof(DYN.ExpandoObject), scopename),
                 returnTarget: DLR.Expression.Label(typeof(AType), "RETURN"),
-                enviromentParam: DLR.Expression.Parameter(typeof(AplusEnvironment), "_EXTERNAL_EVN_"),
                 isMethod: true
             );
 
@@ -95,7 +94,7 @@ namespace AplusCore.Compiler.AST
             }
 
             // Add parameter for AplusEnviroment
-            methodParameters.AddFirst(methodScope.AplusEnvironment);
+            methodParameters.AddFirst(methodScope.RuntimeExpression);
 
             // Create a return label for exiting from the function
             //methodScope.ReturnTarget = ;
@@ -108,7 +107,7 @@ namespace AplusCore.Compiler.AST
                     DLR.Expression.Assign(methodScope.ModuleExpression, DLR.Expression.Constant(new DYN.ExpandoObject())),
                 // set AplusEnviroment's function scope reference
                     DLR.Expression.Assign(
-                        DLR.Expression.Property(methodScope.AplusEnvironment, "FunctionScope"),
+                        DLR.Expression.Property(methodScope.RuntimeExpression, "FunctionScope"),
                         methodScope.ModuleExpression
                     ),
                 // Calculate the result of the defined function
@@ -118,7 +117,7 @@ namespace AplusCore.Compiler.AST
                     ),
                 // reset  AplusEnviroment's function scope reference
                     DLR.Expression.Assign(
-                        DLR.Expression.Property(methodScope.AplusEnvironment, "FunctionScope"),
+                        DLR.Expression.Property(methodScope.RuntimeExpression, "FunctionScope"),
                         DLR.Expression.Constant(null, typeof(DYN.ExpandoObject))
                     ),
                 // Return the result

@@ -10,7 +10,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
     {
         #region Entry point
 
-        public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
+        public override AType Execute(AType right, AType left, Aplus environment = null)
         {
             return left.IsNumber ?
                 ReadMemoryMappedFile(right, left, environment) :
@@ -21,7 +21,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
 
         #region Computation
 
-        private AType ReadMemoryMappedFile(AType right, AType left, AplusEnvironment environment)
+        private AType ReadMemoryMappedFile(AType right, AType left, Aplus environment)
         {
             string resultPath = Util.GetPath(right, environment);
 
@@ -38,10 +38,10 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
                 throw new Error.Domain(DomainErrorText);
             }
 
-            return environment.Runtime.MemoryMappedFileManager.Read(resultPath, (MemoryMappedFileMode)mode);
+            return environment.MemoryMappedFileManager.Read(resultPath, (MemoryMappedFileMode)mode);
         }
 
-        private AType CreateMemoryMappedFile(AType right, AType left, AplusEnvironment environment)
+        private AType CreateMemoryMappedFile(AType right, AType left, Aplus environment)
         {
             string path = Util.GetFullPathOrValue(left, environment);
 
@@ -60,7 +60,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
                 throw new Error.Type(TypeErrorText);
             }
 
-            environment.Runtime.MemoryMappedFileManager.CreateMemmoryMappedFile(path, right);
+            environment.MemoryMappedFileManager.CreateMemmoryMappedFile(path, right);
 
             return Utils.ANull();
         }

@@ -25,7 +25,7 @@ namespace AplusCoreUnitTests.Dlr.Function.System
         [TestCleanup]
         public void CleanUpMemoryMappedFile()
         {
-            TestUtils.DeleteMemoryMappedFiles();
+            TestUtils.DeleteMemoryMappedFiles(ref this.engine);
         }
 
         #endregion

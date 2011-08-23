@@ -15,7 +15,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
         /// </summary>
         /// <param name="argument"></param>
         /// <returns></returns>
-        public override AType Execute(AType argument, AplusEnvironment environment)
+        public override AType Execute(AType argument, Aplus environment)
         {
             if (argument.IsArray)
             {

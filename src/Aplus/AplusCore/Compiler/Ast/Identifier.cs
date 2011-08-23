@@ -149,7 +149,9 @@ namespace AplusCore.Compiler.AST
 
         private DLR.Expression BuildGlobalAccessor(
             AplusScope scope, Aplus runtime, DLR.Expression variableContainer, string[] contextParts)
+
         {
+            DLR.ParameterExpression environment = scope.GetRuntimeExpression();
             DLR.Expression name = DLR.Expression.Constant(BuildQualifiedName(runtime.CurrentContext));
             DLR.Expression dependencyManager = DLR.Expression.Property(scope.GetRuntimeExpression(), "DependencyManager");
             // Build the ET for getting the dependecy for the variable
@@ -169,7 +171,7 @@ namespace AplusCore.Compiler.AST
                         new DLR.Expression[]
                         {
                             dependencyInformation.Property("Function"),
-                            scope.GetAplusEnvironment(),
+                            environment,
                             dependencyInformation.Property("InvalidIndex")
                         }
                     ),
@@ -178,7 +180,7 @@ namespace AplusCore.Compiler.AST
                         new DLR.Expression[] 
                         {
                             DLR.Expression.Property(dependencyInformation, "Function"),
-                            scope.GetAplusEnvironment()
+                            environment
                         }
                     )
                 );

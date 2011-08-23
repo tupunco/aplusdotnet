@@ -17,7 +17,7 @@ namespace AplusCore.Runtime.Function.ADAP
     {
         #region Variables
 
-        private static Func<AType, AplusEnvironment, AType, AType, AType, AType> CallbackFunction;
+        private static Func<AType, Aplus, AType, AType, AType, AType> CallbackFunction;
         protected static ASCIIEncoding ASCIIEncoder = new ASCIIEncoding();
         
         protected Socket connectionSocket;
@@ -56,7 +56,7 @@ namespace AplusCore.Runtime.Function.ADAP
         {
             DLR.ParameterExpression functionParameter = DLR.Expression.Parameter(typeof(AType), "_FUNCTION_");
 
-            DLR.ParameterExpression environmentParameter = DLR.Expression.Parameter(typeof(AplusEnvironment), "_ENVIRONMENT_");
+            DLR.ParameterExpression environmentParameter = DLR.Expression.Parameter(typeof(Aplus), "_ENVIRONMENT_");
             DLR.ParameterExpression handleParameter = DLR.Expression.Parameter(typeof(AType), "_HANDLE_NUMBER_");
             DLR.ParameterExpression eventTypeParameter = DLR.Expression.Parameter(typeof(AType), "_EVENT_TYPE_");
             DLR.ParameterExpression callDataParameter = DLR.Expression.Parameter(typeof(AType), "_CALL_DATA_");
@@ -65,8 +65,8 @@ namespace AplusCore.Runtime.Function.ADAP
              * Build the following lambda method:
              *  (function, env, handleNumber, eventType, callData) => function(env, callData, eventType, handleNumber);
              */
-            DLR.Expression<Func<AType, AplusEnvironment, AType, AType, AType, AType>> method =
-                DLR.Expression.Lambda<Func<AType, AplusEnvironment, AType, AType, AType, AType>>(
+            DLR.Expression<Func<AType, Aplus, AType, AType, AType, AType>> method =
+                DLR.Expression.Lambda<Func<AType, Aplus, AType, AType, AType, AType>>(
                     DLR.Expression.Convert(
                         DLR.Expression.Dynamic(
                             new Binder.InvokeBinder(new DYN.CallInfo(4)),
@@ -124,7 +124,7 @@ namespace AplusCore.Runtime.Function.ADAP
             CallbackFunction(
                 this.ConnectionAttributes.Function,
                 // FIX ##?: Get the correct AplusEnvironment
-                new AplusEnvironment(new Aplus(null, LexerMode.ASCII), new DYN.ExpandoObject()),
+                new Aplus(null, LexerMode.ASCII),
                 handle,
                 eventType,
                 callData);

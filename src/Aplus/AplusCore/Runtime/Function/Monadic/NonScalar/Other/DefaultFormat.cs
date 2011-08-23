@@ -22,7 +22,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
 
         #region Entry point
 
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             if (argument.IsFunctionScalar)
             {
@@ -49,7 +49,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
             }
 
             //Use Printing precision systam variable to write float number.
-            int tmp = environment != null ? environment.Runtime.SystemVariables["pp"].asInteger : -1;
+            int tmp = environment != null ? environment.SystemVariables["pp"].asInteger : -1;
 
             int printingPrecision;
 

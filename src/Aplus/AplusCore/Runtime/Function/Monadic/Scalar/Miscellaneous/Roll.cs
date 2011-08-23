@@ -8,13 +8,13 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar.Miscellaneous
     class Roll : MonadicScalar
     {
 
-        public override AType ExecutePrimitive(AInteger argument, AplusEnvironment environment)
+        public override AType ExecutePrimitive(AInteger argument, Aplus environment)
         {
             int seed = GetSeed(environment);
             return generateRandomNumber(seed, argument.asInteger);
         }
 
-        public override AType ExecutePrimitive(AFloat argument, AplusEnvironment environment)
+        public override AType ExecutePrimitive(AFloat argument, Aplus environment)
         {
             int seed = GetSeed(environment);
             int result;
@@ -38,7 +38,7 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar.Miscellaneous
             return AInteger.Create(random.Next(number));
         }
 
-        private int GetSeed(AplusEnvironment environment)
+        private int GetSeed(Aplus environment)
         {
             if (environment == null)
             {
@@ -46,8 +46,8 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar.Miscellaneous
             }
 
             // Return and increment the Random Link System Variable
-            int seed = environment.Runtime.SystemVariables["rl"].asInteger + 1;
-            environment.Runtime.SystemVariables["rl"] = AInteger.Create(seed);
+            int seed = environment.SystemVariables["rl"].asInteger + 1;
+            environment.SystemVariables["rl"] = AInteger.Create(seed);
             return seed;
         }
     }

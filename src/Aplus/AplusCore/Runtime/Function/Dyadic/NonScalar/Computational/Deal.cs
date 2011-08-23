@@ -17,7 +17,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
 
         #region Entry point
 
-        public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
+        public override AType Execute(AType right, AType left, Aplus environment = null)
         {
             PrepareVariables(left, right);
 
@@ -70,7 +70,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
         }
 
 
-        private int GetSeed(AplusEnvironment environment)
+        private int GetSeed(Aplus environment)
         {
             if (environment == null)
             {
@@ -78,8 +78,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
             }
 
             // Return and increment the Random Link System Variable
-            int seed = environment.Runtime.SystemVariables["rl"].asInteger + 1;
-            environment.Runtime.SystemVariables["rl"] = AInteger.Create(seed);
+            int seed = environment.SystemVariables["rl"].asInteger + 1;
+            environment.SystemVariables["rl"] = AInteger.Create(seed);
             return seed;
         }
 

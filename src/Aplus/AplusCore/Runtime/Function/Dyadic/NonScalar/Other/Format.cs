@@ -16,7 +16,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
 
         #region Entry point
 
-        public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
+        public override AType Execute(AType right, AType left, Aplus environment = null)
         {
             Checks(left, right);
 

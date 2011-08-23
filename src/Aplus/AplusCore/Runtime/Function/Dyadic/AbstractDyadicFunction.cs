@@ -11,7 +11,7 @@ namespace AplusCore.Runtime.Function.Dyadic
         /// <param name="right"></param>
         /// <param name="left"></param>
         /// <returns></returns>
-        abstract public AType Execute(AType right, AType left, AplusEnvironment environment = null);
+        abstract public AType Execute(AType right, AType left, Aplus environment = null);
 
         #region Properties
 

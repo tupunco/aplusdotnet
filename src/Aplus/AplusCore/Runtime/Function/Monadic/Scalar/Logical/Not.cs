@@ -5,12 +5,12 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar.Logical
     [DefaultResult(ATypes.AInteger)]
     class Not : MonadicScalar
     {
-        public override AType ExecutePrimitive(AInteger argument, AplusEnvironment environment = null)
+        public override AType ExecutePrimitive(AInteger argument, Aplus environment = null)
         {
             return calculateNot(argument.asInteger);
         }
 
-        public override AType ExecutePrimitive(AFloat argument, AplusEnvironment environment = null)
+        public override AType ExecutePrimitive(AFloat argument, Aplus environment = null)
         {
             int result;
             if(argument.ConvertToRestrictedWholeNumber(out result))

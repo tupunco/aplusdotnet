@@ -7,16 +7,16 @@ namespace AplusCore.Runtime.Function
         /// <summary>
         /// System function to get the dependency definition for the given symbol.
         /// </summary>
-        /// <param name="environment"><see cref="AplusEnvironment"/></param>
+        /// <param name="environment"><see cref="Aplus"/></param>
         /// <param name="symbol"><see cref="AType"/> symbol containing the name of the dependency.</param>
         /// <returns>Dependency defintion as a character array or <see cref="ANull"/>.</returns>
         [SystemFunction("_def", "_def{x}: returns the dependency defintion of x, if there is any.")]
-        internal static AType DependencyDefinition(AplusEnvironment environment, AType symbol)
+        internal static AType DependencyDefinition(Aplus environment, AType symbol)
         {
             AType result;
             string variableName;
             DependencyItem dependency;
-            DependencyManager manager = environment.Runtime.DependencyManager;
+            DependencyManager manager = environment.DependencyManager;
 
             if (!TryQualifiedName(environment, symbol, out variableName))
             {
@@ -42,9 +42,9 @@ namespace AplusCore.Runtime.Function
         /// <param name="symbol">Global name of the defined dependency.</param>
         /// <returns>0 if a definition was removed, and 0 otherwise.</returns>
         [SystemFunction("_undef", "_undef{x}: removes the dependency definition for x global name.")]
-        internal static AType DependencyUndef(AplusEnvironment environment, AType symbol)
+        internal static AType DependencyUndef(Aplus environment, AType symbol)
         {
-            DependencyManager manager = environment.Runtime.DependencyManager;
+            DependencyManager manager = environment.DependencyManager;
             string variableName;
 
             if (!TryQualifiedName(environment, symbol, out variableName))

@@ -12,7 +12,7 @@ namespace AplusCoreUnitTests.Dlr.Assignments
     public class UserDefined : AbstractTest
     {
 
-        private static AType TestMethod(AplusEnvironment env, AType arg2, AType arg1, AType arg0)
+        private static AType TestMethod(Aplus env, AType arg2, AType arg1, AType arg0)
         {
             return AInteger.Create(0);
         }
@@ -28,7 +28,7 @@ namespace AplusCoreUnitTests.Dlr.Assignments
                 AInteger.Create(3)
             );
 
-            AType function = AFunc.Create("T", (Func<AplusEnvironment, AType, AType, AType, AType>)TestMethod, 4, "Test method");
+            AType function = AFunc.Create("T", (Func<Aplus, AType, AType, AType, AType>)TestMethod, 4, "Test method");
 
             var scope = this.engine.CreateScope();
             scope.SetVariable(".T", function);
@@ -65,7 +65,7 @@ namespace AplusCoreUnitTests.Dlr.Assignments
                     ABox.Create(AInteger.Create(0))
                 );
 
-            AType function = AFunc.Create("T", (Func<AplusEnvironment, AType, AType, AType, AType>)TestMethod, 4, "Test method");
+            AType function = AFunc.Create("T", (Func<Aplus, AType, AType, AType, AType>)TestMethod, 4, "Test method");
 
             var scope = this.engine.CreateScope();
             scope.SetVariable(".T", function);

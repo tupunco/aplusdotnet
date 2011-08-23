@@ -8,7 +8,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
     {
         #region Entry Point
 
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             this.ErrorCheck(argument);
             return Compute(argument);

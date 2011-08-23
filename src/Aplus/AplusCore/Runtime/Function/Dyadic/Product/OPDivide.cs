@@ -6,7 +6,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Product
     {
         protected override ATypes NullType { get { return ATypes.AFloat; } }
 
-        protected override AType Calculate(AType left, AType right, AplusEnvironment env)
+        protected override AType Calculate(AType left, AType right, Aplus env)
         {
             return DyadicFunctionInstance.Divide.Execute(right, left, env);
         }

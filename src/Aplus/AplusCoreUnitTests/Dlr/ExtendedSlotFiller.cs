@@ -13,7 +13,7 @@ namespace AplusCoreUnitTests.Dlr
     {
         AType issf = AFunc.Create(
             "issf",
-            (Func<AplusEnvironment, AType, AType>)((scope, x) =>
+            (Func<Aplus, AType, AType>)((scope, x) =>
             {
                 if (x.IsArray)
                 {

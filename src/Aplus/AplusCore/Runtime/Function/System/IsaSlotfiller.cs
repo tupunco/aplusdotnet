@@ -11,7 +11,7 @@ namespace AplusCore.Runtime.Function
         /// <param name="input"></param>
         /// <returns></returns>
         [SystemFunction("_issf", "_issf{x}:If x is a slotfiller, the result is 1. Otherwise the result is 0.")]
-        internal static AType IsaSlotfiller(AplusEnvironment environment, AType input)
+        internal static AType IsaSlotfiller(Aplus environment, AType input)
         {
             AType result;
 

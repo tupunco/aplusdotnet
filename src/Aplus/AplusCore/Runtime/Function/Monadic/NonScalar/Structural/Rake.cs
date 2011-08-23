@@ -15,7 +15,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
 
         #region Entry point
 
-        public override AType Execute(AType argument, AplusEnvironment environment)
+        public override AType Execute(AType argument, Aplus environment)
         {
             return argument.SimpleArray() ? SimpleCase(argument) : NestedCase(argument);
         }

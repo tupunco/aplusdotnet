@@ -8,7 +8,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Product
     /// </summary>
     class IPAddMultiply : InnerProduct
     {
-        protected override AType Calculate(AType left, AType right, AplusEnvironment env)
+        protected override AType Calculate(AType left, AType right, Aplus env)
         {
             AType inner = DyadicFunctionInstance.Multiply.Execute(right, left, env);
             AType result = MonadicFunctionInstance.ReduceAdd.Execute(inner, env);

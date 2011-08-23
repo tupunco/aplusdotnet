@@ -54,13 +54,13 @@ namespace AplusCore.Runtime.Function
         /// <summary>
         /// Tries to convert the given <see cref="AType"/> to a qualified name.
         /// </summary>
-        /// <param name="environment"><see cref="AplusEnvironment"/></param>
+        /// <param name="environment"><see cref="Aplus"/></param>
         /// <param name="symbol"><see cref="AType"/> to convert to qualified name</param>
         /// <param name="qualifiedName">Qualified name from the given <see cref="AType"/>.</param>
         /// <returns>True if ther is a valid qualified name otherwise false.</returns>
-        internal static bool TryQualifiedName(AplusEnvironment environment, AType symbol, out string qualifiedName)
+        internal static bool TryQualifiedName(Aplus environment, AType symbol, out string qualifiedName)
         {
-            string currentContext = environment.Runtime.CurrentContext;
+            string currentContext = environment.CurrentContext;
             bool result = false;
 
             if (symbol.Type != ATypes.ASymbol)

@@ -11,7 +11,7 @@ namespace AplusCore.Runtime.Function
         [SystemFunction(
             "_index",
             "_index{index;array;default}: returns with the default if the index is invalid.")]
-        internal static AType PermissiveIndexing(AplusEnvironment environment, AType defaultItem, AType array, AType index)
+        internal static AType PermissiveIndexing(Aplus environment, AType defaultItem, AType array, AType index)
         {
             PermissiveIndexingErrorCheck(index, array, defaultItem);
 
@@ -24,7 +24,7 @@ namespace AplusCore.Runtime.Function
         }
 
         private static AType PermissiveIndexingSubIndex(
-            AType index, AType array, AType defaultItem, AplusEnvironment environment)
+            AType index, AType array, AType defaultItem, Aplus environment)
         {
             AType result = AArray.Create(array.Type);
 
