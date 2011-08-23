@@ -20,7 +20,6 @@ namespace AplusCore.Compiler
 
         private DLR.LabelTarget returnTarget;
 
-        private DLR.ParameterExpression environment;
         private bool iseval;
 
         private bool ismethod;
@@ -36,7 +35,6 @@ namespace AplusCore.Compiler
             Aplus runtime = null,
             DLR.ParameterExpression runtimeParam = null,
             DLR.ParameterExpression moduleParam = null,
-            DLR.ParameterExpression enviromentParam = null,
             DLR.LabelTarget returnTarget = null,
             bool isEval = false,
             bool isMethod = false,
@@ -52,7 +50,6 @@ namespace AplusCore.Compiler
 
             this.variables = new Dictionary<string, DLR.ParameterExpression>();
 
-            this.environment = enviromentParam;
             this.iseval = isEval;
 
             this.ismethod = isMethod;
@@ -77,8 +74,6 @@ namespace AplusCore.Compiler
             get { return this.isAssignment; }
             set { this.isAssignment = value; }
         }
-        
-        internal DLR.ParameterExpression AplusEnvironment { get { return this.environment; } }
 
         /// <summary>
         /// Target of return inside of a user defined function
@@ -134,17 +129,6 @@ namespace AplusCore.Compiler
             }
 
             return currentScope.RuntimeExpression;
-        }
-
-        public DLR.ParameterExpression GetAplusEnvironment()
-        {
-            AplusScope currentScope = this;
-            while (currentScope.AplusEnvironment == null)
-            {
-                currentScope = currentScope.parent;
-            }
-
-            return currentScope.AplusEnvironment;
         }
 
         public DLR.ParameterExpression GetModuleExpression()

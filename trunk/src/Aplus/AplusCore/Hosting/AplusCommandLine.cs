@@ -155,7 +155,7 @@ namespace AplusCore.Hosting
 
         #region CommandLine Method overrides
 
-        static AType Time(AplusEnvironment scope)
+        static AType Time(Aplus scope)
         {
             Process process = Process.GetCurrentProcess();
 
@@ -178,7 +178,7 @@ namespace AplusCore.Hosting
                 "time",
                 AFunc.Create(
                     "time",
-                    (Func<AplusEnvironment, AType>)Time,
+                    (Func<Aplus, AType>)Time,
                     1,
                     "returns the user time of the current process"
                 )
@@ -197,7 +197,7 @@ namespace AplusCore.Hosting
                     "time",
                     AFunc.Create(
                         "time",
-                        (Func<AplusEnvironment, AType>)Time,
+                        (Func<Aplus, AType>)Time,
                         1,
                         "returns the user time of the current process"
                     )

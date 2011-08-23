@@ -9,7 +9,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Informational
         /// </summary>
         /// <param name="argument"></param>
         /// <returns></returns>
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             return ASymbol.Create(argument.Type.ToTypeString());
         }

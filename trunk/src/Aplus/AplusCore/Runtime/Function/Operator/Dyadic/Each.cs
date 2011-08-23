@@ -27,7 +27,7 @@ namespace AplusCore.Runtime.Function.Operator.Dyadic
          */
     class Each
     {
-        public AType Execute(AType function, AType right, AType left, AplusEnvironment environment = null)
+        public AType Execute(AType function, AType right, AType left, Aplus environment = null)
         {
             //If function is not function, we throw an exception.
             if (!(function.Data is AFunc))
@@ -75,7 +75,7 @@ namespace AplusCore.Runtime.Function.Operator.Dyadic
         /// <param name="isNull"></param>
         /// <param name="function"></param>
         /// <returns></returns>
-        private AType Walker(AType left, AType right, AplusEnvironment environment, bool isNull, AFunc function)
+        private AType Walker(AType left, AType right, Aplus environment, bool isNull, AFunc function)
         {
             if (left.IsArray)
             {
@@ -119,7 +119,7 @@ namespace AplusCore.Runtime.Function.Operator.Dyadic
                     AType disclosedRight = MonadicFunctionInstance.Disclose.Execute(right, environment);
                     AType disclosedLeft = MonadicFunctionInstance.Disclose.Execute(left, environment);
 
-                    var method = (Func<AplusEnvironment, AType, AType, AType>)function.Method;
+                    var method = (Func<Aplus, AType, AType, AType>)function.Method;
 
                     //Execute the holden function and enclose the result.
                     AType result = method(environment, disclosedRight, disclosedLeft);

@@ -11,7 +11,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
     {
         #region DLR entry point
 
-        public override AType Execute(AType argument, AplusEnvironment environment)
+        public override AType Execute(AType argument, Aplus environment)
         {
             // Environment is required!
             Assert.NotNull(environment);
@@ -27,7 +27,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
             }
 
             // Get the context parts, (context, variablename) string pairs
-            string[] contextParts = VariableHelper.CreateContextParts(environment.Runtime.CurrentContext, argument.asString);
+            string[] contextParts = VariableHelper.CreateContextParts(environment.CurrentContext, argument.asString);
 
             // Build the method
             Func<AType> method = VariableHelper.BuildVariableAccessMethod(environment, contextParts).Compile();
@@ -39,7 +39,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
 
         #region Assignment Helper
 
-        public static AType Assign(AType target, AType value, AplusEnvironment environment)
+        public static AType Assign(AType target, AType value, Aplus environment)
         {
             // Environment is required!
             Assert.NotNull(environment);
@@ -50,7 +50,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
             }
 
             // Get the context parts, (context, variablename) string pairs
-            string[] contextParts = VariableHelper.CreateContextParts(environment.Runtime.CurrentContext, target.asString);
+            string[] contextParts = VariableHelper.CreateContextParts(environment.CurrentContext, target.asString);
 
             // Build the method
             Func<AType> method = VariableHelper.BuildVariableAssignMethod(environment, contextParts, value).Compile();

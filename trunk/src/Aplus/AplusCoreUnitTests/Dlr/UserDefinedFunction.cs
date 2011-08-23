@@ -21,9 +21,10 @@ namespace AplusCoreUnitTests.Dlr
 
             Assert.IsTrue(result is AReference, "Function definition returned invalid type");
 
-            Func<AplusEnvironment, AType, AType> function = (Func<AplusEnvironment, AType, AType>)((AFunc)result.Data).Method;
+            Func<Aplus, AType, AType> function = (Func<Aplus, AType, AType>)((AFunc)result.Data).Method;
             Aplus aplusRuntime = this.engine.GetService<Aplus>();
-            AType value = function(new AplusEnvironment(aplusRuntime, this.engine.CreateScope()), AInteger.Create(1));
+            aplusRuntime.Context = this.engine.CreateScope();
+            AType value = function(aplusRuntime, AInteger.Create(1));
 
             Assert.AreEqual<AType>(AInteger.Create(2), value, "Function call made incorrect calculation");
         }

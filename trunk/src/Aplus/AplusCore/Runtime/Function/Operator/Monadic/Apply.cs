@@ -6,7 +6,7 @@ namespace AplusCore.Runtime.Function.Operator.Monadic
 {
     class Apply
     {
-        public AType Execute(AType functionScalar, AType argument, AplusEnvironment environment = null)
+        public AType Execute(AType functionScalar, AType argument, Aplus environment = null)
         {
             //'Disclose' the function from functionscalar.
             AFunc function = (AFunc)functionScalar.NestedItem.Data;
@@ -14,8 +14,8 @@ namespace AplusCore.Runtime.Function.Operator.Monadic
             //Convert method to the correspond function format.
             if (function.IsBuiltin)
             {
-                Func<AplusEnvironment, AType, AType, AType> primitiveFunction =
-                    (Func<AplusEnvironment, AType, AType, AType>)function.Method;
+                Func<Aplus, AType, AType, AType> primitiveFunction =
+                    (Func<Aplus, AType, AType, AType>)function.Method;
 
                 return primitiveFunction(environment, argument, null);
             }
@@ -28,8 +28,8 @@ namespace AplusCore.Runtime.Function.Operator.Monadic
                 }
 
                 //Convert method to the correspond function format.
-                Func<AplusEnvironment, AType, AType> userDefinedFunction =
-                    (Func<AplusEnvironment, AType, AType>)function.Method;
+                Func<Aplus, AType, AType> userDefinedFunction =
+                    (Func<Aplus, AType, AType>)function.Method;
 
                 return userDefinedFunction(environment, argument);
             }

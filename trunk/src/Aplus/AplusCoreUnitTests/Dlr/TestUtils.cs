@@ -105,8 +105,9 @@ namespace AplusCoreUnitTests.Dlr
             engine.Execute<AType>("`Char25.m beam 2 5 rho 'HelloWorld'");
         }
 
-        public static void DeleteMemoryMappedFiles()
+        public static void DeleteMemoryMappedFiles(ref ScriptEngine engine)
         {
+            engine = null;
             GC.Collect();
             GC.WaitForPendingFinalizers();
 

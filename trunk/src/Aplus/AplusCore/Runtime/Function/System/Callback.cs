@@ -17,7 +17,7 @@ namespace AplusCore.Runtime.Function
         /// <param name="symbol"></param>
         /// <returns>Always returns ANull.</returns>
         [SystemFunction("_scb", "_scb{y;x}: set a callback for the given 'y' global variable.")]
-        internal static AType SetCallback(AplusEnvironment environment, AType callbackInfo, AType symbol)
+        internal static AType SetCallback(Aplus environment, AType callbackInfo, AType symbol)
         {
             string qualifiedName;
 
@@ -43,7 +43,7 @@ namespace AplusCore.Runtime.Function
 
             AType staticData = MonadicFunctionInstance.Disclose.Execute(callbackInfo[1], environment);
 
-            environment.Runtime.CallbackManager.Register(qualifiedName, callbackFunction.NestedItem, staticData);
+            environment.CallbackManager.Register(qualifiedName, callbackFunction.NestedItem, staticData);
 
             return Utils.ANull();
         }
@@ -56,7 +56,7 @@ namespace AplusCore.Runtime.Function
         /// <param name="symbol"></param>
         /// <returns></returns>
         [SystemFunction("_gcb", "_gcb{y}: returns the callback info for the 'x' global variable.")]
-        internal static AType GetCallback(AplusEnvironment environment, AType symbol)
+        internal static AType GetCallback(Aplus environment, AType symbol)
         {
             string qualifiedName;
 
@@ -68,7 +68,7 @@ namespace AplusCore.Runtime.Function
             AType result;
             CallbackItem callbackItem;
 
-            if(environment.Runtime.CallbackManager.TryGetCallback(qualifiedName, out callbackItem))
+            if(environment.CallbackManager.TryGetCallback(qualifiedName, out callbackItem))
             {
                 string functionName = ((AFunc)callbackItem.CallbackFunction.Data).Name;
                 result = Helpers.BuildStrand(

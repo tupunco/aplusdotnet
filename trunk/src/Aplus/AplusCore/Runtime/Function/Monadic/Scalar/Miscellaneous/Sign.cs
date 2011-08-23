@@ -8,12 +8,12 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar.Miscellaneous
     class Sign : MonadicScalar
     {
 
-        public override AType ExecutePrimitive(AInteger argument, AplusEnvironment environment = null)
+        public override AType ExecutePrimitive(AInteger argument, Aplus environment = null)
         {
             return calculateSignum(argument.asFloat);
         }
 
-        public override AType ExecutePrimitive(AFloat argument, AplusEnvironment environment = null)
+        public override AType ExecutePrimitive(AFloat argument, Aplus environment = null)
         {
             return calculateSignum(argument.asFloat);
         }

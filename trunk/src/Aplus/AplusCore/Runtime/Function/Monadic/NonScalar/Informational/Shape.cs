@@ -11,7 +11,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Informational
         /// The shape of a scalar is Null (scalar does not have axes).
         /// For a nonscalar the i-th element of the result is the i-th dimension of the argument.
         /// </remarks>
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             return argument.Shape.ToAArray();
         }

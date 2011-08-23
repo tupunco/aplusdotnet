@@ -47,7 +47,7 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
 
         #region Entry Point from DLR
 
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             this.currentType = argument.Type;
 
@@ -78,7 +78,7 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
 
         #region Recursion
 
-        private AType ExecuteRecursion(AType argument, AplusEnvironment environment)
+        private AType ExecuteRecursion(AType argument, Aplus environment)
         {
             AType result;
             if (argument.IsArray)
@@ -137,32 +137,32 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
 
         #region Type specific executes
 
-        public virtual AType ExecuteDefault(AType argument, AplusEnvironment environment = null)
+        public virtual AType ExecuteDefault(AType argument, Aplus environment = null)
         {
             throw new NotImplementedException("Invalid use-case");
         }
 
-        public virtual AType ExecutePrimitive(AInteger argument, AplusEnvironment environment = null)
+        public virtual AType ExecutePrimitive(AInteger argument, Aplus environment = null)
         {
             throw new NotImplementedException("Invalid use-case");
         }
 
-        public virtual AType ExecutePrimitive(AFloat argument, AplusEnvironment environment = null)
+        public virtual AType ExecutePrimitive(AFloat argument, Aplus environment = null)
         {
             throw new NotImplementedException("Invalid use-case");
         }
 
-        public virtual AType ExecutePrimitive(AChar argument, AplusEnvironment environment = null)
+        public virtual AType ExecutePrimitive(AChar argument, Aplus environment = null)
         {
             throw new NotImplementedException("Invalid use-case");
         }
 
-        public virtual AType ExecutePrimitive(ASymbol argument, AplusEnvironment environment = null)
+        public virtual AType ExecutePrimitive(ASymbol argument, Aplus environment = null)
         {
             throw new NotImplementedException("Invalid use-case");
         }
 
-        public virtual AType ExecutePrimitive(ABox argument, AplusEnvironment environment = null)
+        public virtual AType ExecutePrimitive(ABox argument, Aplus environment = null)
         {
             throw new NotImplementedException("Invalid use-case");
         }

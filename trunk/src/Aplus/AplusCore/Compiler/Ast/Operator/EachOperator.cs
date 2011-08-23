@@ -54,7 +54,7 @@ namespace AplusCore.Compiler.AST
                 func = this.function.Generate(scope);
             }
 
-            DLR.ParameterExpression environment = scope.GetAplusEnvironment();
+            DLR.ParameterExpression environment = scope.GetRuntimeExpression();
 
             DLR.ParameterExpression functionParam = DLR.Expression.Variable(typeof(AType), "$$functionParam");
             DLR.ParameterExpression rightParam = DLR.Expression.Variable(typeof(AType), "$$rightParam");
@@ -73,7 +73,7 @@ namespace AplusCore.Compiler.AST
                 }
 
                 // 0. Add A+ environment as first argument for user defined functions
-                callArguments.AddFirst(scope.GetAplusEnvironment());
+                callArguments.AddFirst(environment);
 
                 // 1. Construct the method body
                 callArguments.AddFirst(functionParam.Property("NestedItem"));

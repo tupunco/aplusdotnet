@@ -11,7 +11,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
     {
         #region DLR entrypoint
 
-        public override AType Execute(AType right, AType left, AplusEnvironment environment)
+        public override AType Execute(AType right, AType left, Aplus environment)
         {
             // Environment is required!
             Assert.NotNull(environment);
@@ -38,7 +38,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
 
         #region Assignment Helper
 
-        public static AType Assign(AType target, AType contextName, AType value, AplusEnvironment environment)
+        public static AType Assign(AType target, AType contextName, AType value, Aplus environment)
         {
             // Environment is required!
             Assert.NotNull(environment);

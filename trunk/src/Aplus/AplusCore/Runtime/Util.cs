@@ -136,7 +136,7 @@ namespace AplusCore.Runtime
         /// <param name="pathArgument">Must be a Char or Symbol type.</param>
         /// <param name="environment"></param>
         /// <returns>The absolute path for the file or if not found null.</returns>
-        internal static string GetPath(AType pathArgument, AplusEnvironment environment)
+        internal static string GetPath(AType pathArgument, Aplus environment)
         {
             string path = GetFullPathOrValue(pathArgument, environment);
             string resultPath = null;
@@ -179,7 +179,7 @@ namespace AplusCore.Runtime
         /// Name of the file extracted from the <see cref="pathArgument"/> if it is not a relative/absolute path.
         /// Null if the supplied <see cref="AType"/> has an incorrect type.
         /// </returns>
-        internal static string GetFullPathOrValue(AType pathArgument, AplusEnvironment environment)
+        internal static string GetFullPathOrValue(AType pathArgument, Aplus environment)
         {
             if (pathArgument.Type != ATypes.AChar && pathArgument.Type != ATypes.ASymbol)
             {

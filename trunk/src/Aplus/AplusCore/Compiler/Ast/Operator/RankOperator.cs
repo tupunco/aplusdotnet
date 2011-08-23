@@ -62,7 +62,7 @@ namespace AplusCore.Compiler.AST
                     this.condition.Generate(scope),
                     this.rightarg.Generate(scope),
                     this.leftarg.Generate(scope),
-                    scope.GetAplusEnvironment()
+                    scope.GetRuntimeExpression()
                 );
             }
             else
@@ -73,7 +73,7 @@ namespace AplusCore.Compiler.AST
                 func,
                 this.condition.Generate(scope),
                 this.rightarg.Generate(scope),
-                scope.GetAplusEnvironment()
+                scope.GetRuntimeExpression()
             );
             }
 

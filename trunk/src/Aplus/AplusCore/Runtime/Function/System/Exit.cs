@@ -12,7 +12,7 @@ namespace AplusCore.Runtime.Function
         /// <param nave="environment"></param>
         /// <param name="input">exitcode</param>
         [SystemFunction("_exit", "_exit{x}: exits with exitcode x")]
-        internal static AType Exit(AplusEnvironment environment, AType argument)
+        internal static AType Exit(Aplus environment, AType argument)
         {
             AType result;
             bool isFirstScalar = argument.TryFirstScalar(out result, true);

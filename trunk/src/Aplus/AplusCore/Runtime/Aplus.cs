@@ -5,6 +5,7 @@ using Microsoft.Scripting.Runtime;
 
 using AplusCore.Compiler;
 using AplusCore.Runtime.Callback;
+using AplusCore.Runtime.Context;
 using AplusCore.Types;
 
 using DYN = System.Dynamic;
@@ -17,6 +18,9 @@ namespace AplusCore.Runtime
 
         private DYN.ExpandoObject globals;
         private Scope dlrglobals;
+
+        private DYN.IDynamicMetaObjectProvider context;
+        private DYN.ExpandoObject functionscope;
 
         private SystemVariables sysvars;
         private MemoryMappedFileManager mmfmanager;
@@ -68,6 +72,19 @@ namespace AplusCore.Runtime
         {
             get { return this.systemFunctions; }
         }
+
+        public DYN.IDynamicMetaObjectProvider Context
+        {
+            get { return this.context; }
+            set { this.context = value; }
+        }
+
+        public DYN.ExpandoObject FunctionScope
+        {
+            get { return this.functionscope; }
+            set { this.functionscope = value; }
+        }
+
 
         #endregion
 
@@ -124,7 +141,7 @@ namespace AplusCore.Runtime
             foreach (string contextName in this.autoloadContexts)
             {
                 IDictionary<string, object> context = new DYN.ExpandoObject();
-                IDictionary<string, AType> contextElements = Context.ContextLoader.FindContextElements(contextName);
+                IDictionary<string, AType> contextElements = ContextLoader.FindContextElements(contextName);
 
                 foreach (KeyValuePair<string, AType> item in contextElements)
                 {

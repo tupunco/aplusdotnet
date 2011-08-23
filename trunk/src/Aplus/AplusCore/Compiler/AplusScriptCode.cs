@@ -19,7 +19,7 @@ namespace AplusCore.Compiler
         #region Variables
 
         private Aplus aplus;
-        private DLR.Expression<Func<Runtime.AplusEnvironment, AType>> lambda;
+        private DLR.Expression<Func<Aplus, AType>> lambda;
 
         #endregion
 
@@ -44,10 +44,11 @@ namespace AplusCore.Compiler
 
         public override object Run(Scope scope)
         {
+            this.aplus.Context = scope;
             this.aplus.AutoloadContext(scope);
 
-            Func<Runtime.AplusEnvironment, AType> compiled = this.lambda.Compile();
-            object result = compiled(new AplusEnvironment(this.aplus, scope));
+            Func<Aplus, AType> compiled = this.lambda.Compile();
+            object result = compiled(this.aplus);
 
             return result;
         }
@@ -56,12 +57,11 @@ namespace AplusCore.Compiler
 
         #region Code generator
 
-        public DLR.Expression<System.Func<Runtime.AplusEnvironment, AType>> ParseToLambda(string code)
+        public DLR.Expression<System.Func<Runtime.Aplus, AType>> ParseToLambda(string code)
         {
             AplusScope scope = new AplusScope(null, "__top__", this.aplus,
-                DLR.Expression.Parameter(typeof(Runtime.Aplus), "__aplusRuntime__"),
-                DLR.Expression.Parameter(typeof(DYN.IDynamicMetaObjectProvider), "__module__"),
-                DLR.Expression.Parameter(typeof(AplusEnvironment), "__ENVIRONMENT__")
+                DLR.Expression.Parameter(typeof(Aplus), "__aplusRuntime__"),
+                DLR.Expression.Parameter(typeof(DYN.IDynamicMetaObjectProvider), "__module__")
             );
 
             DLR.Expression codebody = null;
@@ -74,21 +74,18 @@ namespace AplusCore.Compiler
             else
             {
                 codebody = DLR.Expression.Block(
-                    new DLR.ParameterExpression[] { scope.RuntimeExpression, scope.ModuleExpression },
+                    new DLR.ParameterExpression[] { scope.ModuleExpression },
                     DLR.Expression.Assign(
-                        scope.RuntimeExpression, DLR.Expression.PropertyOrField(scope.AplusEnvironment, "Runtime")
-                    ),
-                    DLR.Expression.Assign(
-                        scope.ModuleExpression, DLR.Expression.PropertyOrField(scope.AplusEnvironment, "Context")
+                        scope.ModuleExpression, DLR.Expression.PropertyOrField(scope.RuntimeExpression, "Context")
                     ),
                     tree.Generate(scope)
                 );
             }
 
-            DLR.Expression<System.Func<Runtime.AplusEnvironment, AType>> method =
-                DLR.Expression.Lambda<Func<Runtime.AplusEnvironment, AType>>(
+            DLR.Expression<System.Func<Aplus, AType>> method =
+                DLR.Expression.Lambda<Func<Aplus, AType>>(
                     codebody,
-                    scope.AplusEnvironment
+                    scope.RuntimeExpression
                 );
             return method;
         }

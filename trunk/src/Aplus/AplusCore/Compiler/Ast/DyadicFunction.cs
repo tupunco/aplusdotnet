@@ -76,7 +76,7 @@ namespace AplusCore.Compiler.AST
                 result = DLR.Expression.Call(
                     DLR.Expression.Constant(DyadicFunctionInstance.Choose),
                     DyadicFunctionInstance.Choose.GetType().GetMethod("Assign"),
-                    right, left, scope.GetAplusEnvironment()
+                    right, left, scope.GetRuntimeExpression()
                 );
             }
             else
@@ -93,7 +93,7 @@ namespace AplusCore.Compiler.AST
         {
             DLR.Expression result;
 
-            DLR.ParameterExpression environment = scope.GetAplusEnvironment();
+            DLR.ParameterExpression environment = scope.GetRuntimeExpression();
 
             if (this.token.Type == Tokens.OR)
             {

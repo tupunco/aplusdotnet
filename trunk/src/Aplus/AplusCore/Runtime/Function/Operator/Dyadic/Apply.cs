@@ -6,7 +6,7 @@ namespace AplusCore.Runtime.Function.Operator.Dyadic
 {
     class Apply
     {
-        public AType Execute(AType functionScalar, AType right, AType left, AplusEnvironment environment = null)
+        public AType Execute(AType functionScalar, AType right, AType left, Aplus environment = null)
         {
             //'Disclose' the function from functionscalar.
             AFunc func = (AFunc)functionScalar.NestedItem.Data;
@@ -21,7 +21,7 @@ namespace AplusCore.Runtime.Function.Operator.Dyadic
             }
 
             //Convert method to the correspond function format.
-            var function = (Func<AplusEnvironment, AType, AType, AType>)func.Method;
+            var function = (Func<Aplus, AType, AType, AType>)func.Method;
 
             return function(environment, right, left);
         }

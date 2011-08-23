@@ -27,7 +27,7 @@ namespace AplusCore.Runtime.Function.Operator.Monadic
     class Each
     {
 
-        public AType Execute(AType function, AType argument, AplusEnvironment environment = null)
+        public AType Execute(AType function, AType argument, Aplus environment = null)
         {
             //If function is not function, we throw an exception.
             if (!(function.Data is AFunc))
@@ -57,7 +57,7 @@ namespace AplusCore.Runtime.Function.Operator.Monadic
         /// <param name="isNull"></param>
         /// <param name="function"></param>
         /// <returns></returns>
-        private AType Walker(AType argument, AplusEnvironment environment, bool isNull, AFunc function)
+        private AType Walker(AType argument, Aplus environment, bool isNull, AFunc function)
         {
             if (argument.IsArray)
             {
@@ -83,12 +83,12 @@ namespace AplusCore.Runtime.Function.Operator.Monadic
                 //Pick the holden function and apply it.
                 if (function.IsBuiltin)
                 {
-                    var method = (Func<AplusEnvironment, AType, AType, AType>)function.Method;
+                    var method = (Func<Aplus, AType, AType, AType>)function.Method;
                     result = method(environment, result, null);
                 }
                 else
                 {
-                    var method = (Func<AplusEnvironment, AType, AType>)function.Method;
+                    var method = (Func<Aplus, AType, AType>)function.Method;
                     result = method(environment, result);
                 }
 

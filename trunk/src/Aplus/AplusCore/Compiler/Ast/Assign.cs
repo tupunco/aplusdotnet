@@ -49,7 +49,7 @@ namespace AplusCore.Compiler.AST
 
             // Clone the rhs value of the assignment to ensure correct results
             // in case of: a:=b:=[...:=] [rhs]  assignments
-
+            DLR.ParameterExpression environment = scope.GetRuntimeExpression();
             DLR.Expression value =
                 DLR.Expression.Block(
                     new DLR.ParameterExpression[] { temp },
@@ -93,7 +93,7 @@ namespace AplusCore.Compiler.AST
                         typeof(Assign).GetMethod("AppendItem", flags),
                         value,
                         target.Item.Generate(scope),
-                        scope.AplusEnvironment
+                        environment
                     );
                 }
                 else
@@ -110,7 +110,7 @@ namespace AplusCore.Compiler.AST
                     method,
                     targetDLR,
                     value,
-                    scope.GetAplusEnvironment()
+                    environment
                 );
             }
             else if(Node.TestDyadicToken(this.target, Grammar.Tokens.VALUEINCONTEXT))
@@ -125,7 +125,7 @@ namespace AplusCore.Compiler.AST
                     targetDLR,
                     contextNameDLR,
                     value,
-                    scope.GetAplusEnvironment()
+                    environment
                 );
             }
             else if(Node.TestDyadicToken(this.target, Grammar.Tokens.PICK))
@@ -179,7 +179,7 @@ namespace AplusCore.Compiler.AST
                 method.GetType().GetMethod("AssignExecute"),
                 right,
                 left,
-                scope.GetAplusEnvironment()
+                scope.GetRuntimeExpression()
             );
 
             var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static;
@@ -217,7 +217,7 @@ namespace AplusCore.Compiler.AST
 
         #region DLR: append
 
-        private static AType AppendItem(AType value, AType target, AplusEnvironment environment)
+        private static AType AppendItem(AType value, AType target, Aplus environment)
         {
             if (target.Rank == 0)
             {
@@ -347,7 +347,7 @@ namespace AplusCore.Compiler.AST
         {
             AbstractMonadicFunction disclose = MonadicFunctionInstance.Disclose;
             Aplus runtime = scope.GetRuntime();
-            DLR.ParameterExpression environment = scope.GetAplusEnvironment();
+            DLR.ParameterExpression environment = scope.GetRuntimeExpression();
 
             DLR.ParameterExpression valuesParam = DLR.Expression.Parameter(typeof(AType), "__VALUES__");
             // for dependency evaluation
@@ -623,7 +623,7 @@ namespace AplusCore.Compiler.AST
                         new Runtime.Binder.CallbackBinder(),
                         typeof(object),
                         callbackParameter,
-                        scope.GetAplusEnvironment(),
+                        scope.GetRuntimeExpression(),
                         valueParam
                     )
                 )
@@ -660,6 +660,7 @@ namespace AplusCore.Compiler.AST
         /// <returns></returns>
         internal static DLR.Expression BuildIndicesList(AplusScope scope, DLR.Expression argument)
         {
+            DLR.ParameterExpression environment = scope.GetRuntimeExpression();
             var execute = typeof(AbstractMonadicFunction).GetMethod("Execute");
 
             // (iota rho x)
@@ -670,9 +671,9 @@ namespace AplusCore.Compiler.AST
                     DLR.Expression.Constant(MonadicFunctionInstance.Shape),
                     execute,
                     argument,
-                    scope.GetAplusEnvironment()
+                    environment
                 ),
-                scope.GetAplusEnvironment()
+                environment
             );
 
             return indexes;
@@ -695,7 +696,7 @@ namespace AplusCore.Compiler.AST
                 DLR.Expression.Constant(MonadicFunctionInstance.Ravel),
                 execute,
                 target,
-                scope.GetAplusEnvironment()
+                scope.GetRuntimeExpression()
             );
 
             // (,x)[indexExpression] := ..

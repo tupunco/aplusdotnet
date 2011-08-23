@@ -6,11 +6,11 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
 {
     class Stop : AbstractMonadicFunction
     {
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             Assert.NotNull(environment);
 
-            switch (environment.Runtime.SystemVariables["stop"].asInteger)
+            switch (environment.SystemVariables["stop"].asInteger)
             {
                 case 1:
                     throw new StopException("stop");

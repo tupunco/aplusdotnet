@@ -120,7 +120,7 @@ namespace AplusCore.Compiler.AST
                     DLR.Expression.Constant(method),
                     method.GetType().GetMethod("Execute"),
                     argument,
-                    scope.GetAplusEnvironment()
+                    scope.GetRuntimeExpression()
                 );
             }
 

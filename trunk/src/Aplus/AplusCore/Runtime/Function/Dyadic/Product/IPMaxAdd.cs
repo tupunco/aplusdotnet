@@ -8,7 +8,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Product
     /// </summary>
     class IPMaxAdd : InnerProduct
     {
-        protected override AType Calculate(AType left, AType right, AplusEnvironment env)
+        protected override AType Calculate(AType left, AType right, Aplus env)
         {
             AType inner = DyadicFunctionInstance.Add.Execute(right, left, env);
             AType result = MonadicFunctionInstance.ReduceMax.Execute(inner, env);

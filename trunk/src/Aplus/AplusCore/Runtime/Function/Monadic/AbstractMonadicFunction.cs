@@ -9,7 +9,7 @@ namespace AplusCore.Runtime.Function.Monadic
         /// </summary>
         /// <param name="argument"></param>
         /// <returns></returns>
-        abstract public AType Execute(AType argument, AplusEnvironment environment = null);
+        abstract public AType Execute(AType argument, Aplus environment = null);
         
 
         #region Properties

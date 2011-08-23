@@ -11,7 +11,7 @@ namespace AplusCore.Runtime.Function.Operator.Monadic
         private ATypes check;
         private bool convert;
 
-        public AType Execute(AType function, AType n, AType argument, AplusEnvironment environment = null)
+        public AType Execute(AType function, AType n, AType argument, Aplus environment = null)
         {
 
             if (!(function.Data is AFunc))
@@ -49,7 +49,7 @@ namespace AplusCore.Runtime.Function.Operator.Monadic
             return result;
         }
 
-        private int GetNumber(AType argument, AType n, AplusEnvironment environment)
+        private int GetNumber(AType argument, AType n, Aplus environment)
         {
             if (n.Type != ATypes.AInteger)
             {
@@ -83,7 +83,7 @@ namespace AplusCore.Runtime.Function.Operator.Monadic
             return result;
         }
 
-        private AType NullWalker(AType argument, AFunc function, int number, AplusEnvironment environment)
+        private AType NullWalker(AType argument, AFunc function, int number, Aplus environment)
         {
             if (argument.Type == ATypes.ANull)
             {
@@ -117,7 +117,7 @@ namespace AplusCore.Runtime.Function.Operator.Monadic
         }
 
 
-        private AType Walker(AType argument, AFunc function, int number, AplusEnvironment environment)
+        private AType Walker(AType argument, AFunc function, int number, Aplus environment)
         {
             if (argument.Rank != number)
             {
@@ -159,18 +159,18 @@ namespace AplusCore.Runtime.Function.Operator.Monadic
             }
         }
 
-        private AType ExecuteFunction(AFunc function, AType argument, AplusEnvironment environment)
+        private AType ExecuteFunction(AFunc function, AType argument, Aplus environment)
         {
             AType result;
 
             if (function.IsBuiltin)
             {
-                var method = (Func<AplusEnvironment, AType, AType, AType>)function.Method;
+                var method = (Func<Aplus, AType, AType, AType>)function.Method;
                 result = method(environment, argument, null);
             }
             else
             {
-                var method = (Func<AplusEnvironment, AType, AType>)function.Method;
+                var method = (Func<Aplus, AType, AType>)function.Method;
                 result = method(environment, argument);
             }
 

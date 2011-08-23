@@ -18,7 +18,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Product
     {
         #region Entry Point
 
-        public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
+        public override AType Execute(AType right, AType left, Aplus environment = null)
         {
             if (left.Rank < 1 || right.Rank < 1)
             {
@@ -58,7 +58,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Product
 
         #region calculation method
 
-        protected abstract AType Calculate(AType left, AType right, AplusEnvironment env);
+        protected abstract AType Calculate(AType left, AType right, Aplus env);
 
         #endregion
 
@@ -70,7 +70,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Product
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <param name="env"></param>
-        private AType WalkItems(AType left, AType right, AplusEnvironment env)
+        private AType WalkItems(AType left, AType right, Aplus env)
         {
             AType result;
             if (left.Rank > 1)

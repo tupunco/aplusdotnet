@@ -82,7 +82,7 @@ namespace AplusCore.Compiler.AST
             }
 
             // 0. Add A+ environment as first argument for user defined functions
-            callArguments.AddFirst(scope.GetAplusEnvironment());
+            callArguments.AddFirst(scope.GetRuntimeExpression());
 
             // 1. Construct the method body
             callArguments.AddFirst(this.method.Generate(scope));

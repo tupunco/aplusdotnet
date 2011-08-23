@@ -28,7 +28,7 @@ namespace AplusCore.Runtime.Binder
         /// <remarks>
         /// Order of items in the <see cref="args"/> array:
         /// <list type="number">
-        ///  <item><see cref="AplusEnvironment"/></item>
+        ///  <item><see cref="Aplus"/></item>
         ///  <item>New value for the global variable</item>
         /// </list>
         /// </remarks>
@@ -78,13 +78,13 @@ namespace AplusCore.Runtime.Binder
                 }.Where((item, i) => i < callbackAFunction.Valence - 1).Reverse();
                 List<DLR.Expression> callbackArguments = new List<DLR.Expression>();
                 
-                // AplusEnvironment
+                // Aplus
                 callbackArguments.Add(DLR.Expression.Convert(args[0].Expression, args[0].RuntimeType));
                 callbackArguments.AddRange(callbackBaseArguments);
 
 
                 Type[] callTypes = new Type[callbackAFunction.Valence + 1];
-                callTypes[0] = typeof(AplusEnvironment);
+                callTypes[0] = typeof(Aplus);
 
                 for (int i = 1; i < callbackAFunction.Valence; i++)
                 {

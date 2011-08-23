@@ -17,7 +17,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 
         #region Entry point
 
-        public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
+        public override AType Execute(AType right, AType left, Aplus environment = null)
         {
             PrepareVariables(right, left);
             return Compute();

@@ -13,7 +13,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
     {
         #region Entry point
 
-        public override AType Execute(AType argument, AplusEnvironment environment)
+        public override AType Execute(AType argument, Aplus environment)
         {
             // Environment is required!
             Assert.NotNull(environment);
@@ -28,8 +28,8 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
                 throw new Error.Rank(this.RankErrorText);
             }
 
-            DLR.Expression<Func<AplusEnvironment, AType>> lambda = BuildExecuteMethod(argument.ToString(), environment);
-            Func<AplusEnvironment, AType> method = lambda.Compile();
+            DLR.Expression<Func<Aplus, AType>> lambda = BuildExecuteMethod(argument.ToString(), environment);
+            Func<Aplus, AType> method = lambda.Compile();
 
             AType result = method(environment);
 
@@ -40,17 +40,17 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
 
         #region Method Builder
 
-        internal static DLR.Expression<Func<AplusEnvironment, AType>> BuildExecuteMethod(
-            string sourceCode, AplusEnvironment environment
+        internal static DLR.Expression<Func<Aplus, AType>> BuildExecuteMethod(
+            string sourceCode, Aplus environment
         )
         {
             DLR.Expression codebody;
-            AplusCore.Compiler.AST.Node tree = Compiler.Parse.String(sourceCode, environment.Runtime.LexerMode);
+            AplusCore.Compiler.AST.Node tree = Compiler.Parse.String(sourceCode, environment.LexerMode);
 
-            AplusScope scope = new AplusScope(null, "__EVAL__", environment.Runtime,
-                DLR.Expression.Parameter(typeof(Runtime.Aplus), "__EVAL_RUNTIME__"),
+            AplusScope scope = new AplusScope(null, "__EVAL__", environment,
+                DLR.Expression.Parameter(typeof(Aplus), "__EVAL_RUNTIME__"),
                 DLR.Expression.Parameter(typeof(DYN.IDynamicMetaObjectProvider), "__EVAL_MODULE__"),
-                DLR.Expression.Parameter(typeof(AplusEnvironment), "__EVAL_ENVIRONMENT__"),
+                //DLR.Expression.Parameter(typeof(Aplus), "__EVAL_ENVIRONMENT__"),
                 DLR.Expression.Label(typeof(AType), "__EVAL_EXIT__"),
                 isEval: true
             );
@@ -69,18 +69,18 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
 
                 codebody = DLR.Expression.Block(
                     new DLR.ParameterExpression[] {
-                        scope.RuntimeExpression,         // runtime
+                        //scope.RuntimeExpression,         // runtime
                         scope.ModuleExpression,          // root context
                         functionScope.ModuleExpression   // Function local scope
                     },
+                    //DLR.Expression.Assign(
+                    //    scope.RuntimeExpression, scope.RuntimeExpression
+                    //),
                     DLR.Expression.Assign(
-                        scope.RuntimeExpression, DLR.Expression.PropertyOrField(scope.AplusEnvironment, "Runtime")
+                        scope.ModuleExpression, DLR.Expression.PropertyOrField(scope.RuntimeExpression, "Context")
                     ),
                     DLR.Expression.Assign(
-                        scope.ModuleExpression, DLR.Expression.PropertyOrField(scope.AplusEnvironment, "Context")
-                    ),
-                    DLR.Expression.Assign(
-                        functionScope.ModuleExpression, DLR.Expression.PropertyOrField(scope.AplusEnvironment, "FunctionScope")
+                        functionScope.ModuleExpression, DLR.Expression.PropertyOrField(scope.RuntimeExpression, "FunctionScope")
                     ),
                     DLR.Expression.Label(
                         scope.ReturnTarget,
@@ -92,14 +92,14 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
             {
                 codebody = DLR.Expression.Block(
                     new DLR.ParameterExpression[] {
-                        scope.RuntimeExpression,         // runtime
+                        //scope.RuntimeExpression,         // runtime
                         scope.ModuleExpression          // root context
                     },
+                    //DLR.Expression.Assign(
+                    //   scope.RuntimeExpression, scope.RuntimeExpression
+                    //),
                     DLR.Expression.Assign(
-                       scope.RuntimeExpression, DLR.Expression.PropertyOrField(scope.AplusEnvironment, "Runtime")
-                    ),
-                    DLR.Expression.Assign(
-                        scope.ModuleExpression, DLR.Expression.PropertyOrField(scope.AplusEnvironment, "Context")
+                        scope.ModuleExpression, DLR.Expression.PropertyOrField(scope.RuntimeExpression, "Context")
                     ),
                     DLR.Expression.Label(
                         scope.ReturnTarget,
@@ -108,9 +108,9 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
                );
             }
 
-            DLR.Expression<Func<AplusEnvironment, AType>> lambda = DLR.Expression.Lambda<Func<AplusEnvironment, AType>>(
+            DLR.Expression<Func<Aplus, AType>> lambda = DLR.Expression.Lambda<Func<Aplus, AType>>(
                 codebody,
-                scope.GetAplusEnvironment()
+                scope.GetRuntimeExpression()
             );
 
             return lambda;

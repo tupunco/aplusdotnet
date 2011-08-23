@@ -10,7 +10,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
     {
         #region Entry point
 
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             if (argument.SimpleArray())
             {
@@ -125,7 +125,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
         /// <param name="argument"></param>
         /// <param name="environment"></param>
         /// <returns></returns>
-        private AType DiscloseNestedArray(AType argument, AplusEnvironment environment)
+        private AType DiscloseNestedArray(AType argument, Aplus environment)
         {
             AType result;
 

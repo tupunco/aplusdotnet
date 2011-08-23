@@ -7,12 +7,12 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar.Arithmetic
     [DefaultResult(ATypes.AFloat)]
     class Reciprocal : MonadicScalar
     {
-        public override AType ExecutePrimitive(AInteger argument, AplusEnvironment environment = null)
+        public override AType ExecutePrimitive(AInteger argument, Aplus environment = null)
         {
             return calculateReciprocal(argument.asFloat);
         }
 
-        public override AType ExecutePrimitive(AFloat argument, AplusEnvironment environment = null)
+        public override AType ExecutePrimitive(AFloat argument, Aplus environment = null)
         {
             return calculateReciprocal(argument.asFloat);
         }

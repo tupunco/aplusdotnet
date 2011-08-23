@@ -152,7 +152,7 @@ namespace AplusCore.Compiler.AST
         {
             string methodName = String.Format("__built-in({0})__", this.function.Text);
 
-            DLR.ParameterExpression methodEnvArg = DLR.Expression.Parameter(typeof(AplusEnvironment), "_ENV_ARG_");
+            DLR.ParameterExpression methodEnvArg = DLR.Expression.Parameter(typeof(Aplus), "_ENV_ARG_");
             DLR.ParameterExpression methodLeftArg = DLR.Expression.Parameter(typeof(AType), "_LEFT_ARG_");
             DLR.ParameterExpression methodRightArg = DLR.Expression.Parameter(typeof(AType), "_RIGHT_ARG_");
             DLR.LabelTarget methodReturnTarget = DLR.Expression.Label(typeof(AType), "_RESULT_");
@@ -167,7 +167,7 @@ namespace AplusCore.Compiler.AST
                 DLR.Expression.Label(methodReturnTarget, DLR.Expression.Constant(default(AType), typeof(AType)))
             );
 
-            DLR.Expression lambda = DLR.Expression.Lambda<Func<AplusEnvironment, AType, AType, AType>>(
+            DLR.Expression lambda = DLR.Expression.Lambda<Func<Aplus, AType, AType, AType>>(
                 codeBlock,
                 methodName,
                 new DLR.ParameterExpression[] {

@@ -123,7 +123,6 @@
       <DependentUpon>AplusParser.g</DependentUpon>
     </Compile>
     <Compile Include="Runtime\Aplus.cs" />
-    <Compile Include="Runtime\AplusEnvironment.cs" />
     <Compile Include="Runtime\AplusLanguageContext.cs" />
     <Compile Include="Compiler\AplusScope.cs" />
     <Compile Include="Runtime\Binder\CallbackBinder.cs" />

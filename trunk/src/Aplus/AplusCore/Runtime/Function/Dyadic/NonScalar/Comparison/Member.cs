@@ -24,7 +24,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
 
         #region DLR entry point
 
-        public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
+        public override AType Execute(AType right, AType left, Aplus environment = null)
         {
             if (right.Length == 0)
             {

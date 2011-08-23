@@ -71,7 +71,6 @@ namespace AplusCore.Compiler.AST
                     scope.GetRuntime(),
                     scope.GetRuntimeExpression(),
                     scope.Parent.GetModuleExpression(),
-                    scope.GetAplusEnvironment(),
                     scope.ReturnTarget,
                     isEval: true
                 );
@@ -81,15 +80,15 @@ namespace AplusCore.Compiler.AST
             string dependencyName = this.variable.BuildQualifiedName(runtime.CurrentContext);
             string scopename = String.Format("__dependency_{0}_scope__", this.variable.Name);
             AplusScope dependencyScope = new AplusScope(scope, scopename,
+                runtimeParam: scope.GetRuntimeExpression(),
                 moduleParam: DLR.Expression.Parameter(typeof(DYN.ExpandoObject), scopename),
                 returnTarget: DLR.Expression.Label(typeof(AType), "RETURN"),
-                enviromentParam: DLR.Expression.Parameter(typeof(AplusEnvironment), "_EXTERNAL_EVN_"),
                 isMethod: true
             );
             // 1.5. Method for registering dependencies
             MethodInfo registerMethod;
 
-            // 2. Prepare the method arguments (AplusEnvironment)
+            // 2. Prepare the method arguments (RuntimeExpression)
             DLR.ParameterExpression[] methodParameters;
 
             if (this.IsItemwise)
@@ -98,12 +97,12 @@ namespace AplusCore.Compiler.AST
                     DLR.Expression.Parameter(typeof(AType), string.Format("__INDEX[{0}]__", this.Indexer.Name));
                 dependencyScope.Variables.Add(this.Indexer.Name, index);
 
-                methodParameters = new DLR.ParameterExpression[] { dependencyScope.AplusEnvironment, index };
+                methodParameters = new DLR.ParameterExpression[] { dependencyScope.RuntimeExpression, index };
                 registerMethod = typeof(DependencyManager).GetMethod("RegisterItemwise");
             }
             else
             {
-                methodParameters = new DLR.ParameterExpression[] { dependencyScope.AplusEnvironment };
+                methodParameters = new DLR.ParameterExpression[] { dependencyScope.RuntimeExpression };
                 registerMethod = typeof(DependencyManager).GetMethod("Register");
             }
 
@@ -126,7 +125,7 @@ namespace AplusCore.Compiler.AST
                     DLR.Expression.Assign(dependencyScope.ModuleExpression, DLR.Expression.Constant(new DYN.ExpandoObject())),
                     // set AplusEnviroment's function scope reference
                     DLR.Expression.Assign(
-                        DLR.Expression.Property(dependencyScope.AplusEnvironment, "FunctionScope"),
+                        DLR.Expression.Property(dependencyScope.RuntimeExpression, "FunctionScope"),
                         dependencyScope.ModuleExpression
                     ),
                     // Mark the dependency as under evaluation
@@ -148,7 +147,7 @@ namespace AplusCore.Compiler.AST
                     ),
                     // reset  AplusEnviroment's function scope reference
                     DLR.Expression.Assign(
-                        DLR.Expression.Property(dependencyScope.AplusEnvironment, "FunctionScope"),
+                        DLR.Expression.Property(dependencyScope.RuntimeExpression, "FunctionScope"),
                         DLR.Expression.Constant(null, typeof(DYN.ExpandoObject))
                     ),
                     // Return the result

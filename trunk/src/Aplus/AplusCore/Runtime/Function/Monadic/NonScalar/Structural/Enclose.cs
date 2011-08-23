@@ -4,7 +4,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
 {
     class Enclose : AbstractMonadicFunction
     {
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             AType result = ABox.Create(argument);
 

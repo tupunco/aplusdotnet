@@ -14,7 +14,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
 
         #region Entry point
 
-        public override AType Execute(AType argument, AplusEnvironment environment = null)
+        public override AType Execute(AType argument, Aplus environment = null)
         {
             if (argument.IsArray)
             {

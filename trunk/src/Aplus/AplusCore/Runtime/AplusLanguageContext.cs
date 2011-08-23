@@ -181,7 +181,7 @@ namespace AplusCore.Runtime
 
             return Function.Monadic.MonadicFunctionInstance.DefaultFormat.Execute(
                 value,
-                new AplusEnvironment(runtime, null)
+                runtime
             ).ToString();
         }
 

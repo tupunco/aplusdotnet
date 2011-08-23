@@ -12,7 +12,7 @@ namespace AplusCore.Runtime.Function
         /// <param name="input">The thing that we convert to slotfiller.</param>
         /// <returns>A slotfiller.</returns>
         [SystemFunction("_alsf", "_alsf{x}: returns with a slotfiller")]
-        internal static AType Alsf(AplusEnvironment environment, AType input)
+        internal static AType Alsf(Aplus environment, AType input)
         {
             if (input.Rank > 1)
             {

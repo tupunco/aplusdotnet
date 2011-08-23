@@ -15,7 +15,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
+        public override AType Execute(AType right, AType left, Aplus environment = null)
         {
             //If the left side is Null then we clone the right side.
             if (left.Type == ATypes.ANull)
@@ -64,7 +64,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
 
         #region Assign
 
-        public AType Assign(AType right, AType left, AplusEnvironment environment)
+        public AType Assign(AType right, AType left, Aplus environment)
         {
             //If the left side is Null then we clone the right side.
             if (left.Type == ATypes.ANull)

@@ -12,7 +12,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
     {
         #region Entry point
 
-        public override AType Execute(AType right, AType left, AplusEnvironment environment)
+        public override AType Execute(AType right, AType left, Aplus environment)
         {
             // Environment is required!
             Assert.NotNull(environment);
@@ -65,21 +65,21 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
         /// <param name="sourceCode">The code to execute</param>
         /// <param name="newContext">The context name to switch to before executeing the code</param>
         /// <returns>The executed source code's result</returns>
-        private static AType ExecuteWithContextSwitch(AplusEnvironment environment, string sourceCode, string newContext)
+        private static AType ExecuteWithContextSwitch(Aplus environment, string sourceCode, string newContext)
         {
             AType result;
 
-            string oldContext = environment.Runtime.CurrentContext;
-            environment.Runtime.CurrentContext = newContext;
+            string oldContext = environment.CurrentContext;
+            environment.CurrentContext = newContext;
 
-            DLR.Expression<Func<AplusEnvironment, AType>> lambda =
+            DLR.Expression<Func<Aplus, AType>> lambda =
                 Function.Monadic.NonScalar.Other.ExecuteFunction.BuildExecuteMethod(sourceCode, environment);
 
-            Func<AplusEnvironment, AType> method = lambda.Compile();
+            Func<Aplus, AType> method = lambda.Compile();
 
             result = method(environment);
 
-            environment.Runtime.CurrentContext = oldContext;
+            environment.CurrentContext = oldContext;
             return result;
         }
 
@@ -96,15 +96,15 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
         ///  1) An AInteger if there is an error, this integer is the number of the error
         ///  2) The executed source code's result enclosed in an ABox
         /// </returns>
-        private static AType ProtectedExecute(AplusEnvironment environment, string sourcecode)
+        private static AType ProtectedExecute(Aplus environment, string sourcecode)
         {
             AType result;
 
             try
             {
-                DLR.Expression<Func<AplusEnvironment, AType>> lambda =
+                DLR.Expression<Func<Aplus, AType>> lambda =
                     Function.Monadic.NonScalar.Other.ExecuteFunction.BuildExecuteMethod(sourcecode, environment);
-                Func<AplusEnvironment, AType> method = lambda.Compile();
+                Func<Aplus, AType> method = lambda.Compile();
 
                 // Enclose the result
                 result = ABox.Create(method(environment));

@@ -78,7 +78,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar
 
         #region Entry Point from DLR
 
-        public override AType Execute(AType right, AType left, AplusEnvironment environment = null)
+        public override AType Execute(AType right, AType left, Aplus environment = null)
         {
             this.combination = CombinationKey(right.Type, left.Type);
             if (right.Type == ATypes.ANull || left.Type == ATypes.ANull)
