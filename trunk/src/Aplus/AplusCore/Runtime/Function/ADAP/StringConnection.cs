@@ -11,8 +11,16 @@ namespace AplusCore.Runtime.Function.ADAP
     {
         #region Constructors
 
-        public StringConnection(ConnectionAttribute attribute, AipcAttributes aipcAttributes = null, Socket socket = null)
-            : base(attribute, aipcAttributes, socket)
+        public StringConnection(
+            AipcService aipcService, 
+            ConnectionAttribute attribute,
+            AipcAttributes aipcAttributes,
+            Socket socket)
+            : base(aipcService, attribute, aipcAttributes, socket)
+        { }
+
+        public StringConnection(AipcService aipcService, ConnectionAttribute attribute)
+            : base(aipcService, attribute, null, null)
         { }
 
         #endregion

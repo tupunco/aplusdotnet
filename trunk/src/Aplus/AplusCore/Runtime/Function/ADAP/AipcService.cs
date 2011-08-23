@@ -12,7 +12,7 @@ namespace AplusCore.Runtime.Function.ADAP
     {
         #region Variables
 
-        private static AipcService singletonInstance = new AipcService();
+        private Aplus environment;
 
         private int actualHandleNumber;
         private Dictionary<int, AipcConnection> roster;
@@ -24,15 +24,18 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #region Properties
 
-        public static AipcService Instance { get { return singletonInstance; } }
+        public Aplus Environment { get { return this.environment; } }
+
         public HashSet<AipcConnection> RetryList { get { return retryList; } }
 
         #endregion
 
         #region Constructors
 
-        private AipcService()
+        internal AipcService(Aplus environment)
         {
+            this.environment = environment;
+
             this.actualHandleNumber = 3210000;
             this.roster = new Dictionary<int, AipcConnection>();
             this.retryList = new HashSet<AipcConnection>();
@@ -114,7 +117,7 @@ namespace AplusCore.Runtime.Function.ADAP
                     }
                     catch (ADAPException)
                     {
-                        AipcService.Instance.Close(connection.ConnectionAttributes.HandleNumber);
+                        this.Close(connection.ConnectionAttributes.HandleNumber);
                         connection.MakeCallback("reset", ASymbol.Create("readImport"));
                     }
                     catch (SocketException exception)
@@ -432,16 +435,16 @@ namespace AplusCore.Runtime.Function.ADAP
             switch (connectionAttribute.Protocol.asString)
             {
                 case "A":
-                    connection = new AConnection(connectionAttribute, aipcAttributes, socket);
+                    connection = new AConnection(this, connectionAttribute, aipcAttributes, socket);
                     break;
                 case "string":
-                    connection = new StringConnection(connectionAttribute, aipcAttributes, socket);
+                    connection = new StringConnection(this, connectionAttribute, aipcAttributes, socket);
                     break;
                 case "raw":
-                    connection = new RawConnection(connectionAttribute, aipcAttributes, socket);
+                    connection = new RawConnection(this, connectionAttribute, aipcAttributes, socket);
                     break;
                 case "simple":
-                    connection = new SimpleConnection(connectionAttribute, aipcAttributes, socket);
+                    connection = new SimpleConnection(this, connectionAttribute, aipcAttributes, socket);
                     break;
                 default:
                     connectionAttribute.HandleNumber = -1;
@@ -616,7 +619,7 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #region Utility
 
-        private static void CallbackBySocketException(AipcConnection connection, SocketException exception, bool isRead)
+        private void CallbackBySocketException(AipcConnection connection, SocketException exception, bool isRead)
         {
             int handle = connection.ConnectionAttributes.HandleNumber;
 
@@ -634,16 +637,16 @@ namespace AplusCore.Runtime.Function.ADAP
                 case SocketError.NoBufferSpaceAvailable:
                     connection.MakeCallback(isRead ? "buffread" : "buffwrite",
                                             ASymbol.Create(String.Concat(isRead ? "Read " : "Write ", "buffer is full")));
-                    AipcService.Instance.Close(connection.ConnectionAttributes.HandleNumber);
+                    this.Close(connection.ConnectionAttributes.HandleNumber);
                     break;
                 case SocketError.NotInitialized:
                 case SocketError.NotConnected:
 
-                    AipcService.Instance.Close(connection.ConnectionAttributes.HandleNumber);
+                    this.Close(connection.ConnectionAttributes.HandleNumber);
                     break;
                 default:
                     connection.MakeCallback("reset", ASymbol.Create("unknown State"));
-                    AipcService.Instance.Close(connection.ConnectionAttributes.HandleNumber);
+                    this.Close(connection.ConnectionAttributes.HandleNumber);
                     break;
             }
         }

@@ -10,42 +10,42 @@ namespace AplusCore.Runtime.Context
         public static AType SyncSend(Aplus environment, AType timeout, AType message, AType handle)
         {
             int handleNumber = IsScalarAInteger(handle, "i.syncsend").asInteger;
-            return AipcService.Instance.SyncSend(handleNumber, message, timeout);
+            return environment.AipcService.SyncSend(handleNumber, message, timeout);
         }
 
         [AplusContextFunction("syncread", "i.syncread{scalar int;any} returns any")]
         public static AType SyncRead(Aplus environment, AType timeout, AType handle)
         {
             int handleNumber = IsScalarAInteger(handle, "i.syncread").asInteger;
-            return AipcService.Instance.SyncRead(handleNumber, timeout);
+            return environment.AipcService.SyncRead(handleNumber, timeout);
         }
 
         [AplusContextFunction("send", "i.send{scalar int;any} returns scalar int")]
         public static AType Send(Aplus environment, AType message, AType handle)
         {
             int handleNumber = IsScalarAInteger(handle, "i.send").asInteger;
-            return AipcService.Instance.Send(handleNumber, message);
+            return environment.AipcService.Send(handleNumber, message);
         }
 
         [AplusContextFunction("open", "i.open{scalar int} returns scalar int")]
         public static AType Open(Aplus environment, AType handle)
         {
             int handleNumber = IsScalarAInteger(handle, "i.open").asInteger;
-            return AipcService.Instance.Open(handleNumber);
+            return environment.AipcService.Open(handleNumber);
         }
 
         [AplusContextFunction("destroy", "i.destroy{scalar int} returns scalar int")]
-        public static AType Destroy(Aplus envrionment, AType handle)
+        public static AType Destroy(Aplus environment, AType handle)
         {
             int handleNumber = IsScalarAInteger(handle, "i.destroy").asInteger;
-            return AipcService.Instance.Destroy(handleNumber);
+            return environment.AipcService.Destroy(handleNumber);
         }
 
         [AplusContextFunction("close", "i.close{scalar int} returns scalar int")]
         public static AType Close(Aplus environment, AType handle)
         {
             int handleNumber = IsScalarAInteger(handle, "i.close").asInteger;
-            return AipcService.Instance.Close(handleNumber);
+            return environment.AipcService.Close(handleNumber);
         }
 
         [AplusContextFunction("listenNPP", "i.listenNPP{any;any;scalar int;any} returns scalar int")]
@@ -58,7 +58,7 @@ namespace AplusCore.Runtime.Context
                 return AInteger.Create(-1);
             }
 
-            return AipcService.Instance.Listen(function, name, ConnectionAttribute.DEFAULT_HOST, portNumber, protocol);
+            return environment.AipcService.Listen(function, name, ConnectionAttribute.DEFAULT_HOST, portNumber, protocol);
 
         }
 
@@ -70,7 +70,7 @@ namespace AplusCore.Runtime.Context
                 return AInteger.Create(-1);
             }
 
-            return AipcService.Instance.Listen(function, name);
+            return environment.AipcService.Listen(function, name);
         }
 
         [AplusContextFunction("listenNP", "i.listenNP{any;any;any} returns scalar int")]
@@ -81,7 +81,7 @@ namespace AplusCore.Runtime.Context
                 return AInteger.Create(-1);
             }
 
-            return AipcService.Instance.Listen(function, name, protocol);
+            return environment.AipcService.Listen(function, name, protocol);
         }
 
         [AplusContextFunction("connectNHPP", "i.connectNHPP{any;any;any;scalar int;any} returns scalar int")]
@@ -89,39 +89,39 @@ namespace AplusCore.Runtime.Context
             Aplus environment, AType protocol, AType port, AType host, AType name, AType function)
         {
             int portNumber = IsScalarAInteger(port, "connectNHPP").asInteger;
-            return AipcService.Instance.Connect(function, name, host, portNumber, protocol);
+            return environment.AipcService.Connect(function, name, host, portNumber, protocol);
         }
 
         [AplusContextFunction("connectNP", "i.connectNP{any;any;any} returns scalar int")]
         public static AType ConnectNP(Aplus environment, AType protocol, AType name, AType function)
         {
-            return AipcService.Instance.Connect(function, name, protocol);
+            return environment.AipcService.Connect(function, name, protocol);
         }
 
         [AplusContextFunction("connectN", "i.connectN{any;any} returns scalar int")]
         public static AType ConnectN(Aplus environment, AType name, AType function)
         {
-            return AipcService.Instance.Connect(function, name);
+            return environment.AipcService.Connect(function, name);
         }
 
         [AplusContextFunction("timeout", "i.timeout{any} returns any")]
         public static AType Timeout(Aplus environment, AType argument)
         {
-            return AipcService.Instance.GetTimeout(argument);
+            return environment.AipcService.GetTimeout(argument);
         }
 
         [AplusContextFunction("attrs", "i.attrs{scalar int} returns any")]
         public static AType Attributes(Aplus environment, AType handle)
         {
             int handleNumber = IsScalarAInteger(handle, "i.attrs").asInteger;
-            return AipcService.Instance.Attributes(handleNumber);
+            return environment.AipcService.Attributes(handleNumber);
         }
 
         [AplusContextFunction("getattr", "i.getattr{scalar int;any} returns any")]
         public static AType GetAttribute(Aplus environment, AType attributeName, AType handle)
         {
             int handleNumber = IsScalarAInteger(handle, "i.getattr").asInteger;
-            return AipcService.Instance.GetAttribute(handleNumber, attributeName);
+            return environment.AipcService.GetAttribute(handleNumber, attributeName);
         }
 
         [AplusContextFunction("setattr", "i.setattr{scalar int;any;any} returns scalar int")]
@@ -129,20 +129,20 @@ namespace AplusCore.Runtime.Context
         {
             IsScalarAInteger(handle, "i.setattr");
 
-            return AipcService.Instance.SetAttribute(handle.asInteger, attributeName, value);
+            return environment.AipcService.SetAttribute(handle.asInteger, attributeName, value);
         }
 
         [AplusContextFunction("whatis", "i.whatis{scalar int} returns any")]
         public static AType WhatIs(Aplus environment, AType handle)
         {
             int handleNumber = IsScalarAInteger(handle, "i.whatis").asInteger;
-            return AipcService.Instance.WhatIs(handleNumber);
+            return environment.AipcService.WhatIs(handleNumber);
         }
 
         [AplusContextFunction("roster", "i.roster{} returns any")]
         public static AType WhatIs(Aplus environment)
         {
-            return AipcService.Instance.Roster();
+            return environment.AipcService.Roster();
         }
 
         #region Utility

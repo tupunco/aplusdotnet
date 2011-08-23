@@ -171,10 +171,10 @@ namespace AplusCore.Runtime.Function.ADAP
                     result = AInteger.Create(connection.ConnectionAttributes.Port);
                     break;
                 case "writeStatus":
-                    result = AipcService.Instance.WriteQueueStatus(connection.ConnectionAttributes.HandleNumber);
+                    result = this.connection.AipcService.WriteQueueStatus(connection.ConnectionAttributes.HandleNumber);
                     break;
                 case "readStatus":
-                    result = AipcService.Instance.ReadQueueStatus(connection.ConnectionAttributes.HandleNumber);
+                    result = this.connection.AipcService.ReadQueueStatus(connection.ConnectionAttributes.HandleNumber);
                     break;
                 case "listener":
                     result = (listener == 0) ? Utils.ANull() : AInteger.Create(listener);
@@ -264,7 +264,7 @@ namespace AplusCore.Runtime.Function.ADAP
 
         public AType GetWriteQueue()
         {
-            return AipcService.Instance.WriteQueueStatus(connection.ConnectionAttributes.HandleNumber);
+            return this.connection.AipcService.WriteQueueStatus(connection.ConnectionAttributes.HandleNumber);
         }
 
         #endregion

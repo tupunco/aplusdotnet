@@ -19,7 +19,8 @@ namespace AplusCore.Runtime.Function.ADAP
 
         private static Func<AType, Aplus, AType, AType, AType, AType> CallbackFunction;
         protected static ASCIIEncoding ASCIIEncoder = new ASCIIEncoding();
-        
+
+        private AipcService aipcService;
         protected Socket connectionSocket;
 
         private ConnectionAttribute connectionAttributes;
@@ -30,6 +31,8 @@ namespace AplusCore.Runtime.Function.ADAP
         #endregion
 
         #region Properties
+
+        internal AipcService AipcService { get { return this.aipcService; } }
 
         public ConnectionAttribute ConnectionAttributes { get { return this.connectionAttributes; } }
         public AipcAttributes AipcAttributes { get { return this.aipcAttributes; } }
@@ -90,8 +93,13 @@ namespace AplusCore.Runtime.Function.ADAP
             CallbackFunction = method.Compile();
         }
 
-        public AipcConnection(ConnectionAttribute connectionAttribute, AipcAttributes aipcAttribute = null, Socket socket = null)
+        internal AipcConnection(
+            AipcService aipcService,
+            ConnectionAttribute connectionAttribute,
+            AipcAttributes aipcAttribute,
+            Socket socket)
         {
+            this.aipcService = aipcService;
             this.connectionAttributes = connectionAttribute;
             this.partialSent = false;
 
@@ -106,6 +114,10 @@ namespace AplusCore.Runtime.Function.ADAP
 
             this.Socket = socket;
         }
+
+        internal AipcConnection(AipcService aipcService, ConnectionAttribute connectionAttribute)
+            : this(aipcService, connectionAttribute, null, null)
+        { }
 
         #endregion
 
@@ -123,8 +135,7 @@ namespace AplusCore.Runtime.Function.ADAP
 
             CallbackFunction(
                 this.ConnectionAttributes.Function,
-                // FIX ##?: Get the correct AplusEnvironment
-                new Aplus(null, LexerMode.ASCII),
+                this.AipcService.Environment,
                 handle,
                 eventType,
                 callData);
@@ -195,7 +206,7 @@ namespace AplusCore.Runtime.Function.ADAP
             try
             {
                 Socket socket = this.connectionSocket.EndAccept(result);
-                AipcService.Instance.InitFromListener(this.connectionAttributes, socket, this.aipcAttributes);
+                this.AipcService.InitFromListener(this.connectionAttributes, socket, this.aipcAttributes);
 
                 AcceptSocket();
             }
@@ -351,7 +362,7 @@ namespace AplusCore.Runtime.Function.ADAP
                     return 0;
                 }
 
-                int port = AipcService.Instance.GetPortByServiceName(connectionAttributes.Name);
+                int port = this.AipcService.GetPortByServiceName(connectionAttributes.Name);
 
                 if (port != 0)
                 {
@@ -359,7 +370,7 @@ namespace AplusCore.Runtime.Function.ADAP
                 }
                 else
                 {
-                    AipcService.Instance.AddToRetryList(this);
+                    this.AipcService.AddToRetryList(this);
                     return 0;
                 }
             }
@@ -372,12 +383,12 @@ namespace AplusCore.Runtime.Function.ADAP
             }
             catch (SocketException)
             {
-                AipcService.Instance.AddToRetryList(this);
+                this.AipcService.AddToRetryList(this);
                 return 0;
             }
             catch (ObjectDisposedException)
             {
-                AipcService.Instance.AddToRetryList(this);
+                this.AipcService.AddToRetryList(this);
                 return 0;
             }
 
@@ -419,15 +430,15 @@ namespace AplusCore.Runtime.Function.ADAP
             }
             catch (SocketException)
             {
-                AipcService.Instance.AddToRetryList(this);
+                this.AipcService.AddToRetryList(this);
             }
             catch (ObjectDisposedException)
             {
-                AipcService.Instance.AddToRetryList(this);
+                this.AipcService.AddToRetryList(this);
             }
             catch (NullReferenceException)
             {
-                AipcService.Instance.AddToRetryList(this);
+                this.AipcService.AddToRetryList(this);
             }
         }
 
@@ -461,7 +472,7 @@ namespace AplusCore.Runtime.Function.ADAP
 
             if (retryRequired && this.aipcAttributes.Retry)
             {
-                AipcService.Instance.AddToRetryList(this);
+                this.AipcService.AddToRetryList(this);
             }
 
         }
@@ -498,7 +509,7 @@ namespace AplusCore.Runtime.Function.ADAP
                 this.connectionSocket = null;
             }
 
-            AipcService.Instance.AddToRetryList(this);
+            this.AipcService.AddToRetryList(this);
 
             return 1;
         }
