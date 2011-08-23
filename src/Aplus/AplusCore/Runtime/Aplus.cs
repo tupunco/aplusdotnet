@@ -6,6 +6,7 @@ using Microsoft.Scripting.Runtime;
 using AplusCore.Compiler;
 using AplusCore.Runtime.Callback;
 using AplusCore.Runtime.Context;
+using AplusCore.Runtime.Function.ADAP;
 using AplusCore.Types;
 
 using DYN = System.Dynamic;
@@ -18,6 +19,8 @@ namespace AplusCore.Runtime
 
         private DYN.ExpandoObject globals;
         private Scope dlrglobals;
+
+        private AipcService aipcService;
 
         private DYN.IDynamicMetaObjectProvider context;
         private DYN.ExpandoObject functionscope;
@@ -73,6 +76,11 @@ namespace AplusCore.Runtime
             get { return this.systemFunctions; }
         }
 
+        internal AipcService AipcService
+        {
+            get { return this.aipcService; }
+        }
+
         public DYN.IDynamicMetaObjectProvider Context
         {
             get { return this.context; }
@@ -112,6 +120,8 @@ namespace AplusCore.Runtime
 
             // TODO: Move this to app.config?
             this.autoloadContexts = new string[] { };
+
+            this.aipcService = new AipcService(this);
         }
 
         #endregion

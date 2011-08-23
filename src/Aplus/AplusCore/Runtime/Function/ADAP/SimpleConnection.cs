@@ -21,10 +21,17 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #region Constructors
 
-        public SimpleConnection(ConnectionAttribute attribute, AipcAttributes aipcAttributes = null, Socket socket = null)
-            : base(attribute, aipcAttributes, socket)
-        {
-        }
+        public SimpleConnection(
+            AipcService aipcService,
+            ConnectionAttribute attribute,
+            AipcAttributes aipcAttributes,
+            Socket socket)
+            : base(aipcService, attribute, aipcAttributes, socket)
+        { }
+
+        public SimpleConnection(AipcService aipcService, ConnectionAttribute attribute)
+            : base(aipcService, attribute, null, null)
+        { }
 
         #endregion
 
