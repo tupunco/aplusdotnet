@@ -584,6 +584,8 @@ namespace AplusCore.Runtime.Function.ADAP
         /// </summary>
         /// <exception cref="SocketException">Throwed if there is a problem with the socket connection.</exception>
         /// <exception cref="ADAPException">Throwed if the received AType is invalid.</exception>
+        /// <exception cref="ObjectDisposedException">Throwed if the socket is disposed.</exception>
+        /// <exception cref="NullReferenceException">Throwed if the socket is set to null.</exception>
         /// <returns></returns>
         public abstract AType Read();
 

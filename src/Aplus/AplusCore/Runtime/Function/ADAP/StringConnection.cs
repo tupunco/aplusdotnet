@@ -90,7 +90,14 @@ namespace AplusCore.Runtime.Function.ADAP
             int length = ReadMessageLength();
             byte[] messageByte = ReadMessageData(length);
 
-            message = ConvertToAObject(messageByte);
+            try
+            {
+                message = ConvertToAObject(messageByte);
+            }
+            catch (Error.Domain)
+            {
+                throw new ADAPException(ADAPExceptionType.Import);
+            }
 
             return message;
         }
