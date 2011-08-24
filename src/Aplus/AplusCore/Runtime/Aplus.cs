@@ -20,8 +20,6 @@ namespace AplusCore.Runtime
         private DYN.ExpandoObject globals;
         private Scope dlrglobals;
 
-        private AipcService aipcService;
-
         private DYN.IDynamicMetaObjectProvider context;
         private DYN.ExpandoObject functionscope;
 
@@ -32,6 +30,7 @@ namespace AplusCore.Runtime
 
         private Dictionary<string, AType> systemFunctions;
 
+        private ContextLoader contextLoader;
         private bool isAutoLoaded;
         private string[] autoloadContexts;
 
@@ -76,9 +75,9 @@ namespace AplusCore.Runtime
             get { return this.systemFunctions; }
         }
 
-        internal AipcService AipcService
+        internal ContextLoader ContextLoader
         {
-            get { return this.aipcService; }
+            get { return this.contextLoader; }
         }
 
         public DYN.IDynamicMetaObjectProvider Context
@@ -120,8 +119,7 @@ namespace AplusCore.Runtime
 
             // TODO: Move this to app.config?
             this.autoloadContexts = new string[] { };
-
-            this.aipcService = new AipcService(this);
+            this.contextLoader = new ContextLoader(this);
         }
 
         #endregion
@@ -151,7 +149,7 @@ namespace AplusCore.Runtime
             foreach (string contextName in this.autoloadContexts)
             {
                 IDictionary<string, object> context = new DYN.ExpandoObject();
-                IDictionary<string, AType> contextElements = ContextLoader.FindContextElements(contextName);
+                IDictionary<string, AType> contextElements = this.ContextLoader.FindContextElements(contextName);
 
                 foreach (KeyValuePair<string, AType> item in contextElements)
                 {
@@ -168,6 +166,42 @@ namespace AplusCore.Runtime
             this.isAutoLoaded = true;
 
             return true;
+        }
+        
+        #endregion
+
+        #region Service handling
+
+        private Dictionary<Type, object> serviceMapping = new Dictionary<Type, object>();
+
+        /// <summary>
+        /// Get a registered service from the Aplus runtime.
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <returns>
+        /// Returns the registered service for the given type if there is such,
+        /// or null if the service was not found.
+        /// </returns>
+        public TService GetService<TService>() where TService : class
+        {
+            object service;
+
+            if (!this.serviceMapping.TryGetValue(typeof(TService), out service))
+            {
+                return null;
+            }
+
+            return service as TService;
+        }
+
+        /// <summary>
+        /// Register a service for the Aplus runtime.
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <param name="service">Service object to register.</param>
+        public void SetService<TService>(TService service) where TService : class
+        {
+            this.serviceMapping[typeof(TService)] = service;
         }
 
         #endregion

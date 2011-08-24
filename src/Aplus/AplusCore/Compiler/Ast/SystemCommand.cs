@@ -57,7 +57,8 @@ namespace AplusCore.Compiler.AST
 
                 case "$laod": // Compatibility with original A+ interpreter
                 case "$load":
-                    IDictionary<string, AType> items = Runtime.Context.ContextLoader.FindContextElements(this.argument);;
+                    IDictionary<string, AType> items = 
+                        runtime.ContextLoader.FindContextElements(this.argument);
 
                     if (items.Count > 0)
                     {
