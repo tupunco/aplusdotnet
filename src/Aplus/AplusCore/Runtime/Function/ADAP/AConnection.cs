@@ -13,7 +13,7 @@ namespace AplusCore.Runtime.Function.ADAP
         public AConnection(
             AipcService aipcService,
             ConnectionAttribute attribute,
-            AipcAttributes aipcAttributes,
+            AipcAttribute aipcAttributes,
             Socket socket)
             : base(aipcService, attribute, aipcAttributes, socket)
         { }

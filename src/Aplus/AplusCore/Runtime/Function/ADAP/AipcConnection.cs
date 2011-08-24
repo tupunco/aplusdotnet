@@ -24,7 +24,7 @@ namespace AplusCore.Runtime.Function.ADAP
         protected Socket connectionSocket;
 
         private ConnectionAttribute connectionAttributes;
-        private AipcAttributes aipcAttributes;
+        private AipcAttribute aipcAttributes;
         protected LinkedList<byte[]> writeBuffer = new LinkedList<byte[]>();
         protected bool partialSent;
 
@@ -35,7 +35,7 @@ namespace AplusCore.Runtime.Function.ADAP
         internal AipcService AipcService { get { return this.aipcService; } }
 
         public ConnectionAttribute ConnectionAttributes { get { return this.connectionAttributes; } }
-        public AipcAttributes AipcAttributes { get { return this.aipcAttributes; } }
+        public AipcAttribute AipcAttributes { get { return this.aipcAttributes; } }
 
         public bool isOpen { get { return (this.connectionSocket == null) ? false : this.connectionSocket.Connected; } }
         public Socket Socket
@@ -96,7 +96,7 @@ namespace AplusCore.Runtime.Function.ADAP
         internal AipcConnection(
             AipcService aipcService,
             ConnectionAttribute connectionAttribute,
-            AipcAttributes aipcAttribute,
+            AipcAttribute aipcAttribute,
             Socket socket)
         {
             this.aipcService = aipcService;
@@ -105,11 +105,11 @@ namespace AplusCore.Runtime.Function.ADAP
 
             if (aipcAttribute != null)
             {
-                this.aipcAttributes = new AipcAttributes(this, aipcAttribute);
+                this.aipcAttributes = aipcAttribute.CreateNew(this);
             }
             else
             {
-                this.aipcAttributes = new AipcAttributes(this);
+                this.aipcAttributes = AipcAttribute.Create(this);
             }
 
             this.Socket = socket;
@@ -168,7 +168,6 @@ namespace AplusCore.Runtime.Function.ADAP
         /// <exception cref="NullReferenceException">Throws if the socket is destroyed.</exception>
         private void Connect(IAsyncResult result)
         {
-            StateObject stateObject = (StateObject)result.AsyncState;
             try
             {
                 this.connectionSocket.EndConnect(result);
@@ -206,7 +205,7 @@ namespace AplusCore.Runtime.Function.ADAP
             try
             {
                 Socket socket = this.connectionSocket.EndAccept(result);
-                this.AipcService.InitFromListener(this.connectionAttributes, socket, this.aipcAttributes);
+                this.AipcService.InitFromListener(this.connectionAttributes, this.aipcAttributes, socket);
 
                 AcceptSocket();
             }
@@ -426,7 +425,7 @@ namespace AplusCore.Runtime.Function.ADAP
 
             try
             {
-                this.connectionSocket.BeginConnect(ip, new AsyncCallback(Connect), new StateObject(ip));
+                this.connectionSocket.BeginConnect(ip, new AsyncCallback(Connect), null);
             }
             catch (SocketException)
             {

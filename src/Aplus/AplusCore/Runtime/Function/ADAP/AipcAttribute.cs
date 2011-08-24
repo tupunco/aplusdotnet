@@ -2,7 +2,7 @@ using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.ADAP
 {
-    public class AipcAttributes
+    public class AipcAttribute
     {
         #region Variables
 
@@ -63,40 +63,61 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #region Constructors
 
-        public AipcAttributes(AipcConnection connection)
+        private AipcAttribute(AipcConnection connection)
         {
             this.connection = connection;
-
-            this.noDelay = false;
-            this.writePause = false;
-            this.readPause = false;
-            this.readPriority = 0;
-            this.writePriority = 0;
-            this.retry = false;
-            this.clientData = Utils.ANull();
-            this.debug = false;
-            this.burstMode = false;
-            this.listener = 0;
-            this.readBufsize = 32768;
-            this.writeBufSize = 32768;
         }
 
-        public AipcAttributes(AipcConnection connection, AipcAttributes attribute)
+        /// <summary>
+        /// Creates a new <see cref="AipcAttrbiute"/> with default values.
+        /// </summary>
+        /// <param name="connection">Connection to set on the new <see cref="AipcAttribute"/>.</param>
+        /// <returns>Returns the new <see cref="AipcAttriute"/>  with default values.</returns>
+        public static AipcAttribute Create(AipcConnection connection)
         {
-            this.connection = connection;
+            AipcAttribute attributes = new AipcAttribute(connection)
+            {
+                noDelay = false,
+                writePause = false,
+                readPause = false,
+                readPriority = 0,
+                writePriority = 0,
+                retry = false,
+                clientData = Utils.ANull(),
+                debug = false,
+                burstMode = false,
+                listener = 0,
+                readBufsize = 32768,
+                writeBufSize = 32768
+            };
 
-            this.noDelay = attribute.noDelay;
-            this.writePause = attribute.writePause;
-            this.readPause = attribute.readPause;
-            this.readPriority = attribute.readPriority;
-            this.writePriority = attribute.writePriority;
-            this.retry = attribute.retry;
-            this.clientData = attribute.clientData;
-            this.debug = attribute.debug;
-            this.burstMode = attribute.burstMode;
-            this.listener = attribute.listener;
-            this.readBufsize = attribute.readBufsize;
-            this.writeBufSize = attribute.writeBufSize;
+            return attributes;
+        }
+
+        /// <summary>
+        /// Create a new <see cref="AipcAttribute"/> from the existing one.
+        /// </summary>
+        /// <param name="connection">Connection to set on the new <see cref="AipcAttribute"/>.</param>
+        /// <returns>Returns the new <see cref="AipcAttriute"/>.</returns>
+        public AipcAttribute CreateNew(AipcConnection connection)
+        {
+            AipcAttribute attributes = new AipcAttribute(connection)
+            {
+                noDelay = this.noDelay,
+                writePause = this.writePause,
+                readPause = this.readPause,
+                readPriority = this.readPriority,
+                writePriority = this.writePriority,
+                retry = this.retry,
+                clientData = this.clientData,
+                debug = this.debug,
+                burstMode = this.burstMode,
+                listener = this.listener,
+                readBufsize = this.readBufsize,
+                writeBufSize = this.writeBufSize
+            };
+
+            return attributes;
         }
 
         #endregion

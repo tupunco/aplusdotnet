@@ -29,31 +29,6 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #endregion
 
-        #region Constructors
-
-        public ConnectionAttribute()
-        {
-            this.zeroPort = false;
-            this.protocol = DEFAULT_PROTOCOL;
-            this.host = DEFAULT_HOST;
-            this.port = DEFAULT_PORT;
-            this.listener = false;
-        }
-
-        public ConnectionAttribute(ConnectionAttribute attribute)
-        {
-            this.zeroPort = attribute.zeroPort;
-            this.func = attribute.func;
-            this.name = attribute.name;
-            this.protocol = attribute.protocol;
-            this.host = attribute.host;
-            this.port = attribute.port;
-            this.listener = attribute.listener;
-            this.handleNumber = attribute.handleNumber;
-        }
-
-        #endregion
-
         #region Properties
 
         public AType Function
@@ -102,6 +77,38 @@ namespace AplusCore.Runtime.Function.ADAP
         {
             get { return this.listener; }
             set { this.listener = value; }
+        }
+
+        #endregion
+
+        #region Constructors
+
+        public ConnectionAttribute()
+        {
+            this.zeroPort = false;
+            this.protocol = DEFAULT_PROTOCOL;
+            this.host = DEFAULT_HOST;
+            this.port = DEFAULT_PORT;
+            this.listener = false;
+        }
+
+        #endregion
+
+        #region Utility
+
+        public ConnectionAttribute Clone()
+        {
+            return new ConnectionAttribute()
+            {
+                ZeroPort = this.ZeroPort,
+                Function = this.Function,
+                Name = this.Name.Clone(),
+                Protocol = this.Protocol.Clone(),
+                Host = this.Host.Clone(),
+                Port = this.Port,
+                IsListener = this.IsListener,
+                HandleNumber = this.HandleNumber
+            };
         }
 
         #endregion
