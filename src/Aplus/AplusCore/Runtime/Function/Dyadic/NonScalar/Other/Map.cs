@@ -23,7 +23,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
 
         private AType ReadMemoryMappedFile(AType right, AType left, Aplus environment)
         {
-            string resultPath = Util.GetPath(right, environment);
+            string resultPath = Util.GetPath(environment, right, ".m");
 
             if (resultPath == null)
             {

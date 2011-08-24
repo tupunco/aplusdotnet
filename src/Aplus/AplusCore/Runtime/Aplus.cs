@@ -114,7 +114,8 @@ namespace AplusCore.Runtime
 
             if (String.IsNullOrEmpty(Environment.GetEnvironmentVariable("APATH", EnvironmentVariableTarget.User)))
             {
-                Environment.SetEnvironmentVariable("APATH", ".", EnvironmentVariableTarget.User);
+                string paths = String.Join(";", ".", "./Runtime/Context/");
+                Environment.SetEnvironmentVariable("APATH", paths, EnvironmentVariableTarget.User);
             }
 
             // TODO: Move this to app.config?

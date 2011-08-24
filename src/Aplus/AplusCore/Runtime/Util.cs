@@ -133,10 +133,11 @@ namespace AplusCore.Runtime
         /// <remarks>
         /// The search for the file relies on the APATH environment variable.
         /// </remarks>
-        /// <param name="pathArgument">Must be a Char or Symbol type.</param>
         /// <param name="environment"></param>
+        /// <param name="pathArgument">Must be a Char or Symbol type.</param>
+        /// <param name="expectedExtension"></param>
         /// <returns>The absolute path for the file or if not found null.</returns>
-        internal static string GetPath(AType pathArgument, Aplus environment)
+        internal static string GetPath(Aplus environment, AType pathArgument, string expectedExtension)
         {
             string path = GetFullPathOrValue(pathArgument, environment);
             string resultPath = null;
@@ -155,7 +156,7 @@ namespace AplusCore.Runtime
                         absolutePath = Path.GetFullPath(absolutePath);
                     }
 
-                    if (FileSearch(absolutePath, out resultPath))
+                    if (FileSearch(absolutePath, expectedExtension, out resultPath))
                     {
                         break;
                     }
@@ -163,7 +164,7 @@ namespace AplusCore.Runtime
             }
             else
             {
-                FileSearch(path, out resultPath);
+                FileSearch(path, expectedExtension, out resultPath);
             }
 
             return resultPath;
@@ -175,7 +176,7 @@ namespace AplusCore.Runtime
         /// <param name="pathArgument">Must be a Char or Symbol type.</param>
         /// <param name="environment"></param>
         /// <returns>
-        /// Absolute path if the <see cref="parthArgument"/> is a relative/absoulte path.
+        /// Absolute path if the <see cref="pathArgument"/> is a relative/absoulte path.
         /// Name of the file extracted from the <see cref="pathArgument"/> if it is not a relative/absolute path.
         /// Null if the supplied <see cref="AType"/> has an incorrect type.
         /// </returns>
@@ -213,33 +214,28 @@ namespace AplusCore.Runtime
             return path;
         }
 
-        private static bool FileSearch(string path, out string result)
+        private static bool FileSearch(string path, string expectedExtension, out string result)
         {
-            bool found = false;
-            result = null;
+            string appendedExtension = string.Concat(path, expectedExtension);
 
-            if (Path.GetExtension(path) == ".m" && File.Exists(path))
+            if (Path.GetExtension(path) == expectedExtension && File.Exists(path))
             {
                 result = path;
-                found = true;
+            }
+            else if (File.Exists(appendedExtension))
+            {
+                result = appendedExtension;
+            }
+            else if (File.Exists(path))
+            {
+                result = path;
             }
             else
             {
-                string appendedExtension = path + ".m";
-
-                if (File.Exists(appendedExtension))
-                {
-                    result = appendedExtension;
-                    found = true;
-                }
-                else if (File.Exists(path))
-                {
-                    result = path;
-                    found = true;
-                }
+                result = null;
             }
 
-            return found;
+            return result != null;
         }
 
         #endregion

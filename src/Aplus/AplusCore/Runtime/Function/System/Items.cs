@@ -14,7 +14,7 @@ namespace AplusCore.Runtime.Function
         [SystemFunction("_items", "_items{y;x}: Increase/truncate the size of a memory-mapped file, or get the size of the file.")]
         internal static AType Items(Aplus environment, AType memoryMappedFileName, AType number)
         {
-            string resultPath = Util.GetPath(memoryMappedFileName, environment);
+            string resultPath = Util.GetPath(environment, memoryMappedFileName, ".m");
 
             if (resultPath == null)
             {
