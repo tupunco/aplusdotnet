@@ -125,6 +125,14 @@ namespace AplusCore.Runtime.Function.ADAP
                         writeList.Remove(connection.Socket); // this should only happen at unknown state but...
                         CallbackBySocketException(connection, exception, true);
                     }
+                    catch (ObjectDisposedException)
+                    {
+                        this.Close(connection.ConnectionAttributes.HandleNumber);
+                    }
+                    catch (NullReferenceException)
+                    {
+                        this.Close(connection.ConnectionAttributes.HandleNumber);
+                    }
                 }
 
                 foreach (Socket socket in writeList)
@@ -144,6 +152,14 @@ namespace AplusCore.Runtime.Function.ADAP
                     catch (SocketException exception)
                     {
                         CallbackBySocketException(connection, exception, false);
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        this.Close(connection.ConnectionAttributes.HandleNumber);
+                    }
+                    catch (NullReferenceException)
+                    {
+                        this.Close(connection.ConnectionAttributes.HandleNumber);
                     }
                 }
 
