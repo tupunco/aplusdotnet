@@ -205,7 +205,7 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #region i context related
 
-        public int GetPortByServiceName(AType name)
+        internal int GetPortByServiceName(AType name)
         {
             lock (mutex)
             {
@@ -418,9 +418,9 @@ namespace AplusCore.Runtime.Function.ADAP
             return Listen(func, name, ConnectionAttribute.DEFAULT_HOST, ConnectionAttribute.DEFAULT_PORT, protocol);
         }
 
-        public void InitFromListener(ConnectionAttribute connectionAttribute, Socket socket, AipcAttributes aipcAttributes)
+        public void InitFromListener(ConnectionAttribute connectionAttribute, AipcAttribute aipcAttributes, Socket socket)
         {
-            ConnectionAttribute attribute = new ConnectionAttribute(connectionAttribute);
+            ConnectionAttribute attribute = connectionAttribute.Clone();
             attribute.IsListener = false;
             AipcConnection connection = Create(attribute, aipcAttributes, socket);
 
@@ -428,7 +428,7 @@ namespace AplusCore.Runtime.Function.ADAP
             connection.MakeCallback("connected", AInteger.Create(connection.AipcAttributes.Listener));
         }
 
-        private AipcConnection Create(ConnectionAttribute connectionAttribute, AipcAttributes aipcAttributes, Socket socket)
+        private AipcConnection Create(ConnectionAttribute connectionAttribute, AipcAttribute aipcAttributes, Socket socket)
         {
             AipcConnection connection;
 
