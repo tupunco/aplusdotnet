@@ -641,9 +641,6 @@ namespace AplusCore.Runtime.Function.ADAP
 
             switch (exception.SocketErrorCode)
             {
-                case SocketError.ConnectionReset:
-                    Console.WriteLine("call reset? callback here with reset?! {0}", handle);
-                    break;
                 case SocketError.TimedOut:
                     connection.MakeCallback("timeout", ASymbol.Create("Timeout"));
                     break;
@@ -657,9 +654,9 @@ namespace AplusCore.Runtime.Function.ADAP
                     break;
                 case SocketError.NotInitialized:
                 case SocketError.NotConnected:
-
                     this.Close(connection.ConnectionAttributes.HandleNumber);
                     break;
+                case SocketError.ConnectionReset:
                 default:
                     connection.MakeCallback("reset", ASymbol.Create("unknown State"));
                     this.Close(connection.ConnectionAttributes.HandleNumber);
