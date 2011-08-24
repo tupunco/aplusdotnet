@@ -136,6 +136,7 @@
     <Compile Include="Runtime\Callback\CallbackManager.cs" />
     <Compile Include="Runtime\Context\AplusContextFunctionAttribute.cs" />
     <Compile Include="Runtime\Context\AplusContextAttribute.cs" />
+    <Compile Include="Runtime\Context\AplusContextInit.cs" />
     <Compile Include="Runtime\Context\ContextLoader.cs" />
     <Compile Include="Runtime\Context\ContextI.cs" />
     <Compile Include="Runtime\DependencyState.cs" />
