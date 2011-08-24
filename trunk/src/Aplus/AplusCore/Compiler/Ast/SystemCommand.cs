@@ -74,26 +74,30 @@ namespace AplusCore.Compiler.AST
                             );
                         }
                     }
-                    else if (File.Exists(this.argument))
-                    {
-                        // TODO: Save working directory and restore.
-                        // Save the previous context.
-                        string previousContext = runtime.CurrentContext;
-
-                        // Create the AST from file 
-                        Node fileAST = Parse.LoadFile(this.argument, runtime.LexerMode);
-                        // And generate the DLR tree
-                        codeBlock.AddFirst(fileAST.Generate(scope));
-
-                        // Restore the previous context
-                        runtime.CurrentContext = previousContext;
-                    }
                     else
                     {
-                        codeBlock.Clear();
-                        codeBlock.AddFirst(
-                            DLR.Expression.Constant(Helpers.BuildString(String.Format("Invalid file: {0}", this.argument)))
-                        );
+                        string path = Util.GetPath(runtime, ASymbol.Create(this.argument), ".a+");
+                        if (File.Exists(path))
+                        {
+                            // TODO: Save working directory and restore.
+                            // Save the previous context.
+                            string previousContext = runtime.CurrentContext;
+
+                            // Create the AST from file 
+                            Node fileAST = Parse.LoadFile(path, runtime.LexerMode);
+                            // And generate the DLR tree
+                            codeBlock.AddFirst(fileAST.Generate(scope));
+
+                            // Restore the previous context
+                            runtime.CurrentContext = previousContext;
+                        }
+                        else
+                        {
+                            codeBlock.Clear();
+                            codeBlock.AddFirst(
+                                DLR.Expression.Constant(Helpers.BuildString(String.Format("Invalid file: {0}", this.argument)))
+                            );
+                        }
                     }
                     break;
 
@@ -111,7 +115,7 @@ namespace AplusCore.Compiler.AST
                     else
                     {
                         codeBlock.Clear();
-                        codeBlock.AddFirst(DLR.Expression.Constant(Runtime.Helpers.BuildString(runtime.LexerMode.ToString())));                           
+                        codeBlock.AddFirst(DLR.Expression.Constant(Runtime.Helpers.BuildString(runtime.LexerMode.ToString())));
                     }
                     break;
 
@@ -126,7 +130,7 @@ namespace AplusCore.Compiler.AST
                         codeBlock.AddFirst(
                             DLR.Expression.Call(
                                 typeof(Runtime.Helpers).GetMethod("BuildString"),
-                                DLR.Expression.Property(scope.RuntimeExpression, "CurrentContext")                                
+                                DLR.Expression.Property(scope.RuntimeExpression, "CurrentContext")
                             )
                         );
                     }
@@ -191,7 +195,7 @@ namespace AplusCore.Compiler.AST
                     break;
 
             }
-            
+
             DLR.Expression result = DLR.Expression.Block(codeBlock);
 
             return result;
