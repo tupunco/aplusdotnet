@@ -39,6 +39,7 @@ namespace AplusCore.Runtime
 
         private void SetVariables()
         {
+            this.store["CCID"] = ASymbol.Create(".NET");
             this.store["cx"] = ASymbol.Create(".");
             this.store["mode"] = ASymbol.Create("apl");
             this.store["rl"] = AInteger.Create(1);
