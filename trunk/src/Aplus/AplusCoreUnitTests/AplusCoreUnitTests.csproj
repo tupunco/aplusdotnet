@@ -269,6 +269,9 @@
     <None Include="Dlr\Function\ADAP\Expected\numbervector.dat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Dlr\Function\ADAP\Expected\strand.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Dlr\Function\ADAP\Expected\string.dat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

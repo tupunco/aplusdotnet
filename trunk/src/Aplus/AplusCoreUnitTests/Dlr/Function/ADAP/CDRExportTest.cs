@@ -15,6 +15,17 @@ namespace AplusCoreUnitTests.Dlr.Function.ADAP
         #region Normal cases
 
         [TestCategory("DLR"), TestCategory("ADAP"), TestCategory("Export"), TestMethod]
+        public void StrandTest()
+        {
+            AType item = this.engine.Execute<AType>("(`eval;(1;2);'+')");
+
+            byte[] result = SysExp.Instance.Format(item);
+            byte[] expected = TestUtils.FileToByteArray("strand.dat");
+
+            Assert.IsTrue(expected.SequenceEqual(result));
+        }
+        
+        [TestCategory("DLR"), TestCategory("ADAP"), TestCategory("Export"), TestMethod]
         public void IntegerTest()
         {
             AType item = this.engine.Execute<AType>("1");
