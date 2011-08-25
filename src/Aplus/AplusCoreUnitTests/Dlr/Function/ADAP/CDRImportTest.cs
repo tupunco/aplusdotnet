@@ -13,13 +13,23 @@ namespace AplusCoreUnitTests.Dlr.Function.ADAP
         #region Normal cases
 
         [TestCategory("DLR"), TestCategory("ADAP"), TestCategory("Import"), TestMethod]
+        public void StrandTest()
+        {
+            AType result = SysImp.Instance.Import(TestUtils.FileToByteArray("strand.dat"));
+            AType expected = this.engine.Execute<AType>("(`eval;(1;2);'+')");
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+        
+        [TestCategory("DLR"), TestCategory("ADAP"), TestCategory("Import"), TestMethod]
         public void IntegerTest()
         {
             AType result = SysImp.Instance.Import(TestUtils.FileToByteArray("number.dat"));
             AType expected = this.engine.Execute<AType>("1");
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
-            Assert.AreEqual(result, expected);
+            Assert.AreEqual(expected, result);
         }
 
         [TestCategory("DLR"), TestCategory("ADAP"), TestCategory("Import"), TestMethod]

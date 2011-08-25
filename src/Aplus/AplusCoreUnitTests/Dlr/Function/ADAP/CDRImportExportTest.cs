@@ -12,6 +12,17 @@ namespace AplusCoreUnitTests.Dlr.Function.ADAP
     public class CDRImportExportTest : AbstractTest
     {
         [TestCategory("DLR"), TestCategory("ADAP"), TestCategory("Import-Export"), TestMethod]
+        public void StrandTest()
+        {
+            byte[] expected = TestUtils.FileToByteArray("strand.dat");
+
+            AType item = SysImp.Instance.Import(expected);
+            byte[] result = SysExp.Instance.Format(item);
+
+            Assert.IsTrue(expected.SequenceEqual(result));
+        }
+        
+        [TestCategory("DLR"), TestCategory("ADAP"), TestCategory("Import-Export"), TestMethod]
         public void IntegerTest()
         {
             byte[] expected = TestUtils.FileToByteArray("number.dat");
