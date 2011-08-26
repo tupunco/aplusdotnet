@@ -139,6 +139,7 @@
     <Compile Include="Runtime\Context\AplusContextInit.cs" />
     <Compile Include="Runtime\Context\ContextLoader.cs" />
     <Compile Include="Runtime\Context\ContextI.cs" />
+    <Compile Include="Runtime\Context\ContextSys.cs" />
     <Compile Include="Runtime\DependencyState.cs" />
     <Compile Include="Runtime\DependencyItem.cs" />
     <Compile Include="Runtime\DependencyManager.cs" />

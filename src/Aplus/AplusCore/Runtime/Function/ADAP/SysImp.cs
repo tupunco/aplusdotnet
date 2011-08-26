@@ -52,9 +52,9 @@ namespace AplusCore.Runtime.Function.ADAP
         /// <returns>The AType created from the byte array.</returns>
         public AType Import(byte[] argument)
         {
-            this.headerIndex = HeaderStartIndex; 
+            this.headerIndex = HeaderStartIndex;
 
-            if (argument[0] != CDRConstants.CDRFlag)
+            if (argument.Length < HeaderStartIndex || argument[0] != CDRConstants.CDRFlag)
             {
                 throw new Error.Domain("sys.imp");
             }
