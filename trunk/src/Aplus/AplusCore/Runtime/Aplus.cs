@@ -119,7 +119,7 @@ namespace AplusCore.Runtime
             }
 
             // TODO: Move this to app.config?
-            this.autoloadContexts = new string[] { };
+            this.autoloadContexts = new string[] { "sys" };
             this.contextLoader = new ContextLoader(this);
         }
 
