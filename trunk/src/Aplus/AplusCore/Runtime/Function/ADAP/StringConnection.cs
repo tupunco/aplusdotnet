@@ -12,7 +12,7 @@ namespace AplusCore.Runtime.Function.ADAP
         #region Constructors
 
         public StringConnection(
-            AipcService aipcService, 
+            AipcService aipcService,
             ConnectionAttribute attribute,
             AipcAttribute aipcAttributes,
             Socket socket)
@@ -126,14 +126,23 @@ namespace AplusCore.Runtime.Function.ADAP
         public override AType SyncSend(AType message, AType timeout)
         {
             AType result = null;
+            bool previousWritePauseState = this.AipcAttributes.WritePause;
+            this.AipcAttributes.WritePause = true;
+
+            try
+            {
+                this.writeBuffer.AddLast(this.ConvertToByte(message));
+            }
+            catch (ADAPException)
+            {
+                this.AipcAttributes.WritePause = previousWritePauseState;
+                return AInteger.Create(-1);
+            }
+            
             int time = timeout.asInteger * 1000;
             int timeForAByte = time / this.WriteBufferContentSize;
             int messageSent = 0;
             bool errorOccured = false;
-            bool previousWritePauseState = this.AipcAttributes.WritePause;
-
-            this.AipcAttributes.WritePause = true;
-            this.writeBuffer.AddLast(this.ConvertToByte(message));
 
             while (writeBuffer.Count > 0)
             {
@@ -166,7 +175,7 @@ namespace AplusCore.Runtime.Function.ADAP
 
             connectionSocket.SendTimeout = 0;
             this.AipcAttributes.WritePause = previousWritePauseState;
-            
+
             if (!errorOccured)
             {
                 result = SyncFillOk(AInteger.Create(messageSent), false);
@@ -177,7 +186,7 @@ namespace AplusCore.Runtime.Function.ADAP
 
         public override AType SyncRead(AType timeout)
         {
-            
+
             byte[] messageByte;
             bool previousReadPauseState = this.AipcAttributes.ReadPause;
             this.AipcAttributes.ReadPause = true;
@@ -194,6 +203,7 @@ namespace AplusCore.Runtime.Function.ADAP
             }
             finally
             {
+                this.AipcAttributes.ReadPause = previousReadPauseState;
                 this.connectionSocket.ReceiveTimeout = 0;
             }
 
@@ -209,8 +219,6 @@ namespace AplusCore.Runtime.Function.ADAP
                 return SyncFillError(SocketError.ConnectionReset, true);
             }
 
-            this.AipcAttributes.ReadPause = previousReadPauseState;
-
             return SyncFillOk(message, true);
         }
 
@@ -224,7 +232,7 @@ namespace AplusCore.Runtime.Function.ADAP
             byte[] messageBody = ASCIIEncoder.GetBytes(message.ToString());
             byte[] messageHeader = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(messageBody.Length));
             List<byte> result = new List<byte>();
-            
+
             result.AddRange(messageHeader);
             result.AddRange(messageBody);
 
