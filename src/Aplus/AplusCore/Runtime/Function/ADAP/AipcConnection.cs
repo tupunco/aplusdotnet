@@ -133,12 +133,20 @@ namespace AplusCore.Runtime.Function.ADAP
             AType handle = AInteger.Create(this.ConnectionAttributes.HandleNumber);
             AType eventType = ASymbol.Create(eventTypeName);
 
-            CallbackFunction(
-                this.ConnectionAttributes.Function,
-                this.AipcService.Environment,
-                handle,
-                eventType,
-                callData);
+            try
+            {
+                CallbackFunction(
+                    this.ConnectionAttributes.Function,
+                    this.AipcService.Environment,
+                    handle,
+                    eventType,
+                    callData);
+            }
+            catch (Error error)
+            {
+                // FIX: report error through environmnet.
+                Console.WriteLine(error);
+            }
         }
 
         /// <summary>
