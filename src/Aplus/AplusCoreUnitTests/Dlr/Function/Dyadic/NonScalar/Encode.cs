@@ -56,6 +56,41 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Encode"), TestMethod]
+        public void EncodeIntegerListStartsWith0ToInteger2()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(1),
+                AInteger.Create(1)
+            );
+
+            AType result = this.engine.Execute<AType>("0 100 unpack 101");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Encode"), TestMethod]
+        public void EncodeIntegerListContains0ToInteger2()
+        {
+            // corner case, the last 0 will allways contain the remaining part
+            // eg. 24 0 60 60 unpack 7200 will result 0 2 0 0
+            
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(0),
+                AInteger.Create(1),
+                AInteger.Create(0),
+                AInteger.Create(0)
+            );
+
+            AType result = this.engine.Execute<AType>("24 0  60 60 unpack 3600");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Encode"), TestMethod]
         public void EncodeInteger2IntegerList()
         {
             AType expected = AArray.Create(
