@@ -242,6 +242,7 @@
     <Compile Include="Runtime\Function\System\Items.cs" />
     <Compile Include="Runtime\Function\System\LoadFile.cs" />
     <Compile Include="Runtime\Function\System\PermissiveIndexing.cs" />
+    <Compile Include="Runtime\Function\System\StringSearchandReplace.cs" />
     <Compile Include="Runtime\Function\System\SystemFunction.cs" />
     <Compile Include="Runtime\Function\System\SystemFunctionAttribute.cs" />
     <Compile Include="Runtime\Function\System\SystemVariables.cs" />
