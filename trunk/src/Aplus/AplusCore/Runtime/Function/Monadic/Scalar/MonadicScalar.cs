@@ -11,7 +11,6 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
         #region Variables
 
         private ATypes defaultResultType;
-        private ATypes currentType;
         private HashSet<ATypes> allowedTypes;
 
         #endregion
@@ -49,36 +48,36 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
 
         public override AType Execute(AType argument, Aplus environment = null)
         {
-            this.currentType = argument.Type;
+            ATypes currentType = argument.Type;
 
             if (argument.Length == 0)
             {
                 return AArray.Create(this.defaultResultType != ATypes.AType ? this.defaultResultType : argument.Type);
             }
             // Check if we have a rule for the specific input type
-            else if (!this.allowedTypes.Contains(this.currentType))
+            else if (!this.allowedTypes.Contains(currentType))
             {
                 // Rule not found
 
                 // reset to the general case
-                this.currentType = ATypes.AType;
+                currentType = ATypes.AType;
 
                 // Check if we have default case
-                if (!this.allowedTypes.Contains(this.currentType))
+                if (!this.allowedTypes.Contains(currentType))
                 {
                     // throw a type error
                     throw new Error.Type(this.TypeErrorText);
                 }
             }
 
-            return ExecuteRecursion(argument, environment);
+            return ExecuteRecursion(argument, currentType, environment);
         }
 
         #endregion
 
         #region Recursion
 
-        private AType ExecuteRecursion(AType argument, Aplus environment)
+        private AType ExecuteRecursion(AType argument, ATypes currentType, Aplus environment)
         {
             AType result;
             if (argument.IsArray)
@@ -90,7 +89,7 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
 
                 for (int i = 0; i < argument.Length; i++)
                 {
-                    currentItem = ExecuteRecursion(argument[i], environment);
+                    currentItem = ExecuteRecursion(argument[i], currentType, environment);
                     floatTypeCounter += (uint)((currentItem.Type == ATypes.AFloat) ? 1 : 0);
 
                     result.AddWithNoUpdate(currentItem);

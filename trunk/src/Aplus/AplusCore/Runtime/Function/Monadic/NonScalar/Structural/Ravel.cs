@@ -6,37 +6,26 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
 {
     class Ravel : AbstractMonadicFunction
     {
-        #region Variables
-
-        private AType result;
-
-        #endregion
-
         #region Entry point
 
         public override AType Execute(AType argument, Aplus environment = null)
         {
+            AType result = AArray.Create(argument.Type);
+
             if (argument.IsArray)
             {
-                result = AArray.Create(argument.Type);
-                ExecuteRecursion(argument);
+                ExtractItems(argument, result);
 
-                int length = 1;
-                foreach (int item in argument.Shape)
-                {
-                    length *= item;
-                }
-
-                result.Length = length;
+                result.Length = argument.Shape.Product();
                 result.Shape = new List<int>() { result.Length };
                 result.Rank = 1;
-
-                return result;
             }
             else
             {
-                return AArray.Create(argument.Type, argument);
+                result.Add(argument);
             }
+
+            return result;
         }
 
         #endregion
@@ -44,22 +33,22 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
         #region Computation
 
         /// <summary>
-        /// Recursively convert items to a vector
+        /// ExtractItems from the <see cref="argument"/> and add it to the <see cref="result"/> vector.
         /// </summary>
         /// <param name="argument"></param>
         /// <param name="result">The array stores the result vector</param>
-        private void ExecuteRecursion(AType argument)
+        private void ExtractItems(AType argument, AType result)
         {
             if (argument.IsArray)
             {
                 foreach (AType item in argument)
                 {
-                    ExecuteRecursion(item);
+                    ExtractItems(item, result);
                 }
             }
             else
             {
-                this.result.AddWithNoUpdate(argument);
+                result.AddWithNoUpdate(argument);
             }
         }
 
