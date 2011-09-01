@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 
 using AplusCore.Runtime.Function.ADAP;
 using AplusCore.Types;
@@ -48,6 +49,29 @@ namespace AplusCore.Runtime.Context
             }
 
             result.UpdateInfo();
+
+            return result;
+        }
+
+        [AplusContextFunction("filesize", "sys.filesize{string} returns any")]
+        public static AType FileSize(Aplus environment, AType argument)
+        {
+            if (argument.Type != ATypes.AChar)
+            {
+                throw new Error.Type("sys.filesize");
+            }
+            
+            AType result;
+            string fileName = argument.ToString();
+
+            if (File.Exists(fileName))
+            {
+                result = Utils.CreateATypeResult((new FileInfo(fileName)).Length);
+            }
+            else
+            {
+                result = AInteger.Create(-1);
+            }
 
             return result;
         }
