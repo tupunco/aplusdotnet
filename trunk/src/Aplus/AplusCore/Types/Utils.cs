@@ -93,11 +93,6 @@ namespace AplusCore.Types
                 throw new Error.Type("assign");
             }
 
-            if (target.Rank < value.Rank)
-            {
-                throw new Error.Rank("assign");
-            }
-
             AType result;
 
             if (value.Length == 1 && value.TryFirstScalar(out result, true))
@@ -120,6 +115,10 @@ namespace AplusCore.Types
                 {
                     PerformIndexAssign(target[i], value[i]);
                 }
+            }
+            else if (target.Rank < value.Rank)
+            {
+                throw new Error.Rank("assign");
             }
             else
             {

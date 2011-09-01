@@ -39,6 +39,21 @@ namespace AplusCoreUnitTests.Dlr
         }
 
         [TestCategory("DLR"), TestCategory("Indexing"), TestMethod]
+        public void SingleElementIndexing()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+
+            scope.SetVariable(".a", Helpers.BuildString("hello"));
+
+            AType expected = Helpers.BuildString("Hello");
+
+            this.engine.Execute<AType>("a[0] := 1 1 rho 'H'", scope);
+            AType result = scope.GetVariable<AType>(".a");
+
+            Assert.AreEqual(expected, result, "Incorrect assignment performed");
+        }
+
+        [TestCategory("DLR"), TestCategory("Indexing"), TestMethod]
         public void TypeConvertIndexing()
         {
             ScriptScope scope = this.engine.CreateScope();
