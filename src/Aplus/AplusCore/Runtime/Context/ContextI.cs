@@ -9,7 +9,10 @@ namespace AplusCore.Runtime.Context
         [AplusContextInit]
         public static void InitContext(Aplus environment)
         {
-            environment.SetService<AipcService>(new AipcService(environment));
+            AipcService service = new AipcService(environment);
+            service.StartNetworkLoop();
+
+            environment.SetService<AipcService>(service);
         }
 
         [AplusContextFunction("syncsend", "i.syncsend{scalar int;any;any} returns any")]

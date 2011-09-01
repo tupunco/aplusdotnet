@@ -40,9 +40,6 @@ namespace AplusCore.Runtime.Function.ADAP
             this.roster = new Dictionary<int, AipcConnection>();
             this.retryList = new HashSet<AipcConnection>();
             this.mutex = new object();
-            this.networkThread = new Thread(new ThreadStart(NetworkLoop));
-            this.networkThread.IsBackground = true;
-            this.networkThread.Start();
         }
 
         #endregion
@@ -54,6 +51,16 @@ namespace AplusCore.Runtime.Function.ADAP
             lock (mutex)
             {
                 retryList.Add(conn);
+            }
+        }
+
+        internal void StartNetworkLoop()
+        {
+            if (this.networkThread == null)
+            {
+                this.networkThread = new Thread(new ThreadStart(NetworkLoop));
+                this.networkThread.IsBackground = true;
+                this.networkThread.Start();
             }
         }
 
