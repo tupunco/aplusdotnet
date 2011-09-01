@@ -22,10 +22,43 @@ namespace AplusCore.Runtime.Function.ADAP
 
         #endregion
 
-        #region Variables
+        #region Nested class for argument pass
 
-        private int headerIndex;
-        private int dataIndex;
+        /// <summary>
+        /// Class to store information about the the data to be imported
+        /// </summary>
+        class ImportInfo
+        {
+            private byte[] data;
+            private int headerIndex;
+            private int dataIndex;
+
+            internal ImportInfo(byte[] data)
+            {
+                this.data = data;
+            }
+
+            internal byte[] Data
+            {
+                get { return this.data; }
+            }
+
+            internal int HeaderIndex
+            {
+                get { return this.headerIndex; }
+                set { this.headerIndex = value; }
+            }
+
+            internal int DataIndex
+            {
+                get { return this.dataIndex; }
+                set { this.dataIndex = value; }
+            }
+        }
+
+        #endregion
+
+        #region Variables
 
         private static SysImp instance = new SysImp();
 
@@ -52,47 +85,49 @@ namespace AplusCore.Runtime.Function.ADAP
         /// <returns>The AType created from the byte array.</returns>
         public AType Import(byte[] argument)
         {
-            this.headerIndex = HeaderStartIndex;
-
             if (argument.Length < HeaderStartIndex || argument[0] != CDRConstants.CDRFlag)
             {
                 throw new Error.Domain("sys.imp");
             }
-            
+
+            ImportInfo info = new ImportInfo(argument)
+            {
+                HeaderIndex = HeaderStartIndex
+            };
+
             // the first 4 byte of the header contains the cdr flag, plus the length of the message.
             byte[] headerByteLength = { 0, argument[1], argument[2], argument[3] };
-            int headerLength = BitConverter.ToInt32(headerByteLength, 0);
-            headerLength = IPAddress.NetworkToHostOrder(headerLength);
+            int headerLength = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(headerByteLength, 0));
 
-            this.dataIndex = headerLength;
+            info.DataIndex = headerLength;
 
-            return GetItems(ref argument);
+            return ExtractItems(info);
         }
 
 
         /// <summary>
-        /// Gets the AType elements from the header and the data.
+        /// Extract the AType elements from the header and the data.
         /// </summary>
-        /// <param name="argument">The byte array.</param>
-        /// <returns>The AType created from the byte array.</returns>
-        private AType GetItems(ref byte[] argument)
+        /// <param name="info">The class containing the informations for importing.</param>
+        /// <returns>The AType created from the import informations.</returns>
+        private AType ExtractItems(ImportInfo info)
         {
             AType result;
 
             List<int> shape = new List<int>();
-            
+
             // The format of the CDR type descriptor
-            int count = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(argument, headerIndex));
-            headerIndex += SizeOfCount;
-            short typeCode = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(argument, headerIndex));
-            headerIndex += SizeOfType;
-            short rank = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(argument, headerIndex));
-            headerIndex += SizeOfRank;
+            int count = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(info.Data, info.HeaderIndex));
+            info.HeaderIndex += SizeOfCount;
+            short typeCode = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(info.Data, info.HeaderIndex));
+            info.HeaderIndex += SizeOfType;
+            short rank = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(info.Data, info.HeaderIndex));
+            info.HeaderIndex += SizeOfRank;
 
             for (short i = 0; i < rank; i++)
             {
-                shape.Add(IPAddress.NetworkToHostOrder(BitConverter.ToInt32(argument, headerIndex)));
-                headerIndex += SizeOfShape;
+                shape.Add(IPAddress.NetworkToHostOrder(BitConverter.ToInt32(info.Data, info.HeaderIndex)));
+                info.HeaderIndex += SizeOfShape;
             }
 
             if (typeCode == CDRConstants.CDRBoxShort)
@@ -101,26 +136,27 @@ namespace AplusCore.Runtime.Function.ADAP
                 {
                     // if an item is ANull, the header contains 20 bytes (more in CDR spec)
                     result = Utils.ANull();
-                    headerIndex += ANullDescriptorLength;
+                    info.HeaderIndex += ANullDescriptorLength;
                 }
                 else
                 {
-                    short nestedType = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(argument, headerIndex + 4));
+                    short nestedType = 
+                        IPAddress.NetworkToHostOrder(BitConverter.ToInt16(info.Data, info.HeaderIndex + 4));
 
                     // `sym is always boxed (see more in CDR spec)
                     if (nestedType == CDRConstants.CDRSymShort)
                     {
-                        result = BuildSymbol(shape, ref argument);
+                        result = BuildSymbol(shape, info);
                     }
                     else
                     {
-                        result = BuildBox(shape, ref argument);
+                        result = BuildBox(shape, info);
                     }
                 }
             }
             else if (typeCode == CDRConstants.CDRSymShort)
             {
-                result = BuildSymbol(shape, ref argument);
+                result = BuildSymbol(shape, info);
             }
             else
             {
@@ -147,8 +183,10 @@ namespace AplusCore.Runtime.Function.ADAP
                     throw new Error.Domain("sys.imp");
                 }
 
-                result = ATypeConverter.Instance.BuildArray(shape, ref argument, type, dataIndex);
-                dataIndex += length;
+                byte[] data = info.Data;
+                result = ATypeConverter.Instance.BuildArray(shape, ref data, type, info.DataIndex);
+
+                info.DataIndex += length;
             }
 
             return result;
@@ -158,23 +196,23 @@ namespace AplusCore.Runtime.Function.ADAP
         /// Builds a box/boxarray.
         /// </summary>
         /// <param name="shape">The shape of the AType.</param>
-        /// <param name="argument">The byte array.</param>
+        /// <param name="info">The class containing the informations for importing.</param>
         /// <returns></returns>
-        private AType BuildBox(List<int> shape, ref byte[] argument)
+        private AType BuildBox(List<int> shape, ImportInfo info)
         {
             AType result;
 
             if (shape.Count == 0)
             {
-                result = ABox.Create(GetItems(ref argument));
+                result = ABox.Create(ExtractItems(info));
             }
             else
             {
+                List<int> subshape = shape.GetRange(1, shape.Count - 1);
                 result = AArray.Create(ATypes.ABox);
-
                 for (int i = 0; i < shape[0]; i++)
                 {
-                    result.Add(BuildBox(shape.GetRange(1, shape.Count - 1), ref argument));
+                    result.Add(BuildBox(subshape, info));
                 }
             }
 
@@ -185,9 +223,9 @@ namespace AplusCore.Runtime.Function.ADAP
         /// Determines the lengths of the ASymbols to build, and then calls BuildSymbolArray to build it.
         /// </summary>
         /// <param name="shape">The shape of the AType.</param>
-        /// <param name="argument">The byte array.</param>
+        /// <param name="info">The class containing the informations for importing.</param>
         /// <returns></returns>
-        private AType BuildSymbol(List<int> shape, ref byte[] argument)
+        private AType BuildSymbol(List<int> shape, ImportInfo info)
         {
             int numberOfSymbols = shape.Product();
             int totalLength = 0;
@@ -196,14 +234,14 @@ namespace AplusCore.Runtime.Function.ADAP
             for (int i = 0; i < numberOfSymbols; i++)
             {
                 // because of the structure of the CDR type descriptor
-                int actualLength = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(argument, headerIndex));
+                int actualLength = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(info.Data, info.HeaderIndex));
 
-                headerIndex += ASymbolDescriptorLength;
+                info.HeaderIndex += ASymbolDescriptorLength;
                 totalLength += actualLength;
                 symbolLengths.Add(actualLength);
             }
 
-            AType result = BuildSymbolArray(shape, symbolLengths, ref argument);
+            AType result = BuildSymbolArray(shape, symbolLengths, info);
             return result;
         }
 
@@ -212,9 +250,9 @@ namespace AplusCore.Runtime.Function.ADAP
         /// </summary>
         /// <param name="shape">The shape of the AType.</param>
         /// <param name="symbolLengths">The lengths of the ASymbols contained by the AType.</param>
-        /// <param name="data"> The byte array.</param>
+        /// <param name="info">The class containing the informations for importing.</param>
         /// <returns></returns>
-        private AType BuildSymbolArray(List<int> shape, IEnumerable<int> symbolLengths, ref byte[] data)
+        private AType BuildSymbolArray(List<int> shape, IEnumerable<int> symbolLengths, ImportInfo info)
         {
             AType result = Utils.ANull();
 
@@ -225,8 +263,8 @@ namespace AplusCore.Runtime.Function.ADAP
 
                 for (int i = 0; i < length; i++)
                 {
-                    toSymbol.Append((char)data[dataIndex]);
-                    dataIndex++;
+                    toSymbol.Append((char)info.Data[info.DataIndex]);
+                    info.DataIndex++;
                 }
 
                 result = ASymbol.Create(toSymbol.ToString());
@@ -240,7 +278,7 @@ namespace AplusCore.Runtime.Function.ADAP
                 {
                     IEnumerable<int> nextSymbolLengths = symbolLengths.Skip(i * subDimensionLength).Take(subDimensionLength);
 
-                    result.Add(BuildSymbolArray(nextShape, nextSymbolLengths, ref data));
+                    result.Add(BuildSymbolArray(nextShape, nextSymbolLengths, info));
                     // advance the bytestream further.
                 }
             }
