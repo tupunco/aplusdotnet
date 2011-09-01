@@ -51,5 +51,14 @@ namespace AplusCore.Runtime
         }
 
         #endregion
+
+        #region Entry handling
+
+        public bool Contains(string key)
+        {
+            return this.store.ContainsKey(key);
+        }
+
+        #endregion
     }
 }
