@@ -23,6 +23,17 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Decode"), TestMethod]
+        public void DecodeFloat2FloatList()
+        {
+            AType expected = AFloat.Create(33);
+
+            AType result = this.engine.Execute<AType>("2 pack 4. 7 3");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Decode"), TestMethod]
         public void DecodeIntegerList2IntegerList()
         {
             AType expected = AInteger.Create(7559);

@@ -7,9 +7,13 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
 {
     class Pick : AbstractDyadicFunction
     {
-        #region Variables
+        #region Constructors
 
-        private bool resultFromBox;
+        internal Pick()
+        {
+            Pick.SymbolConstant2SlotFillerDelegate = new ItemSelectDelegate(SimpleSymbolConstant2SlotFiller);
+            Pick.NestedPathNumber2NestedArrayDelegate = new ItemSelectDelegate(NestedPathNumber2NestedArray);
+        }
 
         #endregion
 
@@ -19,7 +23,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
         private static ItemSelectDelegate SymbolConstant2SlotFillerDelegate;
         private static ItemSelectDelegate NestedPathNumber2NestedArrayDelegate;
 
-        private AType ItemSelectWalker(ItemSelectDelegate method, AType argument, AType items, Aplus environment)
+        private AType ItemSelectWalker(
+            ItemSelectDelegate method, AType argument, AType items, Aplus environment)
         {
             AType result = items;
 
@@ -49,14 +54,9 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
 
         public override AType Execute(AType right, AType left, Aplus environment = null)
         {
-            if (Pick.SymbolConstant2SlotFillerDelegate == null)
-            {
-                Pick.SymbolConstant2SlotFillerDelegate = new ItemSelectDelegate(SimpleSymbolConstant2SlotFiller);
-                Pick.NestedPathNumber2NestedArrayDelegate = new ItemSelectDelegate(NestedPathNumber2NestedArray);
-            }
-            this.resultFromBox = false;
+            bool resultFromBox;
 
-            AType result = Compute(right, left, environment);
+            AType result = Compute(environment, right, left, out resultFromBox);
             return result;
         }
 
@@ -66,8 +66,10 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
 
         public PickAssignmentTarget AssignExecute(AType right, AType left, Aplus environment = null)
         {
-            AType result = Execute(right, left, environment);
-            return new PickAssignmentTarget(result, this.resultFromBox);
+            bool resultFromBox;
+
+            AType result = Compute(environment, right, left, out resultFromBox);
+            return new PickAssignmentTarget(result, resultFromBox);
         }
 
         #endregion
@@ -76,11 +78,10 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
 
         #region Selection
 
-        public AType Compute(AType right, AType left, Aplus environment)
+        public AType Compute(Aplus environment, AType right, AType left, out bool resultFromBox)
         {
             //Type Error!
-            if (left.Type == ATypes.AChar || 
-                (left.Type == ATypes.AFloat && left.asInteger != left.asFloat))
+            if (left.Type == ATypes.AChar || (left.Type == ATypes.AFloat && left.asInteger != left.asFloat))
             {
                 throw new Error.Type(TypeErrorText);
             }
@@ -89,36 +90,41 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
             // Case 2: If the right argument is scalar than we wrap it to one-element vector.
             AType rightArray;
 
-            if(right.IsArray)
+            if (right.IsArray)
             {
                 rightArray = right;
             }
             else
             {
-                rightArray = AArray.Create(
-                    right.Type,
-                    right.IsMemoryMappedFile ?
-                    right.Clone() :
-                    right
-                );
+                rightArray = 
+                    AArray.Create(right.Type, right.IsMemoryMappedFile ? right.Clone() : right);
             }
+
+            AType result;
 
             if (left.IsBox)                         // Case 6
             {
-                return ItemSelectWalker(NestedPathNumber2NestedArrayDelegate, left, rightArray, environment);
+                resultFromBox = true;
+                result =
+                    ItemSelectWalker(NestedPathNumber2NestedArrayDelegate, left, rightArray, environment);
             }
             else if (left.Type == ATypes.ASymbol)   // Case 3
             {
-                return ItemSelectWalker(SymbolConstant2SlotFillerDelegate, left, rightArray, environment);
+                resultFromBox = true;
+                result =
+                    ItemSelectWalker(SymbolConstant2SlotFillerDelegate, left, rightArray, environment);
             }
             else if (right.IsBox)                   // Case 5
             {
-                return PathVector2NestedVector(left, rightArray);
+                result = PathVector2NestedVector(left, rightArray, out resultFromBox);
             }
             else                                    // Case 1-2-4
             {
-                return SimpleNumeric2SimpleRight(left, rightArray);
+                resultFromBox = false;
+                result = SimpleNumeric2SimpleRight(left, rightArray);
             }
+
+            return result;
         }
 
         #endregion
@@ -140,6 +146,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
                 throw new Error.Domain(DomainErrorText);
             }
 
+            AType result;
             AType keys = MonadicFunctionInstance.Disclose.Execute(items[0], environment);
             AType values = MonadicFunctionInstance.Disclose.Execute(items[1], environment);
 
@@ -183,8 +190,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
                     throw new Error.Domain(DomainErrorText);
                 }
 
-                this.resultFromBox = true;
-                return MonadicFunctionInstance.Disclose.Execute(values[index], environment);
+                result = MonadicFunctionInstance.Disclose.Execute(values[index], environment);
             }
             else
             {
@@ -198,10 +204,11 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
                 {
                     throw new Error.Domain(DomainErrorText);
                 }
-
-                this.resultFromBox = true;
-                return MonadicFunctionInstance.Disclose.Execute(values, environment);
+    
+                result = MonadicFunctionInstance.Disclose.Execute(values, environment);
             }
+
+            return result;
         }
 
         #endregion
@@ -251,7 +258,6 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
                 throw new Error.Index(IndexErrorText);
             }
 
-            this.resultFromBox = false;
             return right[index];
         }
 
@@ -265,7 +271,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
         /// <param name="path"></param>
         /// <param name="items"></param>
         /// <returns></returns>
-        private AType PathVector2NestedVector(AType path, AType items)
+        private AType PathVector2NestedVector(AType path, AType items, out bool resultFromBox)
         {
             AType result;
             AType element;
@@ -281,23 +287,27 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
                     throw new Error.Rank(RankErrorText);
                 }
 
-                //Case 0
+                result = items;
+
+                // Case 0
                 if (path.Type == ATypes.ANull || path.Length == 0)
                 {
-                    return items;
+                    resultFromBox = false;
                 }
-
-                result = items;
-                foreach (AType item in path)
-                {
-                    result = PathNumber2NestedVector(item, result);
+                else
+                {    
+                    resultFromBox = true;
+                    foreach (AType item in path)
+                    {
+                        result = PathNumber2NestedVector(item, result);
+                    }
                 }
             }
+            resultFromBox = true;
 
             return result;
         }
 
-        //Path must be AInteger!
         /// <summary>
         /// CASE 5: Nested vector right argument and simple left argument.
         /// </summary>
@@ -324,7 +334,6 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
                 throw new Error.Index(IndexErrorText);
             }
 
-            this.resultFromBox = true;
             return MonadicFunctionInstance.Disclose.Execute(items[index]);
         }
 
@@ -373,7 +382,6 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
                     throw new Error.Domain(DomainErrorText);
                 }
 
-                this.resultFromBox = true;
                 return MonadicFunctionInstance.Disclose.Execute(result, environment);
             }
             else if (path.Type == ATypes.AInteger)
@@ -385,7 +393,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
 
                 if (path.Length == 1)
                 {
-                    //Case 5
+                    // Case 5
                     return PathNumber2NestedVector(path.IsArray ? path[0] : path, items);
                 }
 
@@ -418,7 +426,6 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Selection
                     items = items[index];
                 }
 
-                this.resultFromBox = true;
                 return MonadicFunctionInstance.Disclose.Execute(items, environment);
             }
             else if (path.Type == ATypes.ASymbol)

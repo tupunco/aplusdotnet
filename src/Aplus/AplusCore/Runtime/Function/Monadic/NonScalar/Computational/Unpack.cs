@@ -7,12 +7,6 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
 {
     class Unpack : AbstractMonadicFunction
     {
-        #region Variables
-
-        private int lastDimension;
-
-        #endregion
-
         #region Entry point
 
         public override AType Execute(AType argument, Aplus environment = null)
@@ -28,19 +22,23 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
         /// Find longest symbol in the argument.
         /// </summary>
         /// <param name="argument"></param>
-        private void DetermineLastDimension(AType argument)
+        private int DetermineLastDimension(AType argument)
         {
+            int localMax = int.MinValue;
+
             if (argument.Rank > 0)
             {
                 foreach (AType item in argument)
                 {
-                    DetermineLastDimension(item);
+                    localMax = Math.Max(DetermineLastDimension(item), localMax);
                 }
             }
             else
             {
-                this.lastDimension = Math.Max(this.lastDimension, argument.asString.Length);
+                localMax = Math.Max(localMax, argument.asString.Length);
             }
+
+            return localMax;
         }
 
         #endregion
@@ -64,11 +62,9 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
                 throw new Error.MaxRank(MaxRankErrorText);
             }
 
-            this.lastDimension = int.MinValue;
+            int lastDimension = DetermineLastDimension(argument);
 
-            DetermineLastDimension(argument);
-
-            return CreateCharArray(argument);
+            return CreateCharArray(argument, lastDimension);
         }
 
         /// <summary>
@@ -76,7 +72,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
         /// </summary>
         /// <param name="argument"></param>
         /// <returns></returns>
-        private AType CreateCharArray(AType argument)
+        private AType CreateCharArray(AType argument, int lastDimension)
         {
             if (argument.Rank > 0)
             {
@@ -84,19 +80,19 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
 
                 foreach (AType item in argument)
                 {
-                    result.AddWithNoUpdate(CreateCharArray(item));
+                    result.AddWithNoUpdate(CreateCharArray(item, lastDimension));
                 }
 
                 result.Length = argument.Length;
                 result.Shape = new List<int>(argument.Shape);
-                result.Shape.Add(this.lastDimension);
+                result.Shape.Add(lastDimension);
                 result.Rank = argument.Rank + 1;
 
                 return result;
             }
             else
             {
-                return Convert(argument);
+                return Convert(argument, lastDimension);
             }
         }
 
@@ -105,18 +101,18 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
         /// </summary>
         /// <param name="symbol"></param>
         /// <returns></returns>
-        private AType Convert(AType symbol)
+        private AType Convert(AType symbol, int lastDimension)
         {
             string item = symbol.asString;
             AType result = AArray.Create(ATypes.AChar);
 
-            for (int i = 0; i < this.lastDimension; i++)
+            for (int i = 0; i < lastDimension; i++)
             {
                 result.AddWithNoUpdate(AChar.Create(i >= item.Length ? ' ' : item[i]));
             }
 
-            result.Length = this.lastDimension;
-            result.Shape = new List<int>() { this.lastDimension };
+            result.Length = lastDimension;
+            result.Shape = new List<int>() { lastDimension };
             result.Rank = 1;
 
             return result;
