@@ -8,35 +8,70 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
 {
     class Deal : AbstractDyadicFunction
     {
-        #region Variables
+        #region Nested class for shuffling
 
-        private int y;
-        private int x;
+        /// <summary>
+        /// Class stores information for shuffling items.
+        /// </summary>
+        class ShuffleInfo
+        {
+            private int itemCount;
+            private int maxValue;
+
+            /// <summary>
+            /// Initialise a instance of the <see cref="ShuffleInfo"/> class.
+            /// </summary>
+            /// <param name="itemCount">Number of items to shuffle.</param>
+            /// <param name="maxValue">Max value for the shuffling.</param>
+            internal ShuffleInfo(int itemCount, int maxValue)
+            {
+                this.itemCount = itemCount;
+                this.maxValue = maxValue;
+            }
+
+            /// <summary>
+            /// Gets the number of items to shuffle.
+            /// </summary>
+            internal int ItemCount
+            {
+                get { return this.itemCount; }
+            }
+
+            /// <summary>
+            /// Gets the max value for the shuffling.
+            /// </summary>
+            internal int MaxValue
+            {
+                get { return this.maxValue; }
+            }
+        }
 
         #endregion
 
         #region Entry point
 
-        public override AType Execute(AType right, AType left, Aplus environment = null)
+        public override AType Execute(AType right, AType left, Aplus environment)
         {
-            PrepareVariables(left, right);
+            ShuffleInfo info = ExtractShuffleInfo(left, right);
 
-            return Shuffle(GetSeed(environment));
+            return Shuffle(GetSeed(environment), info);
         }
 
         #endregion
 
         #region Preparation
 
-        private void PrepareVariables(AType left, AType right)
+        private ShuffleInfo ExtractShuffleInfo(AType left, AType right)
         {
-            this.y = GetNumber(left);
-            this.x = GetNumber(right);
+            ShuffleInfo info = 
+                new ShuffleInfo(ExtractInteger(left), ExtractInteger(right));
 
-            if (this.y > this.x)
+            if (info.ItemCount > info.MaxValue)
             {
                 throw new Error.Domain(DomainErrorText);
             }
+
+            return info;
         }
 
         /// <summary>
@@ -44,40 +79,32 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
         /// </summary>
         /// <param name="argument"></param>
         /// <returns></returns>
-        private int GetNumber(AType argument)
+        private int ExtractInteger(AType argument)
         {
             AType item;
-            if (argument.TryFirstScalar(out item, true))
-            {
-                int number;
-                if (item.ConvertToRestrictedWholeNumber(out number))
-                {
-                    if (number < 0)
-                    {
-                        throw new Error.Domain(DomainErrorText);
-                    }
-                    return number;
-                }
-                else
-                {
-                    throw new Error.Type(TypeErrorText);
-                }
-            }
-            else
+            if (!argument.TryFirstScalar(out item, true))
             {
                 throw new Error.Domain(DomainErrorText);
             }
-        }
 
-
-        private int GetSeed(Aplus environment)
-        {
-            if (environment == null)
+            int number;
+            if (!item.ConvertToRestrictedWholeNumber(out number))
             {
-                return -1;
+                throw new Error.Type(TypeErrorText);
             }
 
-            // Return and increment the Random Link System Variable
+            if (number < 0)
+            {
+                throw new Error.Domain(DomainErrorText);
+            }
+
+            return number;
+        }
+
+        // TODO: move this to the SystemVariables
+        private int GetSeed(Aplus environment)
+        {
+            // return and increment the Random Link System Variable
             int seed = environment.SystemVariables["rl"].asInteger + 1;
             environment.SystemVariables["rl"] = AInteger.Create(seed);
             return seed;
@@ -88,28 +115,32 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
         #region Computation
 
         /// <summary>
-        /// An implementation of "modified" Durstenfeld's algorithm.
-        /// http://en.wikipedia.org/wiki/Fisher-Yates_shuffle
+        /// Shuffle the items with a given seed.
         /// </summary>
         /// <param name="seed"></param>
+        /// <param name="info">Information for shuffling.</param>
+        /// <remarks>
+        /// An implementation of "modified" Durstenfeld's algorithm.
+        /// http://en.wikipedia.org/wiki/Fisher-Yates_shuffle
+        /// </remarks>
         /// <returns></returns>
-        private AType Shuffle(int seed)
+        private AType Shuffle(int seed, ShuffleInfo info)
         {
             AType result = AArray.Create(ATypes.AInteger);
-            
-            int[] randomList = Enumerable.Range(0, this.x).ToArray();
-            Random rnd = (seed != -1) ? new Random(seed) : new Random();
-            int j;
 
-            for (int i = x - 1; i >= this.x - this.y; i--)
+            int[] randomList = Enumerable.Range(0, info.MaxValue).ToArray();
+            Random random = (seed != -1) ? new Random(seed) : new Random();
+            int currentIndex;
+
+            for (int i = info.MaxValue - 1; i >= info.MaxValue - info.ItemCount; i--)
             {
-                j = rnd.Next(i);
-                result.AddWithNoUpdate(AInteger.Create(randomList[j]));
-                randomList[j] = randomList[i];
+                currentIndex = random.Next(i);
+                result.AddWithNoUpdate(AInteger.Create(randomList[currentIndex]));
+                randomList[currentIndex] = randomList[i];
             }
 
-            result.Length = this.y;
-            result.Shape = new List<int>() { this.y };
+            result.Length = info.ItemCount;
+            result.Shape = new List<int>() { info.ItemCount };
             result.Rank = 1;
 
             return result;

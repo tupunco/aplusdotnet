@@ -7,10 +7,25 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
 {
     class Find : AbstractDyadicFunction
     {
-        #region Variables
+        #region Nested class for argument pass
 
-        private AType y;
-        private List<int> cellShape;
+        class FindArguments
+        {
+            private AType leftArgument;
+            private List<int> cellShape;
+
+            internal AType Items
+            {
+                get { return this.leftArgument; }
+                set { this.leftArgument = value; }
+            }
+
+            internal List<int> CellShape
+            {
+                get { return this.cellShape; }
+                set { this.cellShape = value; }
+            }
+        }
 
         #endregion
 
@@ -18,8 +33,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
 
         public override AType Execute(AType right, AType left, Aplus environment = null)
         {
-            PrepareVariables(left, right);
-            return MultipleItemsWalking(right);
+            FindArguments arguments = PrepareVariables(left, right);
+            return MultipleItemsWalking(right, arguments);
         }
 
         #endregion
@@ -30,20 +45,26 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
         /// Prepare the left side and determine the cellshape.
         /// </summary>
         /// <param name="left"></param>
-        private void PrepareVariables(AType left, AType right)
+        private FindArguments PrepareVariables(AType left, AType right)
         {
             if (!Utils.IsSameGeneralType(left, right) && !Util.TypeCorrect(right.Type, left.Type, "N?", "?N"))
             {
                 throw new Error.Type(TypeErrorText);
             }
 
-            this.y = left;
-            this.cellShape = (this.y.Rank > 1 && this.y.Length > 0) ? this.y[0].Shape : new List<int>();
 
-            if (right.Rank < this.cellShape.Count)
+            FindArguments arguments = new FindArguments()
+            {
+                Items = left,
+                CellShape = (left.Rank > 1 && left.Length > 0) ? left[0].Shape : new List<int>()
+            };
+
+            if (right.Rank < arguments.CellShape.Count)
             {
                 throw new Error.Rank(RankErrorText);
             }
+
+            return arguments;
         }
 
         #endregion
@@ -55,16 +76,17 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
         /// If different we throw Length error. The second step is classify the cell.
         /// </summary>
         /// <param name="cell"></param>
+        /// <param name="arguments">Instead of class variables.</param>
         /// <returns></returns>
-        private AType MultipleItemsWalking(AType cell)
+        private AType MultipleItemsWalking(AType cell, FindArguments arguments)
         {
-            if (this.cellShape.Count == cell.Shape.Count)
+            if (arguments.CellShape.Count == cell.Shape.Count)
             {
-                if (!this.cellShape.SequenceEqual(cell.Shape))
+                if (!arguments.CellShape.SequenceEqual(cell.Shape))
                 {
                     throw new Error.Length(LengthErrorText);
                 }
-                return Classify(cell);
+                return Classify(cell, arguments);
             }
             else
             {
@@ -72,7 +94,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
 
                 foreach (AType item in cell)
                 {
-                    result.AddWithNoUpdate(MultipleItemsWalking(item));
+                    result.AddWithNoUpdate(MultipleItemsWalking(item, arguments));
                 }
                 result.UpdateInfo();
 
@@ -83,33 +105,35 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
         /// <summary>
         /// The value of that element is the index of the first item of y to which the cell is identical.
         /// </summary>
-        /// <param name="element"></param>
+        /// <param name="element">AType to search for.</param>
+        /// <param name="arguments">Instead of class variables.</param>
         /// <returns></returns>
-        private AType Classify(AType element)
+        private AType Classify(AType element, FindArguments arguments)
         {
-            int index = this.y.Length;
+            int resultIndex;
 
-            if (this.y.IsArray)
+            if (arguments.Items.IsArray)
             {
-                // TODO: refactor remove 'i', use 'index' instead
-                for (int i = 0; i < this.y.Length; i++)
+                // check if the given left argument of the function contains the element
+                for (resultIndex = 0; resultIndex < arguments.Items.Length; resultIndex++)
                 {
-                    if(ComparisonToleranceCompareTo(this.y[i],element))
+                    if (ComparisonToleranceCompareTo(arguments.Items[resultIndex], element))
                     {
-                        index = i;
                         break;
                     }
                 }
             }
+            else if (ComparisonToleranceCompareTo(arguments.Items, element))
+            {
+                resultIndex = 0;
+            }
             else
             {
-                if (ComparisonToleranceCompareTo(this.y, element))
-                {
-                    index = 0;
-                }
+                // item not found
+                resultIndex = arguments.Items.Length;
             }
 
-            return AInteger.Create(index);
+            return AInteger.Create(resultIndex);
         }
 
         private bool ComparisonToleranceCompareTo(AType actual, AType other)
@@ -128,11 +152,11 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
             }
             else
             {
-                if(Util.TypeCorrect(actual.Type, other.Type, "II", "FF", "IF", "FI"))
+                if (Util.TypeCorrect(actual.Type, other.Type, "II", "FF", "IF", "FI"))
                 {
                     return Utils.ComparisonTolerance(actual.asFloat, other.asFloat);
                 }
-                else if(Util.TypeCorrect(actual.Type, other.Type, "CC"))
+                else if (Util.TypeCorrect(actual.Type, other.Type, "CC"))
                 {
                     return actual.asChar.CompareTo(other.asChar) == 0;
                 }
