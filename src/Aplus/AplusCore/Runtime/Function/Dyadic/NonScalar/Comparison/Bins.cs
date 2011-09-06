@@ -7,10 +7,25 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
 {
     class Bins : AbstractDyadicFunction
     {
-        #region Variables
+        #region Nested class for argument pass
 
-        private AType interval;
-        private List<int> cellShape;
+        class CalculationArguments
+        {
+            private AType interval;
+            private List<int> cellShape;
+
+            internal AType Interval
+            {
+                get { return this.interval; }
+                set { this.interval = value; }
+            }
+
+            internal List<int> CellShape
+            {
+                get { return this.cellShape; }
+                set { this.cellShape = value; }
+            }
+        }
 
         #endregion
 
@@ -18,8 +33,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
 
         public override AType Execute(AType right, AType left, Aplus environment = null)
         {
-            PrepareVariables(left, right);
-            return MultipleItemsWalking(right);
+            CalculationArguments arguments = PrepareVariables(left, right);
+            return MultipleItemsWalking(right, arguments);
         }
 
         #endregion
@@ -30,21 +45,26 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
         /// Prepare the left side and determine the cellshape.
         /// </summary>
         /// <param name="left"></param>
-        private void PrepareVariables(AType left, AType right)
+        private CalculationArguments PrepareVariables(AType left, AType right)
         {
-            if (left.IsBox || right.IsBox || 
+            if (left.IsBox || right.IsBox ||
                 (left.Type != right.Type && !Util.TypeCorrect(right.Type, left.Type, "FI", "IF", "N?", "?N")))
             {
                 throw new Error.Type(TypeErrorText);
             }
 
-            this.interval = left;
-            this.cellShape = (this.interval.Rank > 1 && this.interval.Length > 0) ? this.interval[0].Shape : new List<int>();
+            CalculationArguments arguments = new CalculationArguments()
+            {
+                Interval = left,
+                CellShape = (left.Rank > 1 && left.Length > 0) ? left[0].Shape : new List<int>()
+            };
 
-            if (right.Rank < this.cellShape.Count)
+            if (right.Rank < arguments.CellShape.Count)
             {
                 throw new Error.Rank(RankErrorText);
             }
+
+            return arguments;
         }
 
         #endregion
@@ -55,14 +75,15 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
         /// Classify element to the corresponding group.
         /// </summary>
         /// <param name="element"></param>
+        /// <param name="arguments">Instead of class variables.</param>
         /// <returns></returns>
-        private AType Classify(AType element)
+        private AType Classify(AType element, CalculationArguments arguments)
         {
             int index;
 
-            if (this.interval.IsArray)
+            if (arguments.Interval.IsArray)
             {
-                AType intervalArray = this.interval;
+                AType intervalArray = arguments.Interval;
 
                 for (index = 0; index < intervalArray.Length; index++)
                 {
@@ -74,7 +95,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
             }
             else
             {
-                index = (element.CompareTo(this.interval) <= 0) ? 0 : this.interval.Length;
+                index = (element.CompareTo(arguments.Interval) <= 0) ? 0 : arguments.Interval.Length;
             }
 
             return AInteger.Create(index);
@@ -85,17 +106,18 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
         /// If different we throw Length error. The second step is classify the cell.
         /// </summary>
         /// <param name="cell"></param>
+        /// <param name="arguments">Instead of class variables.</param>
         /// <returns></returns>
-        private AType MultipleItemsWalking(AType cell)
+        private AType MultipleItemsWalking(AType cell, CalculationArguments arguments)
         {
-            if (this.cellShape.Count == cell.Shape.Count)
+            if (arguments.CellShape.Count == cell.Shape.Count)
             {
-                if (!this.cellShape.SequenceEqual(cell.Shape))
+                if (!arguments.CellShape.SequenceEqual(cell.Shape))
                 {
                     throw new Error.Length(LengthErrorText);
                 }
 
-                return Classify(cell);
+                return Classify(cell, arguments);
             }
             else
             {
@@ -103,7 +125,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
 
                 foreach (AType item in cell)
                 {
-                    result.AddWithNoUpdate(MultipleItemsWalking(item));
+                    result.AddWithNoUpdate(MultipleItemsWalking(item, arguments));
                 }
                 result.UpdateInfo();
 

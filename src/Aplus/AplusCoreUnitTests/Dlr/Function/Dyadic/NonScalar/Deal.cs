@@ -11,8 +11,6 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
     [TestClass]
     public class Deal : AbstractTest
     {
-        private List<int> dups;
-
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Deal"), TestMethod]
         public void DealInteger2Integer1()
         {
@@ -43,26 +41,6 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         {
             AType result = this.engine.Execute<AType>("1000 rand 1000");
             TestDuplication(result);
-        }
-
-        private void TestDuplication(AType argument)
-        {
-            dups = new List<int>();
-
-            int num;
-            foreach (AType item in argument)
-            {
-                num = item.asInteger;
-
-                if (dups.Contains(num))
-                {
-                    Assert.Fail("Result contains duplicate items!");
-                }
-                else
-                {
-                    dups.Add(num);
-                }
-            }
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Deal"), TestMethod]
@@ -112,6 +90,23 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         public void DealDomainError5()
         {
             AType result = this.engine.Execute<AType>("20 rand 10");
+        }
+
+        private static void TestDuplication(AType argument)
+        {
+            HashSet<int> duplicates = new HashSet<int>();
+
+            foreach (AType item in argument)
+            {
+                int num = item.asInteger;
+
+                if (duplicates.Contains(num))
+                {
+                    Assert.Fail("Result contains duplicate items!");
+                }
+
+                duplicates.Add(num);
+            }
         }
     }
 }

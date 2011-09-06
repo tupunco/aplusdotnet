@@ -13,7 +13,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
     [TestClass]
     public class Find : AbstractTest
     {
-        AType a = AFunc.Create(
+        AType TestFunction = AFunc.Create(
             "a",
             (Func<Scope, AType, AType, AType>)((scope, x, y) =>
             {
@@ -52,7 +52,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         public void FindStrand2NestedFunction()
         {
             ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("a", a);
+            scriptscope.SetVariable("a", TestFunction);
 
             AType expected = AInteger.Create(2);
 

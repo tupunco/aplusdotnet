@@ -8,82 +8,118 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
 {
     class Member : AbstractDyadicFunction
     {
-        #region Variables
+        #region Nested class for search information handling
 
         /// <summary>
-        /// Stores the resulting AArray
+        /// Class to store information about the search.
         /// </summary>
-        private AType result;
+        class SearchInfo
+        {
+            private AType searchWhere;
+            private AType result;
+            private string errorText;
 
-        /// <summary>
-        /// Stores the AArray where we need to perform the search
-        /// </summary>
-        private AType searchWhere;
+            internal AType SearchWhere
+            {
+                get { return this.searchWhere; }
+                set { this.searchWhere = value; }
+            }
+
+            internal AType Result
+            {
+                get { return this.result; }
+                set { this.result = value; }
+            }
+
+            internal string ErrorText
+            {
+                get { return this.errorText; }
+                set { this.errorText = value; }
+            }
+        }
 
         #endregion
 
         #region DLR entry point
 
+        /// <summary>
+        /// Search the <see cref="left"/> argument in the <see cref="right"/> argument.
+        /// </summary>
+        /// <param name="right">The data where the search should be performed.</param>
+        /// <param name="left">Element to search in the right argument.</param>
+        /// <param name="environment"></param>
+        /// <returns></returns>
         public override AType Execute(AType right, AType left, Aplus environment = null)
         {
             if (right.Length == 0)
             {
                 switch (left.Rank)
-	            {
+                {
                     case 0:
                         return AInteger.Create(0);
-		            default:
+                    default:
                         return DyadicFunctionInstance.Reshape.Execute(AInteger.Create(0), left.Shape.ToAArray());
-	            }
+                }
             }
             else if (!(left.IsNumber && right.IsNumber) && (right.Type != left.Type))
             {
                 throw new Error.Type(this.TypeErrorText);
             }
 
-            // Convert the right argument to an array (make life easier..)
-            this.searchWhere = (right.IsArray) ? right : AArray.Create(right.Type, right);
+            SearchInfo searchInfo = new SearchInfo()
+            {
+                // convert the right argument to an array (make life easier..)
+                SearchWhere = right.IsArray ? right : AArray.Create(right.Type, right),
+                ErrorText = this.LengthErrorText
+            };
 
-            if (left.Rank < this.searchWhere[0].Rank)
+            if (left.Rank < searchInfo.SearchWhere[0].Rank)
             {
                 // The item we are looking for have a lesser rank than the items of the right argument
                 throw new Error.Rank(this.RankErrorText);
             }
 
+            AType result;
+
             if (!left.IsArray)
             {
                 // Process a simple scalar 
-                return ProcessScalar(left);
+                result = ProcessScalar(left, searchInfo);
             }
-
-            this.result = AArray.Create(ATypes.AInteger);
-            AType searchWhat = left;
-            
-            ProcessMatrix(searchWhat);
-
-            this.result.UpdateInfo();
-
-            // Check how many elements we need to return
-            int elementCount = left.Shape.Count - Math.Max(right.Rank - 1, 0);
-            AType scalar;
-            if ((elementCount == 0) && this.result.TryFirstScalar(out scalar))
+            else
             {
-                // need to return a simple scalar
-                return scalar;
+                searchInfo.Result = AArray.Create(ATypes.AInteger);
+
+                ProcessMatrix(left, searchInfo);
+
+                searchInfo.Result.UpdateInfo();
+
+                // Check how many elements we need to return
+                int elementCount = left.Shape.Count - Math.Max(right.Rank - 1, 0);
+
+                if ((elementCount == 0) && searchInfo.Result.TryFirstScalar(out result))
+                {
+                    // need to return a simple scalar
+                    // 'result' contains the desired value
+                }
+                else
+                {
+                    // reshape the result to the required shape
+                    List<int> desiredShape = left.Shape.GetRange(0, elementCount);
+                    result = DyadicFunctionInstance.Reshape.Execute(searchInfo.Result, desiredShape.ToAArray());
+                }
             }
 
-            // Reshape the result to the required shape
-            List<int> desiredShape = left.Shape.GetRange(0, elementCount);
-            return DyadicFunctionInstance.Reshape.Execute(this.result, desiredShape.ToAArray());
+            return result;
         }
 
         #endregion
 
         #region Utility
 
-        private void ProcessMatrix(AType searchWhat)
+        private static void ProcessMatrix(AType searchWhat, SearchInfo searchInfo)
         {
-            if (searchWhat.Shape.Count > this.searchWhere[0].Shape.Count)
+            if (searchWhat.Shape.Count > searchInfo.SearchWhere[0].Shape.Count)
             {
                 // Travers down to the correct cells
                 foreach (AType item in searchWhat)
@@ -91,56 +127,37 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
                     if (item.IsArray)
                     {
                         // Found an array, lets see if we can process it further
-                        ProcessMatrix(item);
+                        ProcessMatrix(item, searchInfo);
                     }
                     else
                     {
                         // Simple Scalar found
-                        this.result.AddWithNoUpdate(ProcessScalar(item));
+                        searchInfo.Result.AddWithNoUpdate(ProcessScalar(item, searchInfo));
                     }
                 }
             }
-            else if (searchWhat.Shape.SequenceEqual<int>(this.searchWhere[0].Shape))
+            else if (searchWhat.Shape.SequenceEqual<int>(searchInfo.SearchWhere[0].Shape))
             {
-                // Found the cell we were looking for
-                int value = 0;
+                // search for the cell
+                int found = 
+                    searchInfo.SearchWhere.Any(item => searchWhat.EqualsWithTolerance(item)) ? 1 : 0;
 
-                foreach (AType item in this.searchWhere)
-                {
-                    if (searchWhat.EqualsWithTolerance(item))
-                    {
-                        value = 1;
-                        // If we found one true result, no need to check further
-                        break;
-                    }
-                }
-
-                this.result.AddWithNoUpdate(AInteger.Create(value));
+                searchInfo.Result.AddWithNoUpdate(AInteger.Create(found));
             }
             else
             {
-                throw new Error.Length(this.LengthErrorText);
+                throw new Error.Length(searchInfo.ErrorText);
             }
         }
 
-        private AType ProcessScalar(AType searchWhat)
+        private static AType ProcessScalar(AType searchWhat, SearchInfo searchInfo)
         {
-            int value = 0;
-            foreach (AType item in this.searchWhere)
-            {
-                // Check if the item is equals to the search item
-                //  in case of number use comparisonTolerance
-                //  otherwise a simple ==
-                if ((item.IsNumber && Utils.ComparisonTolerance(item.asFloat, searchWhat.asFloat)) ||
-                    (item.Equals(searchWhat)) )
-                {
-                    value = 1;
-                    // If we found one true result, no need to check further
-                    break;
-                }
-            }
+            int found = 
+                searchInfo.SearchWhere.Any(item =>
+                    (item.IsNumber && Utils.ComparisonTolerance(item.asFloat, searchWhat.asFloat)) ||
+                    item.Equals(searchWhat)) ? 1 : 0;
 
-            return AInteger.Create(value);
+            return AInteger.Create(found);
         }
 
         #endregion
