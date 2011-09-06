@@ -7,32 +7,23 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 {
     class Expand : AbstractDyadicFunction
     {
-        #region Variables
-
-        private List<byte> expandVector;
-        private AType items;
-
-        #endregion
-
         #region Entry point
 
         public override AType Execute(AType right, AType left, Aplus environment = null)
         {
-            PrepareExpandVector(left);
-            PrepareInputItems(right);
-            return Compute();
+            byte[] expandVector = PrepareExpandVector(left);
+            AType items = PrepareInputItems(right, expandVector);
+            return Compute(items, expandVector);
         }
 
         #endregion
 
         #region Preparation
 
-        private void PrepareExpandVector(AType left)
+        private byte[] PrepareExpandVector(AType left)
         {
-            this.expandVector = new List<byte>();
-
-            //If the left side is User defined function, we throw Valence error.
-            //This part excatly belongs to Scan.
+            // if the left side is User defined function, we throw Valence error.
+            // this part belongs to Scan.
             if (left.Type == ATypes.AFunc)
             {
                 throw new Error.Valence(ValenceErrorText);
@@ -48,78 +39,86 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                 throw new Error.Rank(RankErrorText);
             }
 
-            int element;
+            //int element;
             AType scalar;
+
+            byte[] expandVector;
 
             if (left.TryFirstScalar(out scalar, true))
             {
-                if (!scalar.ConvertToRestrictedWholeNumber(out element))
-                {
-                    throw new Error.Type(TypeErrorText);
-                }
-
-                if (element != 0 && element != 1)
-                {
-                    throw new Error.Domain(DomainErrorText);
-                }
-
-                this.expandVector.Add((byte)element);
+                expandVector = new byte[] { ExtractExpandArgument(scalar) };
             }
             else
             {
-                foreach (AType item in left)
-                {
-                    if (!item.ConvertToRestrictedWholeNumber(out element))
-                    {
-                        throw new Error.Type(TypeErrorText);
-                    }
-
-                    if (element != 0 && element != 1)
-                    {
-                        throw new Error.Domain(DomainErrorText);
-                    }
-
-                    this.expandVector.Add((byte)element);
-                }
+                expandVector = left.Select(item => ExtractExpandArgument(item)).ToArray();
             }
+
+            return expandVector;
         }
 
-        private void PrepareInputItems(AType right)
+        /// <summary>
+        /// Extract the byte representation from the given number, if it is correct.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>0 or 1.</returns>
+        private byte ExtractExpandArgument(AType number)
         {
-            if (right.IsArray)
-            {
-                this.items = right;
+            int result;
 
-                if (this.items.Length != 1 && this.expandVector.Count<byte>(item => { return item == 1; }) != this.items.Length)
+            if (!number.ConvertToRestrictedWholeNumber(out result))
+            {
+                throw new Error.Type(TypeErrorText);
+            }
+
+            if (result != 0 && result != 1)
+            {
+                throw new Error.Domain(DomainErrorText);
+            }
+
+            return (byte)result;
+        }
+
+        private AType PrepareInputItems(AType input, byte[] expandVector)
+        {
+            AType result;
+
+            if (input.IsArray)
+            {
+                if (input.Length != 1 &&
+                    expandVector.Count<byte>(item => { return item == 1; }) != input.Length)
                 {
                     throw new Error.Length(LengthErrorText);
                 }
+
+                result = input;
             }
             else
             {
-                this.items = AArray.Create(right.Type, right);
+                result = AArray.Create(input.Type, input);
             }
+
+            return result;
         }
 
         #endregion
 
         #region Computation
 
-        private AType Compute()
+        private AType Compute(AType items, byte[] expandVector)
         {
             AType result = AArray.Create(ATypes.AType);
             int index = 0;
 
-            // Get the filler element based on the right argument
-            AType fillElementShape = 
-                this.items.Rank > 1 ? this.items.Shape.GetRange(1, this.items.Shape.Count - 1).ToAArray() : null;
-            AType filler = Utils.FillElement(this.items.Type, fillElementShape);
+            // get the filler element based on the right argument
+            AType fillElementShape =
+                items.Rank > 1 ? items.Shape.GetRange(1, items.Shape.Count - 1).ToAArray() : null;
+            AType filler = Utils.FillElement(items.Type, fillElementShape);
 
-            for (int i = 0; i < this.expandVector.Count; i++)
+            for (int i = 0; i < expandVector.Length; i++)
             {
-                if (this.expandVector[i] == 1)
+                if (expandVector[i] == 1)
                 {
-                    result.AddWithNoUpdate(items[this.items.Length > 1 ? index++ : 0].Clone());
+                    result.AddWithNoUpdate(items[items.Length > 1 ? index++ : 0].Clone());
                 }
                 else
                 {
@@ -127,8 +126,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                 }
             }
 
-            result.Length = this.expandVector.Count;
-            result.Shape = new List<int>() { this.expandVector.Count };
+            result.Length = expandVector.Length;
+            result.Shape = new List<int>() { expandVector.Length };
 
             if (items.Rank > 1)
             {
@@ -136,7 +135,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
             }
 
             result.Rank = items.Rank;
-            result.Type = result.Length > 0 ? result[0].Type : (this.items.MixedType() ? ATypes.ANull : this.items.Type);
+            result.Type = result.Length > 0 ? result[0].Type : (items.MixedType() ? ATypes.ANull : items.Type);
 
             return result;
         }
