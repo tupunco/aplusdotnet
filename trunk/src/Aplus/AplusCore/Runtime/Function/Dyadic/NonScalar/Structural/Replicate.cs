@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 using AplusCore.Types;
 
@@ -6,10 +7,29 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 {
     class Replicate : AbstractDyadicFunction
     {
-        #region Variables
+        #region Repliacte information
 
-        private List<int> replicateVector;
-        private AType items;
+        class ReplicateJobInfo
+        {
+            private AType items;
+            private int[] replicateVector;
+
+            public ReplicateJobInfo(int[] replicateVector, AType items)
+            {
+                this.replicateVector = replicateVector;
+                this.items = items;
+            }
+
+            internal AType Items
+            {
+                get { return items; }
+            }
+
+            internal int[] ReplicateVector
+            {
+                get { return this.replicateVector; }
+            }
+        }
 
         #endregion
 
@@ -17,19 +37,16 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 
         public override AType Execute(AType right, AType left, Aplus environment = null)
         {
-            PrepareReplicateVector(right,left);
-            PrepareInputItems(right);
-            return Compute();
+            ReplicateJobInfo replicateInfo = CreateReplicateJobInfo(right, left);
+            return Compute(replicateInfo);
         }
 
         #endregion
 
         #region Preparation
 
-        private void PrepareReplicateVector(AType right, AType left)
+        private ReplicateJobInfo CreateReplicateJobInfo(AType right, AType left)
         {
-            this.replicateVector = new List<int>();
-
             if (!(left.Type == ATypes.AFloat || left.Type == ATypes.AInteger || left.Type == ATypes.ANull))
             {
                 throw new Error.Type(TypeErrorText);
@@ -40,107 +57,102 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                 throw new Error.Rank(RankErrorText);
             }
 
-            int element;
+            int[] replicateVector;
             AType scalar;
 
             if (left.TryFirstScalar(out scalar, true))
             {
-                if (!scalar.ConvertToRestrictedWholeNumber(out element))
-                {
-                    throw new Error.Type(TypeErrorText);
-                }
-
-                if (element < 0)
-                {
-                    throw new Error.Domain(DomainErrorText);
-                }
-
-                this.replicateVector.Add(element);
+                replicateVector = new int[] { ExtractInteger(scalar) };
             }
             else
             {
                 if (left.Length > 0)
                 {
-                    foreach (AType item in left)
-                    {
-                        if (!item.ConvertToRestrictedWholeNumber(out element))
-                        {
-                            throw new Error.Type(TypeErrorText);
-                        }
-
-                        if (element < 0)
-                        {
-                            throw new Error.Domain(DomainErrorText);
-                        }
-
-                        this.replicateVector.Add(element);
-                    }
+                    replicateVector = left.Select(item => ExtractInteger(item)).ToArray();
                 }
                 else
                 {
-                    this.replicateVector.Add(0);
+                    replicateVector = new int[] { 0 };
                 }
 
-                //Lenght check should be the first than parse the left side,
-                //but the A+ follow that order.
+                // lenght check should be the first than parse the left side,
+                // but the A+ follow that order.
                 if (right.Length != 1 && left.Length != right.Length)
                 {
                     throw new Error.Length(LengthErrorText);
                 }
-
             }
+
+            ReplicateJobInfo info = new ReplicateJobInfo(
+                replicateVector,
+                right.IsArray ? right : AArray.Create(right.Type, right)
+            );
+
+            return info;
         }
 
-        private void PrepareInputItems(AType right)
+        private int ExtractInteger(AType item)
         {
-            // TODO: do we still need these converts?
-            this.items = right.IsArray ? right : AArray.Create(right.Type, right);
+            int element;
+
+            if (!item.ConvertToRestrictedWholeNumber(out element))
+            {
+                throw new Error.Type(TypeErrorText);
+            }
+
+            if (element < 0)
+            {
+                throw new Error.Domain(DomainErrorText);
+            }
+
+            return element;
         }
 
         #endregion
 
         #region Computation
 
-        private AType Compute()
+        private static AType Compute(ReplicateJobInfo replicateInfo)
         {
             AType result = AArray.Create(ATypes.AArray);
             int length = 0;
 
-            if (this.replicateVector.Count == 1)
+            if (replicateInfo.ReplicateVector.Length == 1)
             {
-                    for (int i = 0; i < this.items.Length; i++)
+                for (int i = 0; i < replicateInfo.Items.Length; i++)
+                {
+                    for (int j = 0; j < replicateInfo.ReplicateVector[0]; j++)
                     {
-                        for (int j = 0; j < this.replicateVector[0]; j++)
-                        {
-                            result.AddWithNoUpdate(items[i].Clone());
-                        }
+                        result.AddWithNoUpdate(replicateInfo.Items[i].Clone());
                     }
+                }
 
-                    length = this.replicateVector[0] * this.items.Length;
+                length = replicateInfo.ReplicateVector[0] * replicateInfo.Items.Length;
             }
             else //replicateCounter.Count > 1
             {
-                for (int i = 0; i < this.replicateVector.Count; i++)
+                for (int i = 0; i < replicateInfo.ReplicateVector.Length; i++)
                 {
-                    for (int j = 0; j < this.replicateVector[i]; j++)
+                    for (int j = 0; j < replicateInfo.ReplicateVector[i]; j++)
                     {
-                        result.AddWithNoUpdate(this.items[this.items.Length > 1 ? i : 0].Clone());
+                        result.AddWithNoUpdate(replicateInfo.Items[replicateInfo.Items.Length > 1 ? i : 0].Clone());
                     }
 
-                    length += this.replicateVector[i];
+                    length += replicateInfo.ReplicateVector[i];
                 }
             }
 
             result.Length = length;
             result.Shape = new List<int>() { length };
 
-            if (this.items.Rank > 1)
+            if (replicateInfo.Items.Rank > 1)
             {
-                result.Shape.AddRange(this.items.Shape.GetRange(1, this.items.Shape.Count - 1));
+                result.Shape.AddRange(replicateInfo.Items.Shape.GetRange(1, replicateInfo.Items.Shape.Count - 1));
             }
 
-            result.Rank = this.items.Rank;
-            result.Type = length > 0 ? result[0].Type :(this.items.MixedType() ? ATypes.ANull : this.items.Type);
+            result.Rank = replicateInfo.Items.Rank;
+            result.Type = 
+                length > 0 ? result[0].Type : (replicateInfo.Items.MixedType() ? ATypes.ANull : replicateInfo.Items.Type);
 
             return result;
         }
