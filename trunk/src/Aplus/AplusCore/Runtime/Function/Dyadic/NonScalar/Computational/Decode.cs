@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using AplusCore.Types;
 
@@ -7,12 +8,37 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
 {
     class Decode : AbstractDyadicFunction
     {
-        #region Variables
+        #region Decode information
 
-        private List<double> y;
-        private AType x;
-        private ATypes type;
-        private bool convert;
+        class DecodeInformation
+        {
+            private double[] decodeValues;
+            private ATypes type;
+            private bool integerConversion;
+
+            internal DecodeInformation(ATypes resultingType, double[] decodeValues)
+            {
+                this.type = resultingType;
+                this.RequiresConvert = (resultingType != ATypes.AFloat);// ? false : true;
+                this.decodeValues = decodeValues;
+            }
+
+            internal bool RequiresConvert
+            {
+                get { return this.integerConversion; }
+                set { this.integerConversion = value; }
+            }
+
+            internal ATypes Type
+            {
+                get { return type; }
+            }
+
+            internal double[] DecodeValues
+            {
+                get { return decodeValues; }
+            }
+        }
 
         #endregion
 
@@ -20,8 +46,15 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
 
         public override AType Execute(AType right, AType left, Aplus environment = null)
         {
-            PrepareVariables(left, right);
-            return Compute();
+            DecodeInformation info = ExtractDecodeInformation(left, right);
+            AType result = DecodeArray(right, info);
+
+            if (info.RequiresConvert)
+            {
+                result = ConvertToInteger(result);
+            }
+
+            return result;
         }
 
         #endregion
@@ -29,107 +62,85 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
         #region Preparation
 
         /// <summary>
-        /// Check left and right side to statisfied conditions.
+        /// Extracts <see cref="DecodeInformation"/> from the arguments.
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
-        private void PrepareVariables(AType left, AType right)
+        /// <returns></returns>
+        private DecodeInformation ExtractDecodeInformation(AType left, AType right)
         {
-            //TypeCheck!
+            // TypeCheck!
             if (!Util.TypeCorrect(right.Type, left.Type, "FF", "II", "FI", "IF", "FN", "NF", "IN", "NI", "NN"))
             {
                 throw new Error.Type(TypeErrorText);
             }
 
-            this.type = (left.Type == ATypes.AFloat || right.Type == ATypes.AFloat || right.Type == ATypes.ANull) ? ATypes.AFloat : ATypes.AInteger;
-
-            this.convert = this.type == ATypes.AFloat ? false : true;
-
-            //Righ side must be array,else Rank error.
+            // righ side must be array
             if (!right.IsArray)
             {
                 throw new Error.Rank(RankErrorText);
             }
 
-            this.x = right;
-
-            //Left side must be scalar or vector.
+            // left side must be scalar or vector
             if (left.Rank > 1)
             {
                 throw new Error.Rank(RankErrorText);
             }
 
-            this.y = new List<double>();
+            ATypes resultType = 
+                (left.Type == ATypes.AFloat || right.Type == ATypes.AFloat || right.Type == ATypes.ANull)
+                ? ATypes.AFloat
+                : ATypes.AInteger;
+
+            double[] decodeValues;
 
             if (left.IsArray)
             {
-                AType leftArray = left;
-
-                //One-element vector case, then we reshape it: (#x) rho y.
-                if (leftArray.Length == 1)
+                if (left.Length == 1)
                 {
-                    for (int i = 0; i < this.x.Length; i++)
-                    {
-                        this.y.Add(leftArray[0].asFloat);
-                    }
+                    // one-element vector case, then we reshape it: (#x) rho y.
+                    decodeValues = Enumerable.Repeat(left[0].asFloat, right.Length).ToArray();
                 }
                 else
                 {
-                    foreach (AType item in leftArray)
+                    // left and right side length have to equal!
+                    if (left.Length != right.Length)
                     {
-                        this.y.Add(item.asFloat);
+                        throw new Error.Length(LengthErrorText);
                     }
+
+                    decodeValues = left.Select(item => item.asFloat).ToArray();
                 }
             }
             else
             {
-                //Scalar case, reshape it: (#x) rho y.
-                for (int i = 0; i < this.x.Length; i++)
-                {
-                    this.y.Add(left.asFloat);
-                }
+                // scalar case, reshape it: (#x) rho y.
+                decodeValues = Enumerable.Repeat(left.asFloat, right.Length).ToArray();
             }
 
-            //Left and right side length have to equal!
-            if (this.y.Count != this.x.Length)
-            {
-                throw new Error.Length(LengthErrorText);
-            }
+            return new DecodeInformation(resultType, decodeValues);
         }
 
         #endregion
 
         #region Computation
 
-        private AType Compute()
-        {
-            AType result = DecodeArray(this.x);
-
-            if (this.convert)
-            {
-                result = Convert(result);
-            }
-
-            return result;
-        }
-
         /// <summary>
         /// Decode argument vector.
         /// </summary>
-        /// <param name="argument"></param>
         /// <returns></returns>
-        private AType DecodeVector(AType argument)
+        private static AType DecodeVector(AType argument, DecodeInformation decodeInfo)
         {
             double result = argument.Length > 0 ? argument[0].asFloat : 0;
 
-            for (int i = 1; i < this.y.Count; i++)
+            for (int i = 1; i < decodeInfo.DecodeValues.Length; i++)
             {
-                result = result * this.y[i] + argument[i].asFloat;
+                result = result * decodeInfo.DecodeValues[i] + argument[i].asFloat;
             }
 
-            if (type == ATypes.AInteger && !IsInteger(result))
+            if (decodeInfo.Type == ATypes.AInteger && !IsInteger(result))
             {
-                this.convert = false;
+                decodeInfo.RequiresConvert = false;
             }
 
             return AFloat.Create(result);
@@ -140,19 +151,22 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
         /// </summary>
         /// <param name="number"></param>
         /// <returns></returns>
-        private bool IsInteger(double number)
+        private static bool IsInteger(double number)
         {
             return Int32.MinValue <= number && number <= Int32.MaxValue && number % 1 == 0;
         }
 
         /// <summary>
+        /// </summary>
+        /// <remarks>
         /// If argument is matrix, each element i#r of the result is evaluation
         /// of the column x[;i]. If (rho rho x) > 2, each element of the result is the
         /// evalution corresponding vector along the first axis of x.
-        /// </summary>
+        /// </remarks>
         /// <param name="argument"></param>
+        /// <param name="decodeInfo"></param>
         /// <returns></returns>
-        private AType DecodeArray(AType argument)
+        private static AType DecodeArray(AType argument, DecodeInformation decodeInfo)
         {
             List<AType> indexes = new List<AType>() { Utils.ANull() };
             AType index;
@@ -166,7 +180,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
                     index = AInteger.Create(i);
                     indexes.Add(index);
 
-                    result.AddWithNoUpdate(DecodeArray(argument[indexes]));
+                    result.AddWithNoUpdate(DecodeArray(argument[indexes], decodeInfo));
 
                     indexes.Remove(index);
                 }
@@ -180,27 +194,24 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
             }
             else
             {
-                return DecodeVector(argument);
+                return DecodeVector(argument, decodeInfo);
             }
         }
 
         /// <summary>
-        /// The result type usually float, but if the items can be represent as integer
-        /// then we convert items to float.
+        /// Convert items to integers.
         /// </summary>
         /// <param name="argument"></param>
         /// <returns></returns>
-        private AType Convert(AType argument)
+        private static AType ConvertToInteger(AType argument)
         {
             if (argument.Rank > 0)
             {
-                AType argumentArray = argument;
-
                 AType result = AArray.Create(ATypes.AArray);
 
-                foreach (AType item in argumentArray)
+                foreach (AType item in argument)
                 {
-                    result.AddWithNoUpdate(Convert(item));
+                    result.AddWithNoUpdate(ConvertToInteger(item));
                 }
 
                 result.UpdateInfo();

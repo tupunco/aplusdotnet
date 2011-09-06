@@ -8,9 +8,20 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
 {
     class Format : AbstractDyadicFunction
     {
-        #region Variables
+        #region Format information
 
-        private List<int[]> formaters;
+        struct FormatInfo
+        {
+            /// <summary>
+            /// Specifes the total length of the resulting format.
+            /// </summary>
+            internal int TotalLength;
+
+            /// <summary>
+            /// Specifies the length for the fractional part of the format.
+            /// </summary>
+            internal int FractionLength;
+        }
 
         #endregion
 
@@ -18,13 +29,11 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
 
         public override AType Execute(AType right, AType left, Aplus environment = null)
         {
-            Checks(left, right);
+            ValidateInput(left, right);
 
-            this.formaters = new List<int[]>();
-
-            PrepareFormaters(left);
-
-            return FormatArray(right);
+            List<FormatInfo> formaters = new List<FormatInfo>();
+            ExtractFormatInfo(left, formaters);
+            return FormatArray(right, formaters);
         }
 
         #endregion
@@ -32,13 +41,13 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
         #region Preparation
 
         /// <summary>
-        /// Type and length check.
+        /// Perform type and length check for the arguments
         /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        private void Checks(AType left, AType right)
+        /// <param name="left">Format info.</param>
+        /// <param name="right">Items to format.</param>
+        private void ValidateInput(AType left, AType right)
         {
-            if(!Util.TypeCorrect(right.Type, left.Type,
+            if (!Util.TypeCorrect(right.Type, left.Type,
                 "FF", "II", "FI", "IF", "FS", "IS", "NI", "NF", "NS", "FN", "IN", "NN"))
             {
                 throw new Error.Type(TypeErrorText);
@@ -51,14 +60,9 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
 
             if (left.IsArray)
             {
-                int length = 1;
+                int length = left.Shape.Product();
 
-                for (int i = 0; i < left.Shape.Count; i++)
-                {
-                    length *= left.Shape[i];
-                }
-
-                if(right.Shape.Count == 0 || length != right.Shape[right.Rank -1])
+                if (right.Shape.Count == 0 || length != right.Shape[right.Rank - 1])
                 {
                     throw new Error.Length(LengthErrorText);
                 }
@@ -66,21 +70,22 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
         }
 
         /// <summary>
-        /// Walk each item in the array and call PrepareItem function.
+        /// Extract multiple <see cref="FormatInfo"/> from the <see cref="left">argument</see>.
         /// </summary>
         /// <param name="left"></param>
-        private void PrepareFormaters(AType left)
+        /// <param name="formaters">List to store the <see cref="FormatInfo"/> results.</param>
+        private static void ExtractFormatInfo(AType left, List<FormatInfo> formaters)
         {
             if (left.IsArray)
             {
                 foreach (AType item in left)
                 {
-                    PrepareFormaters(item);
+                    ExtractFormatInfo(item, formaters);
                 }
             }
             else
             {
-                PrepareItem(left);
+                formaters.Add(ExtractSingleFormatInfo(left));
             }
         }
 
@@ -89,24 +94,24 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
         /// If argument is integer than precision is undefined.
         /// </summary>
         /// <param name="argument"></param>
-        private void PrepareItem(AType argument)
+        private static FormatInfo ExtractSingleFormatInfo(AType argument)
         {
-            string item = argument.asFloat.ToString(CultureInfo.InvariantCulture);
-            int index = item.IndexOf(".");
-            int[] pair = new int[2];
+            // TODO: currently this feels a bit hacky...
+            string[] items = argument.asFloat.ToString(CultureInfo.InvariantCulture).Split(new char[] { '.' }, 2);
 
-            if (index != -1)
+            FormatInfo format = new FormatInfo()
             {
-                pair[0] = int.Parse(item.Substring(0, index));
-                pair[1] = int.Parse(item.Substring(index + 1, 1));
-            }
-            else
+                TotalLength = int.Parse(items[0]),
+                FractionLength = int.MaxValue
+            };
+
+            if (items.Length == 2)
             {
-                pair[0] = int.Parse(item);
-                pair[1] = int.MaxValue;
+                // the reference implementation only cares for the first digit, so do we
+                format.FractionLength = int.Parse(items[1].Substring(0, 1));
             }
 
-            this.formaters.Add(pair);
+            return format;
         }
 
         #endregion
@@ -114,16 +119,15 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
         #region Computation
 
         /// <summary>
-        /// Walk each item in the argument array and call FormatNumber function,
-        /// if items are floats or integers else call FormatSymbol function.
+        /// 
         /// </summary>
         /// <param name="argument"></param>
+        /// <param name="formaters"></param>
         /// <returns></returns>
-        private AType FormatArray(AType argument)
+        private static AType FormatArray(AType argument, List<FormatInfo> formaters)
         {
             AType result = AArray.Create(ATypes.AChar);
-            AType[] r;
-            int index;
+            AType[] formatted;
 
             if (argument.IsArray)
             {
@@ -131,17 +135,18 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
                 {
                     if (argument.Rank > 1)
                     {
-                        result.AddWithNoUpdate(FormatArray(argument[i]));
+                        result.AddWithNoUpdate(FormatArray(argument[i], formaters));
                     }
                     else
                     {
-                        index = this.formaters.Count > 1 ? i : 0;
+                        FormatInfo format = formaters[formaters.Count > 1 ? i : 0];
+                        formatted = argument.IsNumber
+                            ? FormatNumber(argument[i], format)
+                            : FormatSymbol(argument[i], format);
 
-                        r = argument.IsNumber ? FormatNumber(argument[i], index) : FormatSymbol(argument[i], index);
-
-                        if (r != null)
+                        if (formatted != null)
                         {
-                            result.AddRangeWithNoUpdate(r);
+                            result.AddRangeWithNoUpdate(formatted);
                         }
                     }
                 }
@@ -150,11 +155,14 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
             }
             else
             {
-                r = argument.IsNumber ? FormatNumber(argument, 0) : FormatSymbol(argument, 0);
+                FormatInfo format = formaters[0];
+                formatted = argument.IsNumber
+                    ? FormatNumber(argument, format)
+                    : FormatSymbol(argument, format);
 
-                if (r != null)
+                if (formatted != null)
                 {
-                    result.AddRange(r);
+                    result.AddRange(formatted);
                 }
             }
 
@@ -162,11 +170,11 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
         }
 
         /// <summary>
-        /// Convert string argument to Character array.
+        /// Convert string argument to AType character array.
         /// </summary>
         /// <param name="argument"></param>
         /// <returns></returns>
-        private AType[] ConvertToCharArray(string argument)
+        private static AType[] ConvertToCharArray(string argument)
         {
             AType[] result = new AType[argument.Length];
 
@@ -185,85 +193,92 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
         /// if it is too long.
         /// </summary>
         /// <param name="argument"></param>
-        /// <param name="index"></param>
         /// <returns></returns>
-        private AType[] FormatSymbol(AType argument, int index)
+        private static AType[] FormatSymbol(AType argument, FormatInfo format)
         {
-            string result = this.formaters[index][0] < 0 ? ' ' + argument.asString : argument.asString;
+            string result = format.TotalLength < 0 ? ' ' + argument.asString : argument.asString;
 
-            return ConvertToCharArray(Pad(result, index));
+            return ConvertToCharArray(Pad(result, format.TotalLength));
         }
 
         /// <summary>
+        /// Format an AType scalar number to a AType character representation.
+        /// </summary>
+        /// <param name="argument"></param>
+        /// <param name="format"></param>
+        /// <remarks>
         /// Exponential format: the result for a postive number is padded on the left with two blanks
         /// and for a negative with one, and this padded result is left justified within thw width, after
         /// being truncated on the right if it is too long.
         /// Otherwise: the result is right justified within the width, after being truncated on the right
         /// if it is too long.
-        /// </summary>
-        /// <param name="argument"></param>
-        /// <param name="index"></param>
+        /// </remarks>
         /// <returns></returns>
-        private AType[] FormatNumber(AType argument, int index)
+        private static AType[] FormatNumber(AType argument, FormatInfo format)
         {
-            if (this.formaters[index][0] == 0)
+            if (format.TotalLength == 0)
             {
                 return null;
             }
 
             string result;
 
-            if (this.formaters[index][0] < 0)
+            if (format.TotalLength < 0)
             {
                 string formatString = "0.";
 
-                if (this.formaters[index][1] != int.MaxValue)
+                if (format.FractionLength != int.MaxValue)
                 {
-                    formatString = formatString.PadRight(2 + this.formaters[index][1], '0');
+                    formatString = formatString.PadRight(2 + format.FractionLength, '0');
                 }
 
                 formatString += "e+00";
                 result = argument.asFloat.ToString(formatString, CultureInfo.InvariantCulture);
                 result = result.PadLeft(result.Length + (result[0] == '-' ? 1 : 2));
-                result = Pad(result, index);
+                result = Pad(result, format.TotalLength);
             }
             else
             {
-                if (this.formaters[index][1] != int.MaxValue)
+                if (format.FractionLength != int.MaxValue)
                 {
-                    result = argument.asFloat.ToString("f" + this.formaters[index][1], CultureInfo.InvariantCulture);
+                    result = argument.asFloat.ToString("f" + format.FractionLength, CultureInfo.InvariantCulture);
                 }
                 else
                 {
                     result = Math.Round(argument.asFloat).ToString(CultureInfo.InvariantCulture);
                 }
 
-                result = Pad(result, index);
+                result = Pad(result, format.TotalLength);
             }
 
             return ConvertToCharArray(result);
         }
 
         /// <summary>
-        /// (Left or right) Pad the string argument with formaters[index],
-        /// and if the result length/width is too long than we cut it.
+        /// (Left or right) Pad the string argument with the given length
+        /// and if the result length is too long then cut it.
         /// </summary>
         /// <param name="argument"></param>
-        /// <param name="index"></param>
+        /// <param name="formatLength"></param>
         /// <returns></returns>
-        private string Pad(string argument, int index)
+        private static string Pad(string argument, int formatLength)
         {
-            int length = Math.Abs(this.formaters[index][0]);
+            string result;
+            int length = Math.Abs(formatLength);
 
-            string result = argument;
-
-            if (result.Length < length)
+            if (argument.Length < length)
             {
-                result = this.formaters[index][0] < 0 ? result.PadRight(length) : result.PadLeft(length);
+                result = formatLength < 0
+                    ? argument.PadRight(length)
+                    : argument.PadLeft(length);
             }
-            else if (result.Length > length)
+            else if (argument.Length > length)
             {
-                result = result.Substring(0, length);
+                result = argument.Substring(0, length);
+            }
+            else
+            {
+                result = argument;
             }
 
             return result;
