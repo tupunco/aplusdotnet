@@ -6,18 +6,22 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
 {
     class Rake : AbstractMonadicFunction
     {
-        #region Variables
-
-        private AType result;
-        private int length;
-
-        #endregion
-
         #region Entry point
 
         public override AType Execute(AType argument, Aplus environment)
         {
-            return argument.SimpleArray() ? SimpleCase(argument) : NestedCase(argument);
+            AType result;
+
+            if (argument.SimpleArray())
+            {
+                result = SimpleCase(argument);
+            }
+            else
+            {
+                result = NestedCase(argument);
+            }
+
+            return result;
         }
 
         #endregion
@@ -31,28 +35,31 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
         /// <returns></returns>
         private AType SimpleCase(AType argument)
         {
+            AType result;
+
             if (argument.Type == ATypes.ANull)
             {
-                return Utils.ANull();
+                result = Utils.ANull();
             }
             else
             {
-                AType result = MonadicFunctionInstance.Enclose.Execute(argument);
-                return AArray.Create(result.Type, result);
+                AType enclosedItem = MonadicFunctionInstance.Enclose.Execute(argument);
+                result = AArray.Create(enclosedItem.Type, enclosedItem);
             }
+
+            return result;
         }
 
         private AType NestedCase(AType argument)
         {
-            this.result = AArray.Create(ATypes.AArray);
-            this.length = 0;
+            AType result = AArray.Create(ATypes.AArray);
 
-            DiscloseNestedElement(argument);
+            int itemCount = DiscloseNestedElement(argument, result);
 
-            this.result.Type = this.length > 0 ? argument.Type : ATypes.ANull;
-            this.result.Length = this.length;
-            this.result.Shape = new List<int>() { this.length };
-            this.result.Rank = 1;
+            result.Type = itemCount > 0 ? argument.Type : ATypes.ANull;
+            result.Length = itemCount;
+            result.Shape = new List<int>() { itemCount };
+            result.Rank = 1;
 
             return result;
         }
@@ -61,51 +68,47 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
         /// The result is a nested vector whose depth is one.
         /// </summary>
         /// <param name="argument"></param>
-        private void DiscloseNestedElement(AType argument)
+        /// <param name="result"></param>
+        /// <returns>Number of items disclosed.</returns>
+        private int DiscloseNestedElement(AType argument, AType result)
         {
+            int count = 0;
+
             if (argument.IsArray)
             {
-                //If rank of the argument is higher than one, so not vector, we ravel it!
+                // if rank of the argument is higher than one, so not vector, we ravel it
                 AType raveled = (argument.Rank > 1 ? MonadicFunctionInstance.Ravel.Execute(argument) : argument);
 
-                //Call this function recursively for each element in the array.
+                // call this function recursively for each element in the array.
                 foreach (AType item in raveled)
                 {
-                    DiscloseNestedElement(item);
+                    count += DiscloseNestedElement(item, result);
                 }
             }
             else
             {
-                //Determine the depth of the argument.
-                int depth = (MonadicFunctionInstance.Depth.Execute(argument)).asInteger;
+                // get the depth of the argument
+                int depth = MonadicFunctionInstance.Depth.Execute(argument).asInteger;
 
-                //If depth is bigger than 1, we disclose it.
+                // if depth is bigger than 1, we disclose it
                 if (depth > 1)
                 {
-                    DiscloseNestedElement(MonadicFunctionInstance.Disclose.Execute(argument));
+                    count += DiscloseNestedElement(MonadicFunctionInstance.Disclose.Execute(argument), result);
                 }
                 else
                 {
-                    //Discard Null!
-                    if (argument.IsBox ? !IsNull(argument) : true)
+                    bool isBox = argument.IsBox;
+                    // leave out Null item
+                    if((isBox && argument.NestedItem.Type != ATypes.ANull) || !isBox)
                     {
-                        this.result.AddWithNoUpdate(argument);
-                        this.length++;
+                        
+                        result.AddWithNoUpdate(argument);
+                        count++;
                     }
                 }
             }
-        }
 
-        // TODO: remove this method: only used in one place
-        //Argument must be Box.
-        /// <summary>
-        /// Check the argument is a nested Null.
-        /// </summary>
-        /// <param name="argument"></param>
-        /// <returns></returns>
-        private bool IsNull(AType argument)
-        {
-            return argument.NestedItem.Type == ATypes.ANull;
+            return count;
         }
 
         #endregion

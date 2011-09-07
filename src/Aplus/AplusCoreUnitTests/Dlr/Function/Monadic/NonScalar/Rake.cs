@@ -13,7 +13,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
     [TestClass]
     public class Rake : AbstractTest
     {
-        AType a = AFunc.Create(
+        static AType TestFunction = AFunc.Create(
             "a",
             (Func<Scope, AType,AType, AType>)((scope, x,y) =>
             {
@@ -59,12 +59,12 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         public void RakeStrandWithUDF1()
         {
             ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("a", a);
+            scriptscope.SetVariable("a", TestFunction);
 
             AType expected = Helpers.BuildStrand(
                 new AType[]{
                     AInteger.Create(5),
-                    a
+                    TestFunction
                 }
             );
 
@@ -78,7 +78,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         public void RakeStrandWithUDF2()
         {
             ScriptScope scriptscope = this.engine.CreateScope();
-            scriptscope.SetVariable("a", a);
+            scriptscope.SetVariable("a", TestFunction);
 
             AType expected = Helpers.BuildStrand(
                 new AType[]{
@@ -87,7 +87,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
                     AInteger.Create(5),
                     AInteger.Create(2),
                     Helpers.BuildString("abc"),
-                    ABox.Create(a)
+                    ABox.Create(TestFunction)
                 }
             );
 
@@ -138,8 +138,8 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
 
             AType result = this.engine.Execute<AType>("in (4;'ac';1 2;(3 4;(5;<(););6);7 8)");
 
-            Assert.AreEqual(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Rake"), TestMethod]

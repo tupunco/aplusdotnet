@@ -9,44 +9,36 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 {
     class Rotate : AbstractDyadicFunction
     {
-        #region Attributes
-
-        private List<int> rotateVector;
-        private AType items;
-
-        #endregion
-
         #region Entry point
 
         public override AType Execute(AType right, AType left, Aplus environment = null)
         {
-            if (PrepareRotateVector(right, left))
+            AType result;
+            int[] rotateVector = PrepareRotateVector(right, left);
+            
+            if (right.Rank == 0)
             {
-                return right.Clone();
+                // if the right argument is scalar, we clone it
+                result = right.Clone();
+            }
+            else if (right.Rank > 2)
+            {
+                result = TransformAndCompute(right, rotateVector);
             }
             else
             {
-                this.items = right;
-
-                if (this.items.Rank > 2)
-                {
-                    return TransformAndCompute(right);
-                }
-                else
-                {
-                    return Compute();
-                }
+                result = Compute(right, rotateVector);
             }
+
+            return result;
         }
 
         #endregion
 
         #region Preparation
 
-        private bool PrepareRotateVector(AType right, AType left)
+        private int[] PrepareRotateVector(AType right, AType left)
         {
-            rotateVector = new List<int>();
-
             if (!(left.Type == ATypes.AFloat || left.Type == ATypes.AInteger || left.Type == ATypes.ANull))
             {
                 // Allowed types are: AFloat, AInteger and ANull
@@ -55,6 +47,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
             }
 
             AType scalar;
+            List<int> rotateVector = new List<int>();
 
             if (left.TryFirstScalar(out scalar, true))
             {
@@ -64,7 +57,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                 {
                     throw new Error.Type(TypeErrorText);
                 }
-                
+
                 rotateVector.Add(result);
             }
             else
@@ -82,7 +75,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                     }
                 }
 
-                // If the left is AArray and rank is bigger than 1, we will Ravel it.
+                // if the left is AArray and rank is bigger than 1, Ravel it
                 AType leftvector = left.Rank > 1 ? MonadicFunctionInstance.Ravel.Execute(left) : left;
 
                 int element;
@@ -98,8 +91,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                 }
             }
 
-            //If the right argument is scalar, we clone it!
-            return right.Rank == 0;
+            // if the right argument is scalar, we clone it!
+            return rotateVector.ToArray();
         }
 
         /// <summary>
@@ -107,29 +100,20 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
         /// After the computation transform back the result to the original shape.
         /// </summary>
         /// <param name="right"></param>
+        /// <param name="RotateVector"></param>
         /// <returns></returns>
-        private AType TransformAndCompute(AType right)
+        private AType TransformAndCompute(AType right, int[] RotateVector)
         {
-            AType row = AInteger.Create(this.items.Shape[0]);
+            AType row = AInteger.Create(right.Shape[0]);
+            AType column = AInteger.Create(right.Shape.GetRange(1, right.Shape.Count - 1).Product());
 
-            int temp = 1;
-            for (int i = 1; i < this.items.Shape.Count; i++)
-            {
-                temp *= this.items.Shape[i];
-            }
+            AType desiredShape = AArray.Create(ATypes.AInteger,
+                row,
+                column
+            );
 
-            AType column = AInteger.Create(temp);
-
-            AType shape = AArray.Create(ATypes.AInteger);
-            shape.AddWithNoUpdate(row);
-            shape.AddWithNoUpdate(column);
-            shape.Length = 2;
-            shape.Shape = new List<int>() { 2 };
-            shape.Rank = 1;
-
-            this.items = DyadicFunctionInstance.Reshape.Execute(this.items, shape);
-
-            AType result = Compute();
+            AType reshapedItems = DyadicFunctionInstance.Reshape.Execute(right, desiredShape);
+            AType result = Compute(reshapedItems, RotateVector);
 
             return DyadicFunctionInstance.Reshape.Execute(result, right.Shape.ToAArray());
         }
@@ -144,15 +128,17 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
         /// <param name="number"></param>
         /// <param name="item"></param>
         /// <returns></returns>
-        private AType RotateArray(int number, AType item)
+        private static AType RotateArray(int number, AType item)
         {
+            AType result;
+
             if (number == 0)
             {
-                return item;
+                result = item;
             }
             else
             {
-                AType result = AArray.Create(ATypes.AArray);
+                result = AArray.Create(ATypes.AArray);
 
                 if (item.Length > 0)
                 {
@@ -181,35 +167,33 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                 result.Shape = new List<int>() { result.Length };
                 result.Rank = 1;
                 result.Type = result.Length > 0 ? result[0].Type : (item.MixedType() ? ATypes.ANull : item.Type);
-
-                return result;
             }
+
+            return result;
         }
 
-        private AType Compute()
+        private static AType Compute(AType items, int[] RotateVector)
         {
-            AType result = null;
+            AType result;
 
-            if (this.items.Rank == 1)
+            if (items.Rank == 1)
             {
-                result = RotateArray(this.rotateVector[0], this.items).Clone();
+                result = RotateArray(RotateVector[0], items).Clone();
             }
-            else //The matrix case.
+            else // the matrix case
             {
-                List<AType> indexes = new List<AType>();
-                indexes.Add(Utils.ANull());
-                indexes.Add(Utils.ANull());
-
-                result = AArray.Create(ATypes.AArray);
+                List<AType> indexes = new List<AType>() { Utils.ANull(), Utils.ANull() };
                 List<AType> columns = new List<AType>();
 
-                for (int i = 0; i < this.items.Shape[1]; i++)
+                for (int i = 0; i < items.Shape[1]; i++)
                 {
                     indexes[1] = AInteger.Create(i);
-                    columns.Add(RotateArray(rotateVector[this.rotateVector.Count > 1 ? i : 0], this.items[indexes]));
+                    columns.Add(
+                        RotateArray(RotateVector[RotateVector.Length > 1 ? i : 0], items[indexes])
+                    );
                 }
 
-                result = ReStructure(columns);
+                result = ReStructure(columns, items);
             }
 
             return result;
@@ -218,36 +202,37 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
         /// <summary>
         /// Change column represenation to row representation.
         /// </summary>
-        /// <param name="item"></param>
+        /// <param name="columnItems"></param>
+        /// <param name="originalItems"></param>
         /// <returns></returns>
-        private AType ReStructure(List<AType> item)
+        private static AType ReStructure(List<AType> columnItems, AType originalItems)
         {
             AType result = AArray.Create(ATypes.AArray);
             AType row;
 
-            for (int i = 0; i < this.items.Shape[0]; i++)
+            for (int i = 0; i < originalItems.Shape[0]; i++)
             {
                 row = AArray.Create(ATypes.AArray);
 
-                for (int j = 0; j < this.items.Shape[1]; j++)
+                for (int j = 0; j < originalItems.Shape[1]; j++)
                 {
-                    row.AddWithNoUpdate(item[j][i].Clone());
+                    row.AddWithNoUpdate(columnItems[j][i].Clone());
                 }
 
-                row.Length = this.items.Shape[1];
+                row.Length = originalItems.Shape[1];
                 row.Shape = new List<int>() { row.Length };
                 row.Rank = 1;
-                row.Type = row.Length > 0 ? row[0].Type : (this.items.MixedType() ? ATypes.ANull : this.items.Type);
+                row.Type = row.Length > 0 ? row[0].Type : (originalItems.MixedType() ? ATypes.ANull : originalItems.Type);
 
                 result.AddWithNoUpdate(row);
             }
 
-            result.Length = this.items.Length;
+            result.Length = originalItems.Length;
             result.Shape = new List<int>() { result.Length };
-            result.Shape.AddRange(this.items.Shape.GetRange(1, this.items.Shape.Count - 1));
-            result.Rank = this.items.Rank;
-            result.Type = result.Length > 0 ? result[0].Type : (this.items.MixedType() ? ATypes.ANull : this.items.Type);
-            
+            result.Shape.AddRange(originalItems.Shape.GetRange(1, originalItems.Shape.Count - 1));
+            result.Rank = originalItems.Rank;
+            result.Type = result.Length > 0 ? result[0].Type : (originalItems.MixedType() ? ATypes.ANull : originalItems.Type);
+
             return result;
         }
 
