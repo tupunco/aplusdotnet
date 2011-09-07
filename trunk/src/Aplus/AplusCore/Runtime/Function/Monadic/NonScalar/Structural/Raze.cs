@@ -7,29 +7,15 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
 {
     class Raze : AbstractMonadicFunction
     {
-        #region Variables
-
-        private AType result;
-        private int length;
-
-        #endregion
-
         #region Entry point
 
         public override AType Execute(AType argument, Aplus environment)
         {
-            return Compute(argument);
-        }
+            AType result;
 
-        #endregion
-
-        #region Computation
-
-        private AType Compute(AType argument)
-        {
             if (argument.SimpleArray())
             {
-                return argument.IsMemoryMappedFile ? argument : argument.Clone();
+                result = argument.IsMemoryMappedFile ? argument : argument.Clone();
             }
             else
             {
@@ -41,14 +27,22 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
                 switch (argument.Rank)
                 {
                     case 0:
-                        return MonadicFunctionInstance.Disclose.Execute(argument);
+                        result = MonadicFunctionInstance.Disclose.Execute(argument);
+                        break;
                     case 1:
-                        return NestedVector(argument);
+                        result = NestedVector(argument);
+                        break;
                     default:
                         throw new Error.Rank(RankErrorText);
                 }
             }
+
+            return result;
         }
+
+        #endregion
+
+        #region Computation
 
         /// <summary>
         /// Argument is a nested vector than we: >(0#x), >(1#x),..., >(-1+#x)#x
@@ -57,23 +51,23 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
         /// <returns></returns>
         private AType NestedVector(AType argument)
         {
-            this.result = AArray.Create(ATypes.AArray);
+            AType result = AArray.Create(ATypes.AArray);
 
-            //Disclose the first item of the argument, set type, rank and shape.
+            // disclose the first item of the argument, get type, rank and shape
             AType disclosedItem = MonadicFunctionInstance.Disclose.Execute(argument[0]);
             AType disclosedArray = disclosedItem.IsArray ? disclosedItem : AArray.Create(disclosedItem.Type, disclosedItem);
+
             ATypes type = disclosedArray.Type;
             int rank = disclosedArray.Rank;
             List<int> shape = disclosedArray.Shape;
 
             bool convertToFloat = false;
 
-            //First Float null item.
-            bool FloatNull = disclosedArray.Length == 0 && type == ATypes.AFloat;
-            this.length = 0;
+            // first Float null item
+            bool FloatNull = (disclosedArray.Length == 0 && type == ATypes.AFloat);
 
-            //Add first item to the result.
-            Catenate(disclosedArray);
+            // add first item to the result
+            int length = Catenate(disclosedArray, result);
 
             for (int i = 1; i < argument.Length; i++)
             {
@@ -92,8 +86,8 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
                 if (type != disclosedArray.Type)
                 {
 
-                    //If one item of the argument is Float then all item will be Float
-                    //If and only if other items is Integers or Floats.
+                    // if one item of the argument is Float then all item will be Float
+                    // if and only if other items is Integers or Floats.
                     if (type == ATypes.AFloat && disclosedArray.Type == ATypes.AInteger)
                     {
                         if (FloatNull)
@@ -113,13 +107,10 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
                     {
                         type = disclosedArray.Type;
                     }
-                    else
+                    else if (!type.MixedType() || !disclosedArray.MixedType())
                     {
-                        if (!type.MixedType() || !disclosedArray.MixedType())
-                        {
-                            //Type is differnce so we throw Type error.
-                            throw new Error.Type(TypeErrorText);
-                        }
+                        // type is differnce so we throw Type error
+                        throw new Error.Type(TypeErrorText);
                     }
                 }
 
@@ -130,7 +121,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
                     throw new Error.Rank(RankErrorText);
                 }
 
-                //Mismatch error arise if actual item has bigger rank than 1 and different from the shape.
+                // mismatch error arise if actual item has bigger rank than 1 and has a different shape
                 if (!shape.SequenceEqual(disclosedArray.Shape))
                 {
                     if (shape.Count > 1 || disclosedArray.Shape.Count > 1)
@@ -139,43 +130,45 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Structural
                     }
                 }
 
-                Catenate(disclosedArray);
+                length += Catenate(disclosedArray, result);
             }
 
-            //Set result properties.
-            this.result.Length = length;
-            this.result.Rank = rank;
-            this.result.Shape = new List<int>() { length };
+            // set result properties
+            result.Length = length;
+            result.Rank = rank;
+            result.Shape = new List<int>() { length };
             if (rank > 1)
             {
-                this.result.Shape.AddRange(shape.GetRange(1, shape.Count - 1));
+                result.Shape.AddRange(shape.GetRange(1, shape.Count - 1));
             }
 
-            //Convert items to Float, if this flag is true.
+            // convert items to Float, if this flag is true.
             if (convertToFloat)
             {
-                this.result.ConvertToFloat();
+                result.ConvertToFloat();
             }
             else
             {
-                this.result.Type = type;
+                result.Type = type;
             }
 
             return result;
         }
 
         /// <summary>
-        /// Add/Catenate argument to the result.
+        /// Catenate items to the result.
         /// </summary>
-        /// <param name="argument"></param>
-        private void Catenate(AType argument)
+        /// <param name="items"></param>
+        /// <param name="result"></param>
+        /// <returns>Number of items added to the result.</returns>
+        private static int Catenate(AType items, AType result)
         {
-            for (int i = 0; i < argument.Length; i++)
+            for (int i = 0; i < items.Length; i++)
             {
-                this.result.AddWithNoUpdate(argument[i].Clone());
+                result.AddWithNoUpdate(items[i].Clone());
             }
 
-            this.length += argument.Length;
+            return items.Length;
         }
 
         #endregion

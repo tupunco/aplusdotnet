@@ -9,20 +9,17 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 {
     class TransposeAxes : AbstractDyadicFunction
     {
-        #region Variables
-
-        private List<int> transposeVector;
-        private AType items;
-        private List<int> duplicateItem;
-
-        #endregion
-
         #region Entry point
 
         public override AType Execute(AType right, AType left, Aplus environment)
         {
-            PrepareAttributes(left, right);
-            return CreateArray(ComputeNewShape(), new List<int>());
+            int[] transposeVector;
+            int[] duplicateItems;
+            ExtractData(left, right, out transposeVector, out duplicateItems);
+            
+            LinkedList<int> newShape = ComputeNewShape(right, transposeVector, duplicateItems);
+
+            return CreateArray(right, newShape, new List<int>(), transposeVector);
         }
 
         #endregion
@@ -30,105 +27,100 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
         #region Preparation
 
         /// <summary>
-        /// Set left and right side of the variables.
+        /// Extract data required for further processing.
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
-        private void PrepareAttributes(AType left, AType right)
+        /// <param name="rvDuplicateItems"></param>
+        /// <param name="rvTransposeVector"></param>
+        private void ExtractData(
+            AType left, AType right, out int[] rvTransposeVector, out int[] rvDuplicateItems)
         {
-            //Left side type must be Float, Integer or Null, else Type error.
+            // left side type must be Float, Integer or Null, else Type error
             if (left.Type != ATypes.AFloat && left.Type != ATypes.AInteger && left.Type != ATypes.ANull)
             {
                 throw new Error.Type(TypeErrorText);
             }
 
-            //If it's scalar then we wrap it to one-element vector.
+            // if it's scalar then we wrap it to one-element vector
             AType vector = left.IsArray ? left : AArray.Create(left.Type, left);
 
-            //If the rank > 1 than we ravel it.
+            // if the rank > 1 than we ravel it
             if (vector.Rank > 1)
             {
                 vector = MonadicFunctionInstance.Ravel.Execute(vector);
             }
 
-            //The left side length must equal the right rank.
+            // the left side length must equal the right rank
             if (vector.Length != right.Rank)
             {
                 throw new Error.Rank(RankErrorText);
             }
 
             int number;
-            //Make a statistics from the left side to discover the vector contain duplicate items.
+            // make a statistics from the left side to discover the if the vector contains duplicate items
             int[] stat = new int[vector.Length];
-            this.transposeVector = new List<int>();
+            List<int> transposeVector = new List<int>();
 
             //Extract items from the left side to integer list.
             foreach (AType item in vector)
             {
-                if (item.ConvertToRestrictedWholeNumber(out number))
-                {
-                    //Bad index, raise Domain error!
-                    if (number < 0 || number >= vector.Length)
-                    {
-                        throw new Error.Domain(DomainErrorText);
-                    }
-
-                    stat[number]++;
-                    this.transposeVector.Add(number);
-                }
-                else
+                if (!item.ConvertToRestrictedWholeNumber(out number))
                 {
                     throw new Error.Type(TypeErrorText);
                 }
+
+                // bad index, raise Domain error
+                if (number < 0 || number >= vector.Length)
+                {
+                    throw new Error.Domain(DomainErrorText);
+                }
+
+                stat[number]++;
+                transposeVector.Add(number);
             }
 
-            //Check the list contains duplicate item.
-            bool firstNull = false;
-            this.duplicateItem = new List<int>();
+            // check the list contains duplicate item
+            bool firstIsNull = false;
+            List<int> duplicateItems = new List<int>();
 
             for (int i = 0; i < stat.Length; i++)
             {
                 if (stat[i] == 0)
                 {
-                    if (this.duplicateItem.Count != 0)
-                    {
-                        if (!firstNull)
-                        {
-                            firstNull = true;
-                        }
-                    }
-                    else
+                    if (duplicateItems.Count == 0)
                     {
                         throw new Error.Domain(DomainErrorText);
+                    }
+
+                    if (!firstIsNull)
+                    {
+                        firstIsNull = true;
                     }
                 }
                 else
                 {
-                    if (firstNull)
+                    if (firstIsNull)
                     {
                         throw new Error.Domain(DomainErrorText);
                     }
 
-                    if(stat[i] > 1)
+                    if (stat[i] > 1)
                     {
-                        duplicateItem.Add(i);
+                        duplicateItems.Add(i);
                     }
                 }
             }
 
-            //Set the right side.
-            if (right.IsArray)
+            if (!right.IsArray && transposeVector.Count == 0)
             {
-                this.items = right;
+                // the left side is null and right is scalar, throw Domain error!
+                throw new Error.Domain(DomainErrorText);
+
             }
-            else
-            {
-                //The left side is null and right is scalar, throw Domain error!
-                if (this.transposeVector.Count == 0)
-                {
-                    throw new Error.Domain(DomainErrorText);
-                }
-            }
+
+            rvTransposeVector = transposeVector.ToArray();
+            rvDuplicateItems = duplicateItems.ToArray();
         }
 
         #endregion
@@ -138,25 +130,26 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
         /// <summary>
         /// Determine the new shape of the result.
         /// </summary>
+        /// <param name="arguments">Instead of class variables.</param>
         /// <returns></returns>
-        private LinkedList<int> ComputeNewShape()
+        private LinkedList<int> ComputeNewShape(AType items, int[] transposeVector, int[] duplicateItems)
         {
             int[] shape;
             LinkedList<int> result = new LinkedList<int>();
 
-            if (this.duplicateItem.Count != 0)
+            if (duplicateItems.Length != 0)
             {
-                shape = Enumerable.Repeat(int.MaxValue, this.transposeVector.Count).ToArray();
+                shape = Enumerable.Repeat(int.MaxValue, transposeVector.Length).ToArray();
 
-                for (int i = 0; i < this.transposeVector.Count; i++)
+                for (int i = 0; i < transposeVector.Length; i++)
                 {
-                    if (this.duplicateItem.Contains(this.transposeVector[i]))
+                    if (duplicateItems.Contains(transposeVector[i]))
                     {
-                        shape[this.transposeVector[i]] = Math.Min(shape[this.transposeVector[i]], this.items.Shape[i]);
+                        shape[transposeVector[i]] = Math.Min(shape[transposeVector[i]], items.Shape[i]);
                     }
                     else
                     {
-                        shape[this.transposeVector[i]] = this.items.Shape[i];
+                        shape[transposeVector[i]] = items.Shape[i];
                     }
                 }
 
@@ -168,11 +161,11 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
             }
             else
             {
-                shape = new int[this.transposeVector.Count];
+                shape = new int[transposeVector.Length];
 
-                for (int i = 0; i < this.transposeVector.Count; i++)
+                for (int i = 0; i < transposeVector.Length; i++)
                 {
-                    shape[this.transposeVector[i]] = this.items.Shape[i];
+                    shape[transposeVector[i]] = items.Shape[i];
                 }
 
                 for (int i = 0; i < shape.Length; i++)
@@ -180,16 +173,19 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                     result.AddLast(shape[i]);
                 }
             }
+
             return result;
         }
 
         /// <summary>
         /// Create the result array with corrpesond shape.
         /// </summary>
+        /// <param name="items"></param>
         /// <param name="shape"></param>
         /// <param name="pathVector"></param>
+        /// <param name="transposeVector"></param>
         /// <returns></returns>
-        private AType CreateArray(LinkedList<int> shape, List<int> pathVector)
+        private AType CreateArray(AType items, LinkedList<int> shape, List<int> pathVector, int[] transposeVector)
         {
             List<int> newPathVector;
             LinkedList<int> cutShape = null;
@@ -205,11 +201,11 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                 {
                     cutShape = new LinkedList<int>(shape);
                     cutShape.RemoveFirst();
-                    result.AddWithNoUpdate(CreateArray(cutShape, newPathVector));
+                    result.AddWithNoUpdate(CreateArray(items, cutShape, newPathVector, transposeVector));
                 }
                 else
                 {
-                    result.AddWithNoUpdate(GetItem(newPathVector));
+                    result.AddWithNoUpdate(GetItem(items, newPathVector, transposeVector));
                 }
             }
 
@@ -222,23 +218,25 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
             }
 
             result.Rank = result.Shape.Count;
-            result.Type = result.Length > 0 ? result[0].Type : (this.items.MixedType() ? ATypes.ANull : this.items.Type);
+            result.Type = 
+                result.Length > 0 ? result[0].Type : (items.MixedType() ? ATypes.ANull : items.Type);
 
             return result;
         }
-        
+
         /// <summary>
         /// Determine the original index from the new index.
         /// </summary>
         /// <param name="newPathVector"></param>
+        /// <param name="transposeVector"></param>
         /// <returns></returns>
-        private List<int> GetOriginalIndex(List<int> newPathVector)
+        private static int[] GetOriginalIndex(List<int> newPathVector, int[] transposeVector)
         {
-            List<int> originalPathVector = new List<int>();
+            int[] originalPathVector = new int[transposeVector.Length];
 
-            for (int i = 0; i < this.transposeVector.Count; i++)
+            for (int i = 0; i < transposeVector.Length; i++)
             {
-                originalPathVector.Add(newPathVector[this.transposeVector[i]]);
+                originalPathVector[i] = newPathVector[transposeVector[i]];
             }
 
             return originalPathVector;
@@ -248,16 +246,17 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
         /// Select item from items array by pathVector.
         /// </summary>
         /// <param name="pathVector"></param>
+        /// <param name="arguments"></param>
         /// <returns></returns>
-        private AType GetItem(List<int> pathVector)
+        private static AType GetItem(AType items, List<int> pathVector, int[] transposeVector)
         {
-            List<int> originalPathVector = GetOriginalIndex(pathVector);
+            int[] originalPathVector = GetOriginalIndex(pathVector, transposeVector);
 
-            AType result = this.items;
+            AType result = items;
 
-            for (int i = 0; i < originalPathVector.Count; i++)
+            foreach (int pathElement in originalPathVector)
             {
-                result = result[originalPathVector[i]];
+                result = result[pathElement];
             }
 
             return result.Clone();

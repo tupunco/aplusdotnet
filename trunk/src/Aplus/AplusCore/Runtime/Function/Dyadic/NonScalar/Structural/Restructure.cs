@@ -7,44 +7,36 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 {
     class Restructure : AbstractDyadicFunction
     {
-        #region Variables
-
-        private int y;
-        private AType items;
-
-        #endregion
-
         #region Entry point
 
         public override AType Execute(AType right, AType left, Aplus environment = null)
         {
-            PrepareVariables(right, left);
-            return Compute();
+            int cutValue = GetCutNumber(right, left);
+            return Compute(right, cutValue);
         }
 
         #endregion
 
         #region Preparation
 
-        private void PrepareVariables(AType right, AType left)
+        private int GetCutNumber(AType right, AType left)
         {
-            if (left.Type == ATypes.AFloat || left.Type == ATypes.AInteger || left.Type == ATypes.ANull)
+            if (!(left.Type == ATypes.AFloat || left.Type == ATypes.AInteger || left.Type == ATypes.ANull))
             {
-                AType scalar;
-
-                // Get the first scalar value with length check on
-                if (!left.TryFirstScalar(out scalar, true))
-                {
-                    throw new Error.Nonce(this.NonceErrorText);
-                }
-
-                // Check if the scalar is a whole number and set the desired count of items
-                if (!left.ConvertToRestrictedWholeNumber(out this.y))
-                {
-                    throw new Error.Type(this.TypeErrorText);
-                }
+                throw new Error.Type(this.TypeErrorText);
             }
-            else
+            
+            AType scalar;
+            int cutValue;
+
+            // get the first scalar value with length check on
+            if (!left.TryFirstScalar(out scalar, true))
+            {
+                throw new Error.Nonce(this.NonceErrorText);
+            }
+
+            // check if the scalar is a whole number and set the desired count of items
+            if (!left.ConvertToRestrictedWholeNumber(out cutValue))
             {
                 throw new Error.Type(this.TypeErrorText);
             }
@@ -54,90 +46,90 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                 throw new Error.MaxRank(MaxRankErrorText);
             }
 
-            if(right.Rank == 0 && y != 1)
+            if (right.Rank == 0 && cutValue != 1)
             {
                 throw new Error.Rank(RankErrorText);
             }
 
-            this.items = right;
+            return cutValue;
         }
 
         #endregion
 
         #region Computation
 
-        private AType Compute()
+        private AType Compute(AType items, int cutValue)
         {
             AType result;
 
-            if (this.items.IsArray)
+            if (items.IsArray)
             {
-                result = AArray.Create(ATypes.AType);
-                AType item;
-                int firstAxisLength, abs_y, counter = 0;
+                int absoluteCutValue = Math.Abs(cutValue);
+                int firstAxisLength;
 
-                //Compute the first axis with corrpespond formula.
-                if (this.y > 0)
+                // compute the first axis with corrpespond formula
+                if (cutValue > 0)
                 {
-                    abs_y = this.y;
-
-                    if (this.items.Length % this.y != 0)
+                    if (items.Length % cutValue != 0)
                     {
                         throw new Error.Length(LengthErrorText);
                     }
 
-                    firstAxisLength = this.items.Length / this.y;
+                    firstAxisLength = items.Length / cutValue;
 
                 } // y <= 0
                 else
                 {
-                    abs_y = Math.Abs(this.y);
-
-                    if (this.items.Length < abs_y - 1)
+                    if (items.Length < absoluteCutValue - 1)
                     {
                         throw new Error.Length(LengthErrorText);
                     }
 
-                    firstAxisLength = this.y + 1 + this.items.Length;
+                    firstAxisLength = cutValue + items.Length + 1;
                 }
 
-                if (this.items.Length > 0)
+                result = AArray.Create(ATypes.AType);
+
+                if (items.Length > 0)
                 {
+                    int counter = 0;
+
                     for (int i = 0; i < firstAxisLength; i++)
                     {
-                        item = AArray.Create(ATypes.AArray);
+                        AType item = AArray.Create(ATypes.AArray);
 
-                        //Select the correspond element if y > 0: get the following element else iota abs_y + i # items.
-                        for (int j = 0; j < abs_y; j++)
+                        // select the correspond element if y > 0: get the following element else iota abs_y + i # items.
+                        for (int j = 0; j < absoluteCutValue; j++)
                         {
-                            item.AddWithNoUpdate(this.items[this.y > 0 ? counter++ : i + j].Clone());
+                            item.AddWithNoUpdate(items[cutValue > 0 ? counter++ : i + j].Clone());
                         }
 
-                        item.Length = abs_y;
-                        item.Shape = new List<int>() { abs_y };
-                        item.Shape.AddRange(this.items[0].Shape);
-                        item.Rank = this.items.Rank;
-                        item.Type = item.Length > 0 ? item[0].Type : (this.items.MixedType() ? ATypes.ANull : items.Type);
+                        item.Length = absoluteCutValue;
+                        item.Shape = new List<int>() { absoluteCutValue };
+                        item.Shape.AddRange(items[0].Shape);
+                        item.Rank = items.Rank;
+                        item.Type = 
+                            item.Length > 0 ? item[0].Type : (items.MixedType() ? ATypes.ANull : items.Type);
 
                         result.AddWithNoUpdate(item);
                     }
                 }
 
-                //Set type, length, shape and rank.
-
                 result.Length = firstAxisLength;
                 result.Shape = new List<int>() { firstAxisLength };
-                result.Shape.Add(abs_y);
-                if (this.items.Rank > 1)
+                result.Shape.Add(absoluteCutValue);
+                if (items.Rank > 1)
                 {
-                    result.Shape.AddRange(this.items.Shape.GetRange(1, this.items.Shape.Count - 1));
+                    result.Shape.AddRange(items.Shape.GetRange(1, items.Shape.Count - 1));
                 }
-                result.Rank = 1 + this.items.Rank;
-                result.Type = result.Length > 0 ? result[0].Type : (this.items.MixedType() ? ATypes.ANull : items.Type);
+
+                result.Rank = 1 + items.Rank;
+                result.Type = 
+                    result.Length > 0 ? result[0].Type : (items.MixedType() ? ATypes.ANull : items.Type);
             }
             else
             {
-                result = AArray.Create(this.items.Type, this.items);
+                result = AArray.Create(items.Type, items);
             }
 
             return result;

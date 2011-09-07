@@ -7,11 +7,35 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 {
     class Partition : AbstractDyadicFunction
     {
-        #region Variables
+        #region Partition information
 
-        private List<int> y;
-        private AType x;
-        private int remainder;
+        class PartitionJobInfo
+        {
+            private int[] partitionVector;
+            private int remainder;
+
+            public PartitionJobInfo(int remainder, int[] partitionVector)
+            {
+                this.remainder = remainder;
+                this.partitionVector = partitionVector;
+            }
+
+            /// <summary>
+            /// Gets the number of remainder items.
+            /// </summary>
+            internal int Remainder
+            {
+                get { return this.remainder; }
+            }
+
+            /// <summary>
+            /// Gets the partition counts
+            /// </summary>
+            internal int[] PartitionVector
+            {
+                get { return this.partitionVector; }
+            }
+        }
 
         #endregion
 
@@ -19,176 +43,169 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 
         public override AType Execute(AType right, AType left, Aplus environment = null)
         {
-            PrepareVariables(right, left);
-            return Compute();
+            PartitionJobInfo arguments = CreatePartitionInfo(right, left);
+            return Compute(right, arguments);
         }
 
         #endregion
 
         #region Preparation
 
-        private void PrepareVariables(AType right, AType left)
+        private PartitionJobInfo CreatePartitionInfo(AType right, AType left)
         {
-            int sum = 0;
-            bool going = true;
-
-            this.remainder = 0;
-
-            // Left side type must be float, integer or null.
+            // left side type must be float, integer or null
             if (left.Type != ATypes.AFloat && left.Type != ATypes.AInteger && left.Type != ATypes.ANull || left.IsBox)
             {
                 throw new Error.Type(TypeErrorText);
             }
 
-            //If the right side is scalar then we throw Rank error exception.
+            // if the right side is scalar then we throw Rank error exception
             if (right.Rank < 1)
             {
                 throw new Error.Rank(RankErrorText);
             }
 
-            this.x = right;
-
-            this.y = new List<int>();
             int element;
+            List<int> partitionVector = new List<int>();
+            int remainder = 0;
+            int sum = 0;
+            bool going = true;
 
+            // TODO: check if this branch can be eliminated if the argument is raveled always
             if (left.IsArray)
             {
-                //If the left rank is higher than 1 then we ravel it to vector.
+                // TODO: Check this:
+                // if the left rank is higher than 1 then we ravel it to vector.
                 AType raveled_y = left.Rank > 1 ? MonadicFunctionInstance.Ravel.Execute(left) : left;
 
-                //Get the integer list from the right side.
+                // get the integer list from the right side
                 foreach (AType item in raveled_y)
                 {
-                    //If the actual item is float then we convert it to (if it's a restricted whole number).
-                    if (item.ConvertToRestrictedWholeNumber(out element))
+                    // if the actual item is float then we convert it to (if it's a restricted whole number)
+                    if (!item.ConvertToRestrictedWholeNumber(out element))
                     {
-                        //Negative item raise domain error.
-                        if (element < 0)
+                        throw new Error.Type(TypeErrorText);
+                    }
+
+                    if (element < 0)
+                    {
+                        // negative item raise domain error
+                        throw new Error.Domain(DomainErrorText);
+                    }
+
+                    sum += element;
+
+                    if (right.Length > 0 && going)
+                    {
+                        // compute how many item we can take from the list at last
+                        if (sum > right.Length)
                         {
-                            throw new Error.Domain(DomainErrorText);
-                        }
-
-                        sum += element;
-
-                        if (right.Length > 0 && going)
-                        {
-                            //Compute how many item we can take from the list at last.
-                            if (sum > right.Length)
-                            {
-                                this.y.Add(right.Length - (sum - element));
-                                going = false;
-                            }
-                            else
-                            {
-                                //Collect the item to y list.
-                                this.y.Add(element);
-
-                                if (sum == right.Length)
-                                {
-                                    going = false;
-                                }
-                            }
+                            partitionVector.Add(right.Length - (sum - element));
+                            going = false;
                         }
                         else
                         {
-                            //Count the empty elements what we need.
-                            this.remainder++;
+                            // collect the item to y list
+                            partitionVector.Add(element);
+
+                            if (sum == right.Length)
+                            {
+                                going = false;
+                            }
                         }
                     }
                     else
                     {
-                        throw new Error.Type(TypeErrorText);
+                        // count the empty elements what we need
+                        remainder++;
                     }
                 }
             }
             else
             {
-                //This case is when the left side is scalar.
-                if (left.ConvertToRestrictedWholeNumber(out element))
-                {
-                    if (element < 0)
-                    {
-                        throw new Error.Domain(DomainErrorText);
-                    }
-                }
-                else
+                // this case is when the left side is scalar
+                if (!left.ConvertToRestrictedWholeNumber(out element))
                 {
                     throw new Error.Type(TypeErrorText);
                 }
 
-                if (element != 0)
+                if (element < 0)
+                {
+                    throw new Error.Domain(DomainErrorText);
+                }
+                else if (element != 0)
                 {
                     int round = right.Length / element;
 
                     for (int i = 0; i < round; i++)
                     {
-                        this.y.Add(element);
+                        partitionVector.Add(element);
                     }
 
                     int rem = right.Length % element;
 
                     if (rem != 0)
                     {
-                        this.y.Add(rem);
+                        partitionVector.Add(rem);
                     }
                 }
                 else
                 {
-                    this.y.Add(0);
+                    partitionVector.Add(0);
                 }
             }
+
+            PartitionJobInfo info = new PartitionJobInfo(remainder, partitionVector.ToArray());
+            return info;
         }
 
         #endregion
 
         #region Computation
 
-        private AType Compute()
+        private AType Compute(AType inputItems, PartitionJobInfo info)
         {
-            //The left side is equal with 0, then the result is Enclosed null.
-            if (this.y.Count == 1 && this.y[0] == 0)
-            {  
-                return CreateEnclosedNull();
+            // the left side is equal with 0, then the result is Enclosed null
+            if (info.PartitionVector.Length == 1 && info.PartitionVector[0] == 0)
+            {
+                return CreateEnclosedNull(inputItems);
             }
 
-            //The result is a nested vector.
+            // the result is a nested vector
             AType result = AArray.Create(ATypes.AType);
-            AType item;
             int counter = 0;
 
-            //Enclose y[i] items from x array.
-            for (int i = 0; i < this.y.Count; i++)
+            // enclose y[i] items from x array
+            //for (int i = 0; i < arguments.PartitionVector.Length; i++)
+            foreach (int partitionNumber in info.PartitionVector)
             {
-                item = AArray.Create(this.x[counter].Type);
+                AType item = AArray.Create(inputItems[counter].Type);
 
-                for (int j = 0; j < this.y[i]; j++)
+                for (int j = 0; j < partitionNumber; j++)
                 {
-                    item.AddWithNoUpdate(this.x[counter]);
+                    item.AddWithNoUpdate(inputItems[counter]);
                     counter++;
                 }
 
-                item.Length = this.y[i];
-                item.Shape = new List<int>() { this.y[i] };
-                if (this.x.Rank > 1)
+                item.Length = partitionNumber;
+                item.Shape = new List<int>() { partitionNumber };
+                if (inputItems.Rank > 1)
                 {
-                    item.Shape.AddRange(this.x.Shape.GetRange(1, this.x.Shape.Count - 1));
+                    item.Shape.AddRange(inputItems.Shape.GetRange(1, inputItems.Shape.Count - 1));
                 }
 
-                item.Rank = this.x.Rank;
+                item.Rank = inputItems.Rank;
 
                 result.AddWithNoUpdate(ABox.Create(item));
             }
 
-            //Add the remainder Enclosed null.
-            if (this.remainder != 0)
+            // add the remainder Enclosed null
+            for (int i = 0; i < info.Remainder; i++)
             {
-                for (int i = 0; i < this.remainder; i++)
-                {
-                    result.AddWithNoUpdate(CreateEnclosedNull());
-                }
+                result.AddWithNoUpdate(CreateEnclosedNull(inputItems));
             }
 
-            result.Length = this.y.Count + this.remainder;
+            result.Length = info.PartitionVector.Length + info.Remainder;
             result.Shape = new List<int>() { result.Length };
             result.Rank = 1;
 
@@ -197,19 +214,19 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
             return result;
         }
 
-        private AType CreateEnclosedNull()
+        private static AType CreateEnclosedNull(AType inputItem)
         {
-            AType result = AArray.Create(this.x.MixedType() ? ATypes.ANull : this.x.Type);
+            AType result = AArray.Create(inputItem.MixedType() ? ATypes.ANull : inputItem.Type);
 
             result.Length = 0;
             result.Shape = new List<int>() { result.Length };
 
-            if (this.x.Rank > 1)
+            if (inputItem.Rank > 1)
             {
-                result.Shape.AddRange(this.x.Shape.GetRange(1, this.x.Shape.Count - 1));
+                result.Shape.AddRange(inputItem.Shape.GetRange(1, inputItem.Shape.Count - 1));
             }
 
-            result.Rank = this.x.Rank;
+            result.Rank = inputItem.Rank;
 
             return ABox.Create(result);
         }
