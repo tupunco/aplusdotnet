@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 using Microsoft.Scripting.Runtime;
 
@@ -28,6 +29,48 @@ namespace AplusCore.Runtime
             Console.WriteLine(String.Join(" ", storage.GetDynamicMemberNames()));
 
             return Utils.ANull();
+        }
+
+        /// <summary>
+        /// Writes data to the specified file.
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <param name="variableName">
+        /// The name of the variable which stores the date to write into the file.
+        /// </param>
+        /// <param name="filename">The filename to write the data to.</param>
+        public static void WriteToFile(Aplus environment, string variableName, string filename)
+        {
+            AType variable = null;
+
+            try
+            {
+                variable =
+                    Function.Monadic.MonadicFunctionInstance.Value.Execute(ASymbol.Create(variableName), environment);
+            }
+            catch (Error)
+            {
+                // intentionally left blank
+            }
+
+            if (variable != null)
+            {
+                try
+                {
+                    using (StreamWriter writer = new StreamWriter(filename))
+                    {
+                        writer.Write(variable.ToString());
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    throw new Error.Invalid("$>");
+                }
+            }
+            else
+            {
+                Console.WriteLine("bad varname");
+            }
         }
     }
 }
