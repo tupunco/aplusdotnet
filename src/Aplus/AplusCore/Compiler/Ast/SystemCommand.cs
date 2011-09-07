@@ -57,7 +57,7 @@ namespace AplusCore.Compiler.AST
 
                 case "$laod": // Compatibility with original A+ interpreter
                 case "$load":
-                    IDictionary<string, AType> items = 
+                    IDictionary<string, AType> items =
                         runtime.ContextLoader.FindContextElements(this.argument);
 
                     if (items.Count > 0)
@@ -191,9 +191,31 @@ namespace AplusCore.Compiler.AST
                     break;
 
                 default:
-                    Console.WriteLine("Unknown system command: {0} {1}", this.command, this.argument);
-                    break;
+                    if (this.command.StartsWith("$>"))
+                    {
+                        string variable = this.command.Substring(2);
 
+                        if (this.argument == null || this.argument.Length == 0 || variable.Length == 0)
+                        {
+                            Console.WriteLine("incorrect");
+                        }
+                        else
+                        {
+                            codeBlock.AddFirst(
+                                DLR.Expression.Call(
+                                    typeof(SystemCommands).GetMethod("WriteToFile"),
+                                    DLR.Expression.Constant(runtime),
+                                    DLR.Expression.Constant(variable),
+                                    DLR.Expression.Constant(this.argument)
+                                )
+                            );  
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unknown system command: {0} {1}", this.command, this.argument);
+                    }
+                    break;
             }
 
             DLR.Expression result = DLR.Expression.Block(codeBlock);
