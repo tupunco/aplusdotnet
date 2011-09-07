@@ -8,15 +8,70 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
 {
     class DefaultFormat : AbstractMonadicFunction
     {
-        #region Variables
+        #region Format information
 
-        private int index;
-        private List<string> items;
-        private ATypes type;
+        class FormatInformation
+        {
+            private int index;
+            private List<string> items;
+            private ATypes type;
+            private int intervalMax;
+            private int fractionMax;
+            private bool dotFound;
+            private int precision;
 
-        private int intervalMax;
-        private int fractionMax;
-        private bool dot;
+            internal FormatInformation(ATypes type, int printingPrecision)
+            {
+                this.type = type;
+                this.precision = printingPrecision;
+
+                this.index = 0;
+                this.items = new List<string>();
+                this.intervalMax = -1;
+                this.fractionMax = -1;
+                this.dotFound = false;
+            }
+
+            internal int Precision
+            {
+                get { return this.precision; }
+            }
+
+            internal bool DotFound
+            {
+                get { return dotFound; }
+                set { dotFound = value; }
+            }
+
+            internal int FractionMax
+            {
+                get { return fractionMax; }
+                set { fractionMax = value; }
+            }
+
+            internal int IntervalMax
+            {
+                get { return intervalMax; }
+                set { intervalMax = value; }
+            }
+
+            internal ATypes Type
+            {
+                get { return type; }
+                set { type = value; }
+            }
+
+            internal List<string> Items
+            {
+                get { return items; }
+            }
+
+            internal int Index
+            {
+                get { return index; }
+                set { index = value; }
+            }
+        }
 
         #endregion
 
@@ -48,23 +103,18 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
                 return argument.Clone();
             }
 
-            //Use Printing precision systam variable to write float number.
-            int tmp = environment != null ? environment.SystemVariables["pp"].asInteger : -1;
+            // use Printing precision system variable
+            int printingPrecision = (environment != null) ? environment.SystemVariables["pp"].asInteger : -1;
 
-            int printingPrecision;
-
-            switch(tmp)
+            switch (printingPrecision)
             {
                 case -1:
-                    //System variable doesn't exist, so we write whole float number.
+                    // system variable doesn't exist, so we write whole float number.
                     printingPrecision = 0;
                     break;
                 case 0:
-                    //If `pp is 0, then it is reated as if it were one.
+                    // if `pp is 0, then it is reated as if it were one.
                     printingPrecision = 1;
-                    break;
-                default:
-                    printingPrecision = tmp;
                     break;
             }
 
@@ -94,55 +144,54 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
         /// Walk the whole (array) argument to find the longest interval and fraction.
         /// </summary>
         /// <param name="argument"></param>
-        /// <param name="printingPrecision"></param>
-        private void DetectLongestSymbol(AType argument, int printingPrecision)
+        /// <param name="formatInfo"></param>
+        private void DetectLongestSymbol(AType argument, FormatInformation formatInfo)
         {
             if (argument.IsArray)
             {
                 foreach (AType item in argument)
                 {
-                    DetectLongestSymbol(item, printingPrecision);
+                    DetectLongestSymbol(item, formatInfo);
                 }
             }
             else
             {
-                this.items.Add(GetItem(argument, printingPrecision));
+                formatInfo.Items.Add(GetItem(argument, formatInfo));
             }
         }
 
         /// <summary>
-        /// Convert items to string (with printing precision).
+        /// Convert item to string.
         /// </summary>
-        /// <param name="argument"></param>
-        /// <param name="printingPrecision"></param>
-        private string GetItem(AType argument, int printingPrecision)
+        /// <param name="item"></param>
+        /// <param name="info"></param>
+        private string GetItem(AType item, FormatInformation info)
         {
             string result;
 
-            switch (argument.Type)
+            switch (item.Type)
             {
                 case ATypes.AInteger:
-                    result = (argument.asInteger).ToString();
-                    this.intervalMax = Math.Max(result.Length, this.intervalMax);
+                    result = item.asInteger.ToString();
+                    info.IntervalMax = Math.Max(result.Length, info.IntervalMax);
                     break;
                 case ATypes.ASymbol:
-                    result = "`" + argument.asString;
-                    this.intervalMax = Math.Max(result.Length, this.intervalMax);
+                    result = "`" + item.asString;
+                    info.IntervalMax = Math.Max(result.Length, info.IntervalMax);
                     break;
                 default:
-                    result = (argument.asFloat).ToString("g" + printingPrecision, CultureInfo.InvariantCulture);
+                    result = item.asFloat.ToString("g" + info.Precision, CultureInfo.InvariantCulture);
+                    int dotPostion = result.IndexOf(".");
 
-                    int ind = result.IndexOf(".");
-
-                    if (ind != -1)
+                    if (dotPostion != -1)
                     {
-                        this.intervalMax = Math.Max(ind, this.intervalMax);
-                        this.fractionMax = Math.Max(result.Length - (ind + 1), this.fractionMax);
-                        this.dot = true;
+                        info.IntervalMax = Math.Max(dotPostion, info.IntervalMax);
+                        info.FractionMax = Math.Max(result.Length - (dotPostion + 1), info.FractionMax);
+                        info.DotFound = true;
                     }
                     else
                     {
-                        this.intervalMax = Math.Max(result.Length, this.intervalMax);
+                        info.IntervalMax = Math.Max(result.Length, info.IntervalMax);
                     }
                     break;
             }
@@ -154,33 +203,28 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
 
         #region Computation
 
-        private AType Compute(AType argument, int printingPrecision)
+        private AType Compute(AType item, int printingPrecision)
         {
-            this.index = 0;
-            this.items = new List<string>();
-            this.type = argument.Type;
+            FormatInformation formatInfo = new FormatInformation(item.Type, printingPrecision);
 
-            this.intervalMax = -1;
-            this.fractionMax = -1;
-            this.dot = false;
+            DetectLongestSymbol(item, formatInfo);
 
-            DetectLongestSymbol(argument, printingPrecision);
-
-            if (argument.Rank < 2)
+            if (item.Rank < 2)
             {
-                this.intervalMax = -1;
-                this.fractionMax = -1;
+                formatInfo.IntervalMax = -1;
+                formatInfo.FractionMax = -1;
             }
 
-            return FormatArray(argument.Shape);
+            return FormatArray(item.Shape, formatInfo);
         }
 
         /// <summary>
         /// Execute padding on all items and make the result character array.
         /// </summary>
         /// <param name="shape"></param>
+        /// <param name="arguments">Instead of class variables.</param>
         /// <returns></returns>
-        private AType FormatArray(List<int> shape)
+        private AType FormatArray(List<int> shape, FormatInformation arguments)
         {
             AType result = AArray.Create(ATypes.AChar);
             int rank = shape.Count;
@@ -191,11 +235,11 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
                 {
                     if (rank > 1)
                     {
-                        result.AddWithNoUpdate(FormatArray(shape.GetRange(1, rank - 1)));
+                        result.AddWithNoUpdate(FormatArray(shape.GetRange(1, rank - 1), arguments));
                     }
                     else
                     {
-                        result.AddRangeWithNoUpdate(FormatScalar());
+                        result.AddRangeWithNoUpdate(FormatScalar(arguments));
                     }
                 }
 
@@ -203,41 +247,44 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
             }
             else
             {
-                result.AddRange(FormatScalar());
+                result.AddRange(FormatScalar(arguments));
             }
+
             return result;
         }
 
         /// <summary>
-        /// Execute padding on actual item (this.items[index]) and
+        /// Execute padding on actual item (arguments.Items[index]) and
         /// create a character array.
         /// </summary>
+        /// <param name="info">Instead of class variables.</param>
         /// <returns></returns>
-        private AType[] FormatScalar()
+        private AType[] FormatScalar(FormatInformation info)
         {
-            int blankFront, blankEnd, counter = 0;
+            int blankFront;
+            int blankEnd;
+            int counter = 0;
 
-            switch (this.type)
+            switch (info.Type)
             {
                 case ATypes.ASymbol:
-                    FormatSymbol(out blankFront, out blankEnd);
+                    FormatSymbol(info, out blankFront, out blankEnd);
                     break;
                 case ATypes.AInteger:
-                    FormatInteger(out blankFront, out blankEnd);
+                    FormatInteger(info, out blankFront, out blankEnd);
                     break;
                 default:
-                    FormatFloat(out blankFront, out blankEnd);
+                    FormatFloat(info, out blankFront, out blankEnd);
                     break;
-
             }
 
-            AType[] result = new AType[blankFront + this.items[index].Length + blankEnd];
+            AType[] result = new AType[blankFront + info.Items[info.Index].Length + blankEnd];
 
             for (int i = 0; i < result.Length; i++)
             {
-                if (i >= blankFront && i < blankFront + this.items[index].Length)
+                if (i >= blankFront && i < blankFront + info.Items[info.Index].Length)
                 {
-                    result[i] = AChar.Create(this.items[index][counter++]);
+                    result[i] = AChar.Create(info.Items[info.Index][counter++]);
                 }
                 else
                 {
@@ -245,7 +292,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
                 }
             }
 
-            this.index++;
+            info.Index++;
 
             return result;
         }
@@ -253,47 +300,60 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
         /// <summary>
         /// Determine right and left padding of symbol.
         /// </summary>
+        /// <param name="arguments">Instead of class variables.</param>
         /// <param name="blankFront"></param>
         /// <param name="blankEnd"></param>
-        private void FormatSymbol(out int blankFront, out int blankEnd)
+        private void FormatSymbol(FormatInformation arguments, out int blankFront, out int blankEnd)
         {
             blankFront = 1;
-            blankEnd = this.intervalMax == -1 ? 0 : (this.intervalMax - this.items[index].Length);
+            blankEnd = (arguments.IntervalMax == -1)
+                ? 0
+                : (arguments.IntervalMax - arguments.Items[arguments.Index].Length);
         }
 
         /// <summary>
         /// Determine right and left padding of integer.
         /// </summary>
+        /// <param name="arguments">Instead of class variables.</param>
         /// <param name="blankFront"></param>
         /// <param name="blankEnd"></param>
-        private void FormatInteger(out int blankFront, out int blankEnd)
+        private void FormatInteger(FormatInformation arguments, out int blankFront, out int blankEnd)
         {
-            blankFront = this.intervalMax == -1 ? 1 : 1 + (this.intervalMax - this.items[index].Length);
+            blankFront = (arguments.IntervalMax == -1)
+                ? 1
+                : (1 + arguments.IntervalMax - arguments.Items[arguments.Index].Length);
             blankEnd = 0;
         }
 
         /// <summary>
         /// Determine right and left padding of float.
         /// </summary>
+        /// <param name="arguments">Instead of class variables.</param>
         /// <param name="blankFront"></param>
         /// <param name="blankEnd"></param>
-        private void FormatFloat(out int blankFront, out int blankEnd)
+        private void FormatFloat(FormatInformation arguments, out int blankFront, out int blankEnd)
         {
-            int ind = this.items[index].IndexOf(".");
+            int dotPosition = arguments.Items[arguments.Index].IndexOf(".");
 
-            if (ind != -1)
+            if (dotPosition != -1)
             {
-                blankFront = this.intervalMax == -1 ? 1 : 1 + (this.intervalMax - ind);
-
-                blankEnd = this.fractionMax == -1 ? 0 : (this.fractionMax - (this.items[index].Length - (ind + 1)));
+                blankFront = (arguments.IntervalMax == -1)
+                    ? 1
+                    : (1 + arguments.IntervalMax - dotPosition);
+                blankEnd = (arguments.FractionMax == -1)
+                    ? 0
+                    : (arguments.FractionMax - (arguments.Items[arguments.Index].Length - (dotPosition + 1)));
             }
             else
             {
-                blankFront = this.intervalMax == -1 ? 1 : 1 + (this.intervalMax - this.items[index].Length);
+                blankFront = (arguments.IntervalMax == -1)
+                    ? 1
+                    : 1 + (arguments.IntervalMax - arguments.Items[arguments.Index].Length);
+                blankEnd = (arguments.FractionMax == -1)
+                    ? 0
+                    : arguments.FractionMax;
 
-                blankEnd = this.fractionMax == -1 ? 0 : this.fractionMax;
-
-                if (dot)
+                if (arguments.DotFound)
                 {
                     blankEnd++;
                 }
