@@ -25,7 +25,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Comprasion
         private byte[] PrepareVector(AType argument)
         {
             // Type check.
-            if(!Util.TypeCorrect(argument.Type, 'F','I','N'))
+            if(!(argument.IsNumber || argument.Type == ATypes.ANull))
             {
                 throw new Error.Type(TypeErrorText);
             }

@@ -45,13 +45,16 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
         /// Prepare the left side and determine the cellshape.
         /// </summary>
         /// <param name="left"></param>
+        /// <param name="right"></param>
         private FindArguments PrepareVariables(AType left, AType right)
         {
-            if (!Utils.IsSameGeneralType(left, right) && !Util.TypeCorrect(right.Type, left.Type, "N?", "?N"))
+            // Error if the arguments:
+            //  - are not from the same general type
+            //  - and one of them is a Null
+            if (!Utils.IsSameGeneralType(left, right) && !(left.Type == ATypes.ANull || right.Type == ATypes.ANull))
             {
                 throw new Error.Type(TypeErrorText);
             }
-
 
             FindArguments arguments = new FindArguments()
             {
@@ -152,19 +155,19 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
             }
             else
             {
-                if (Util.TypeCorrect(actual.Type, other.Type, "II", "FF", "IF", "FI"))
+                if (actual.IsNumber && other.IsNumber)
                 {
                     return Utils.ComparisonTolerance(actual.asFloat, other.asFloat);
                 }
-                else if (Util.TypeCorrect(actual.Type, other.Type, "CC"))
+                else if (actual.Type == ATypes.AChar && other.Type == ATypes.AChar)
                 {
-                    return actual.asChar.CompareTo(other.asChar) == 0;
+                    return actual.asChar == other.asChar;
                 }
-                else if (Util.TypeCorrect(actual.Type, other.Type, "SS"))
+                else if (actual.Type == ATypes.ASymbol && other.Type == ATypes.ASymbol)
                 {
-                    return actual.asString.CompareTo(other.asString) == 0;
+                    return actual.asString == other.asString;
                 }
-                else if (Util.TypeCorrect(actual.Type, other.Type, "UU") || actual.IsBox && other.IsBox)
+                else if ((actual.Type == ATypes.AFunc && other.Type == ATypes.AFunc) || (actual.IsBox && other.IsBox))
                 {
                     return actual.Equals(other);
                 }

@@ -59,7 +59,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
         /// <param name="left"></param>
         private LaminateJobInfo CreateLaminateJob(AType right, AType left)
         {
-            LaminateJobInfo laminateInfo = 
+            LaminateJobInfo laminateInfo =
                 new LaminateJobInfo(left.Length != 0 ? left.Type : right.Type);
             
             if (left.IsArray && !right.IsArray)
@@ -90,7 +90,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
                 {
                     left = left.ConvertToFloat();
                 }
-                else if (!Utils.IsSameGeneralType(left, right) && !Util.TypeCorrect(right.Type, left.Type, "N?", "?N"))
+                else if (!(Utils.IsSameGeneralType(left, right) 
+                    || left.Type == ATypes.ANull || right.Type == ATypes.ANull))
                 {
                     throw new Error.Type(TypeErrorText);
                 }
@@ -130,7 +131,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Structural
 
             if (laminateInfo.Left.Length == 0 || laminateInfo.Right.Length == 0)
             {
-                result.Type = laminateInfo.Left.Type = laminateInfo.Right.Type = 
+                result.Type = laminateInfo.Left.Type = laminateInfo.Right.Type =
                     laminateInfo.ResultType.MixedType() ? ATypes.ANull : laminateInfo.ResultType;
             }
 
