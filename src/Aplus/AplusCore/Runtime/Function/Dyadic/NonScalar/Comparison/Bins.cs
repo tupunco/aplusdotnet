@@ -45,10 +45,18 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Comparison
         /// Prepare the left side and determine the cellshape.
         /// </summary>
         /// <param name="left"></param>
+        /// <param name="right"></param>
         private CalculationArguments PrepareVariables(AType left, AType right)
         {
+            // Error if the arguments:
+            //  - are boxes
+            //  - or not of the same type and:
+            //    - not numbers
+            //    - or one of them is a Null
             if (left.IsBox || right.IsBox ||
-                (left.Type != right.Type && !Util.TypeCorrect(right.Type, left.Type, "FI", "IF", "N?", "?N")))
+                (left.Type != right.Type &&
+                !(Utils.DifferentNumberType(left, right) || left.Type == ATypes.ANull || right.Type == ATypes.ANull)
+            ))
             {
                 throw new Error.Type(TypeErrorText);
             }

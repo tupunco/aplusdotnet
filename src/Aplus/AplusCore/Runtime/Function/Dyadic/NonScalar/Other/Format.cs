@@ -47,8 +47,10 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
         /// <param name="right">Items to format.</param>
         private void ValidateInput(AType left, AType right)
         {
-            if (!Util.TypeCorrect(right.Type, left.Type,
-                "FF", "II", "FI", "IF", "FS", "IS", "NI", "NF", "NS", "FN", "IN", "NN"))
+            bool typeOK = (left.IsNumber || left.Type == ATypes.ANull)
+                && (right.IsNumber || right.Type == ATypes.ASymbol || right.Type == ATypes.ANull);
+
+            if (!typeOK)
             {
                 throw new Error.Type(TypeErrorText);
             }

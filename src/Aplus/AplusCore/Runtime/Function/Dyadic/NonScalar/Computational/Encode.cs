@@ -68,8 +68,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
         /// <param name="right"></param>
         private EncodeInformation ExtractEncodeInformation(AType left, AType right)
         {
-            // TypeCheck!
-            if (!Util.TypeCorrect(right.Type, left.Type, "FF", "II", "FI", "IF", "FN", "NF", "IN", "NI", "NN"))
+            // Error if the arguments are not numbers or Null
+            if (!((left.IsNumber || left.Type == ATypes.ANull) && (right.IsNumber || right.Type == ATypes.ANull))) 
             {
                 throw new Error.Type(TypeErrorText);
             }
