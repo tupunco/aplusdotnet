@@ -36,16 +36,16 @@ namespace AplusCore.Runtime
         /// </summary>
         /// <param name="environment"></param>
         /// <param name="variableName">
-        /// The name of the variable which stores the date to write into the file.
+        /// The name of the variable which stores the data to write into the file.
         /// </param>
         /// <param name="filename">The filename to write the data to.</param>
         public static void WriteToFile(Aplus environment, string variableName, string filename)
         {
-            AType variable = null;
+            AType data = null;
 
             try
             {
-                variable =
+                data =
                     Function.Monadic.MonadicFunctionInstance.Value.Execute(ASymbol.Create(variableName), environment);
             }
             catch (Error)
@@ -53,13 +53,16 @@ namespace AplusCore.Runtime
                 // intentionally left blank
             }
 
-            if (variable != null)
+            if (data != null)
             {
                 try
                 {
-                    using (StreamWriter writer = new StreamWriter(filename))
+                    using (FileStream fileStream = new FileStream(filename, FileMode.Create))
                     {
-                        writer.Write(variable.ToString());
+                        foreach (char item in data.ToString())
+                        {
+                            fileStream.WriteByte((byte)item);
+                        }
                     }
                 }
                 catch (ArgumentException)
