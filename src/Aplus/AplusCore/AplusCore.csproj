@@ -165,6 +165,7 @@
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Computational\Deal.cs" />
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Computational\Decode.cs" />
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Computational\Encode.cs" />
+    <Compile Include="Runtime\Function\Dyadic\NonScalar\Computational\Solve.cs" />
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Other\Cast.cs" />
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Other\ExecuteInContext.cs" />
     <Compile Include="Runtime\Function\Dyadic\NonScalar\Other\Format.cs" />

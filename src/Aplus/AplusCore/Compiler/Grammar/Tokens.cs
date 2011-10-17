@@ -118,6 +118,7 @@ namespace AplusCore.Compiler.Grammar
         RESHAPE,
         RESTRUCTURE,
         ROTATE,
+        SOLVE,
         TAKE,
         TRANSPOSEAXES,
         VALUEINCONTEXT,
