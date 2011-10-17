@@ -30,6 +30,7 @@ namespace AplusCore.Compiler.AST
             { Tokens.INTERVAL, Tokens.FIND },
             { Tokens.ITEMRAVEL, Tokens.RESTRUCTURE },
             { Tokens.MAPIN, Tokens.MAP },
+            { Tokens.MATRIXINVERSE, Tokens.SOLVE },
             { Tokens.NATURALLOG, Tokens.LOG },
             { Tokens.NEGATE, Tokens.SUBTRACT },
             { Tokens.NOT, Tokens.LAMINATE },
@@ -298,6 +299,8 @@ namespace AplusCore.Compiler.AST
                     return DyadicFunctionInstance.Restructure;
                 case Tokens.ROTATE:
                     return DyadicFunctionInstance.Rotate;
+                case Tokens.SOLVE:
+                    return DyadicFunctionInstance.Solve;
                 case Tokens.TAKE:
                     return DyadicFunctionInstance.Take;
                 case Tokens.TRANSPOSEAXES:

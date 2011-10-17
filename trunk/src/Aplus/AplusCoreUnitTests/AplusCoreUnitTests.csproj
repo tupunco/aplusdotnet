@@ -114,6 +114,7 @@
     <Compile Include="Dlr\Function\Dyadic\NonScalar\Reshape.cs" />
     <Compile Include="Dlr\Function\Dyadic\NonScalar\Restructure.cs" />
     <Compile Include="Dlr\Function\Dyadic\NonScalar\Rotate.cs" />
+    <Compile Include="Dlr\Function\Dyadic\NonScalar\Solve.cs" />
     <Compile Include="Dlr\Function\Dyadic\NonScalar\Take.cs" />
     <Compile Include="Dlr\Function\Dyadic\NonScalar\TransposeAxes.cs" />
     <Compile Include="Dlr\Function\Dyadic\NonScalar\ValueInContext.cs" />

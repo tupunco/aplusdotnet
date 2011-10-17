@@ -79,6 +79,7 @@ namespace AplusCore.Runtime.Function.Dyadic
         internal static readonly AbstractDyadicFunction Deal = new Deal();
         internal static readonly AbstractDyadicFunction Decode = new Decode();
         internal static readonly AbstractDyadicFunction Encode = new Encode();
+        internal static readonly AbstractDyadicFunction Solve = new Solve();
 
         #endregion
 
