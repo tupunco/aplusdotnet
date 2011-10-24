@@ -103,7 +103,7 @@ expressionGroup returns [AST.ExpressionList node]
 
 expression returns [AST.Node node]
 	:	controlStatements								{ node = $controlStatements.node; }
-	|	lhs=dyadicLeftArg func=functionSelector rhs=expression
+	|	lhs=dyadicLeftArg func=dyadicFunctionSelector rhs=expression
 			{
 				if($func.node is AST.Token)
 				{
@@ -116,12 +116,19 @@ expression returns [AST.Node node]
 					oper.LeftArgument = $lhs.node;
 					node = oper;
 				}
+				else if($func.node is AST.UserDefInvoke)
+				{
+					AST.UserDefInvoke funcInvoke = (AST.UserDefInvoke)$func.node;
+					funcInvoke.Arguments.Items.AddLast(new LinkedListNode<AST.Node>($rhs.node));
+					funcInvoke.Arguments.Items.AddLast(new LinkedListNode<AST.Node>($lhs.node));
+					node = funcInvoke;
+				}
 				else
 				{
 					throw new ParseException("Should Not reach this point!", false);
 				}
 			}
-	|	func=functionSelector arg=expression
+	|	func=monadicFunctionSelector arg=expression
 			{
 				if($func.node is AST.Token)
 				{
@@ -140,6 +147,12 @@ expression returns [AST.Node node]
 						node = oper;
 					}
 				}
+				else if($func.node is AST.UserDefInvoke)
+				{
+					AST.UserDefInvoke funcInvoke = (AST.UserDefInvoke)$func.node;
+					funcInvoke.Arguments.Items.AddFirst(new LinkedListNode<AST.Node>($arg.node));
+					node = funcInvoke;
+				}
 				else
 				{
 					throw new ParseException("Should Not reach this point!", false);
@@ -148,9 +161,19 @@ expression returns [AST.Node node]
 	|	simpleExpression				{ node = $simpleExpression.node; }
 	;
 
-functionSelector returns [AST.Node node]
+monadicFunctionSelector returns [AST.Node node]
 	:	operatorSymbol							{ node = $operatorSymbol.node; }
 	|	functionSymbol							{ node = $functionSymbol.token; }
+	|	{  IsMonadic(input.LT(1)) }? variableName 
+				{ node = AST.Node.UserDefInvoke($variableName.node, AST.Node.ExpressionList()); }
+	;
+
+
+dyadicFunctionSelector returns [AST.Node node]
+	:	operatorSymbol							{ node = $operatorSymbol.node; }
+	|	functionSymbol							{ node = $functionSymbol.token; }
+	|	{  IsDyadic(input.LT(1)) }? variableName 
+				{ node = AST.Node.UserDefInvoke($variableName.node, AST.Node.ExpressionList()); }
 	;
 
 dyadicLeftArg returns [AST.Node node]
