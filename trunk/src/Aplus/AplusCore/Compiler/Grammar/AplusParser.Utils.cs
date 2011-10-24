@@ -6,6 +6,8 @@ namespace AplusCore.Compiler.Grammar
 {
     partial class AplusParser
     {
+        #region Variables
+
         /// <summary>
         /// Describes if the current parsing state is inside a function.
         /// </summary>
@@ -19,7 +21,16 @@ namespace AplusCore.Compiler.Grammar
         /// </summary>
         private bool isdependency = false;
 
-        public AST.Node tree;
+        private AST.Node tree;
+
+        #endregion
+
+        #region Properties
+
+        public AST.Node Tree
+        {
+            get { return this.tree; }
+        }
 
         public FunctionInformation FunctionInfo
         {
@@ -27,7 +38,14 @@ namespace AplusCore.Compiler.Grammar
             set { this.functionInfo = value; }
         }
 
-        public bool ParseOk { get { return NumberOfSyntaxErrors == 0; } }
+        public bool ParseOk
+        {
+            get { return NumberOfSyntaxErrors == 0; }
+        }
+
+        #endregion
+
+        #region Parser utility
 
         public bool Parse()
         {
@@ -56,6 +74,10 @@ namespace AplusCore.Compiler.Grammar
             // Throw an error, maybe we can continue the execution?
             throw new ParseException(exception.Message, true, exception);
         }
+
+        #endregion
+
+        #region Parser internals
 
         private void SetupUserDefFunction()
         {
@@ -217,5 +239,6 @@ namespace AplusCore.Compiler.Grammar
             return node;
         }
 
+        #endregion
     }
 }

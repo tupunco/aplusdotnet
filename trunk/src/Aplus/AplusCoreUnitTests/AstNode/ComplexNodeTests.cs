@@ -50,7 +50,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -85,7 +85,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -173,7 +173,7 @@ namespace AplusCoreUnitTests.AstNode
 
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
     }

@@ -22,7 +22,7 @@ namespace AplusCore.Compiler
             parser.FunctionInfo = functionInfo;
 
             bool parseOk = parser.Parse();
-            AST.Node tree = parser.tree;
+            AST.Node tree = parser.Tree;
 
             return tree;
         }
@@ -34,7 +34,7 @@ namespace AplusCore.Compiler
             parser.FunctionInfo = functionInfo;
 
             bool parseOk = parser.Parse();
-            return parser.tree;
+            return parser.Tree;
         }
 
         public static AST.Node String(string input, LexerMode mode, FunctionInformation functionInfo)

@@ -35,10 +35,10 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
 
         }
 
@@ -70,7 +70,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -94,10 +94,10 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
 
         }
 
@@ -131,7 +131,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -154,9 +154,9 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Invalid Node created! (Helper method used)");
 
-            Assert.IsTrue(this.parser.tree == expectedTree, "Operator == Compare Failed!");
+            Assert.IsTrue(this.parser.Tree == expectedTree, "Operator == Compare Failed!");
 
         }
 
@@ -180,10 +180,10 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
@@ -207,7 +207,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -233,10 +233,10 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
@@ -261,10 +261,10 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
 
@@ -284,8 +284,8 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.tree, "Invalid Node created! (Helper method used)");
-            Assert.IsTrue(this.parser.tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
@@ -304,8 +304,8 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.tree, "Invalid Node created! (Helper method used)");
-            Assert.IsTrue(this.parser.tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
@@ -328,10 +328,10 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
@@ -354,10 +354,10 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
@@ -380,10 +380,10 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
@@ -451,7 +451,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -493,7 +493,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -517,7 +517,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
         }
 
         /// <summary>
@@ -557,7 +557,7 @@ namespace AplusCoreUnitTests.AstNode
                     )
                 );
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
         }
 
     }

@@ -52,7 +52,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Operator AST Node tests"), TestMethod]
@@ -78,7 +78,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Operator AST Node tests"), TestMethod]
@@ -111,7 +111,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Operator AST Node tests"), TestMethod]
@@ -146,7 +146,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Operator AST Node tests"), TestMethod]
@@ -184,7 +184,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
         }
     }
 }
