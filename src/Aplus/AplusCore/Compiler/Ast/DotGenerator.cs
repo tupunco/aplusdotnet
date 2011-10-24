@@ -26,7 +26,7 @@ namespace AplusCore.Compiler.AST
 
             if (parseOk)
             {
-                CreateDotFile(parser.tree, outputFileName);
+                CreateDotFile(parser.Tree, outputFileName);
             }
 
             return parseOk;

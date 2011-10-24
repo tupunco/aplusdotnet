@@ -45,7 +45,7 @@ namespace AplusCoreUnitTests.AstNode
                 )
             ));
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -70,7 +70,7 @@ namespace AplusCoreUnitTests.AstNode
                 )
             ));
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -94,7 +94,7 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -130,7 +130,7 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -156,7 +156,7 @@ namespace AplusCoreUnitTests.AstNode
                 )
             ));
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -202,7 +202,7 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -238,7 +238,7 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -279,7 +279,7 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -310,7 +310,7 @@ namespace AplusCoreUnitTests.AstNode
                 )
             ));
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -334,7 +334,7 @@ namespace AplusCoreUnitTests.AstNode
                 )
             ));
 
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -371,7 +371,7 @@ namespace AplusCoreUnitTests.AstNode
             );
 
             Assert.IsTrue(this.parser.Parse(), "Dyadic Parsing FAILED!");
-            Assert.AreEqual(expectedTree, this.parser.tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
         }
 
     }

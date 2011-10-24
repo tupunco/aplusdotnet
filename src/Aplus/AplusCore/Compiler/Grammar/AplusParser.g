@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 
 script // returns [AST.Node tree]
-	:	statements EOF 			{ tree = $statements.node; }
+	:	statements EOF 			{ this.tree = $statements.node; }
 	;
 	
 statements returns [AST.ExpressionList node]
