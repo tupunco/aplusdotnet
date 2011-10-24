@@ -45,7 +45,8 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
         )
         {
             DLR.Expression codebody;
-            AplusCore.Compiler.AST.Node tree = Compiler.Parse.String(sourceCode, environment.LexerMode);
+            // TODO: fix the third function info argument
+            AplusCore.Compiler.AST.Node tree = Compiler.Parse.String(sourceCode, environment.LexerMode, null);
 
             AplusScope scope = new AplusScope(null, "__EVAL__", environment,
                 DLR.Expression.Parameter(typeof(Aplus), "__EVAL_RUNTIME__"),

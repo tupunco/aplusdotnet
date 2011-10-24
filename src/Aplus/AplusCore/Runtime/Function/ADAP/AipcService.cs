@@ -68,6 +68,8 @@ namespace AplusCore.Runtime.Function.ADAP
         {
             while (true)
             {
+                Thread.Sleep(1);
+
                 List<AipcConnection> connectionList = new List<AipcConnection>();
                 List<Socket> readList = new List<Socket>();
                 List<Socket> writeList = new List<Socket>();

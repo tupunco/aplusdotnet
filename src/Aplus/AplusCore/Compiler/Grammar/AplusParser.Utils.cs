@@ -12,6 +12,7 @@ namespace AplusCore.Compiler.Grammar
         private bool isfunction = false;
         private AST.Node function;
         private Variables variables;
+        private FunctionInformation functionInfo;
 
         /// <summary>
         /// Describes if the current parsing state is inside a function.
@@ -19,6 +20,12 @@ namespace AplusCore.Compiler.Grammar
         private bool isdependency = false;
 
         public AST.Node tree;
+
+        public FunctionInformation FunctionInfo
+        {
+            get { return this.functionInfo; }
+            set { this.functionInfo = value; }
+        }
 
         public bool ParseOk { get { return NumberOfSyntaxErrors == 0; } }
 
@@ -62,6 +69,21 @@ namespace AplusCore.Compiler.Grammar
             this.isfunction = false;
             this.function = null;
             this.variables = null;
+        }
+
+        private bool IsOperator(IToken nextToken)
+        {
+            return (nextToken != null) && this.FunctionInfo != null && this.FunctionInfo.IsOperator(nextToken.Text);
+        }
+
+        private bool IsDyadic(IToken nextToken)
+        {
+            return (nextToken != null) && this.FunctionInfo != null && this.FunctionInfo.IsDyadic(nextToken.Text);
+        }
+
+        private bool IsMonadic(IToken nextToken)
+        {
+            return (nextToken != null) && this.FunctionInfo != null && this.FunctionInfo.IsMonadic(nextToken.Text);
         }
 
         private AST.Node BuildMonadic(AST.Token symbol, AST.Node argument)

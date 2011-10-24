@@ -28,7 +28,6 @@ namespace AplusCore.Compiler
         public AplusScriptCode(Aplus aplus, string code, SourceUnit sourceunit)
             : base(sourceunit)
         {
-            
             this.aplus = aplus;
             this.lambda = ParseToLambda(code.Trim());
         }
@@ -64,8 +63,14 @@ namespace AplusCore.Compiler
                 DLR.Expression.Parameter(typeof(DYN.IDynamicMetaObjectProvider), "__module__")
             );
 
+            FunctionInformation funcionInfo = new FunctionInformation(this.aplus.CurrentContext);
+            if (this.aplus.Context != null)
+            {
+                funcionInfo.LoadInfo((this.aplus.Context as Scope).Storage as ScopeStorage);
+            }
+
             DLR.Expression codebody = null;
-            AST.Node tree = Compiler.Parse.String(code, this.aplus.LexerMode);
+            AST.Node tree = Compiler.Parse.String(code, this.aplus.LexerMode, funcionInfo);
 
             if (tree == null)
             {

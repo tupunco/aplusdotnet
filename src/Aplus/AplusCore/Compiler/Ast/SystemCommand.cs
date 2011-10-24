@@ -84,7 +84,8 @@ namespace AplusCore.Compiler.AST
                             string previousContext = runtime.CurrentContext;
 
                             // Create the AST from file 
-                            Node fileAST = Parse.LoadFile(path, runtime.LexerMode);
+                            // TODO: fix the third function info argument
+                            Node fileAST = Parse.LoadFile(path, runtime.LexerMode, null);
                             // And generate the DLR tree
                             codeBlock.AddFirst(fileAST.Generate(scope));
 

@@ -94,6 +94,7 @@
     <Compile Include="Compiler\Ast\UserDefInvoke.cs" />
     <Compile Include="Compiler\Ast\MethodChooser.cs" />
     <Compile Include="Compiler\ExpressionTreeExtensions.cs" />
+    <Compile Include="Compiler\FunctionInformation.cs" />
     <Compile Include="Compiler\Grammar\AplusParser.Utils.cs" />
     <Compile Include="Compiler\Grammar\Apl\AplusLexer.cs">
       <DependentUpon>AplusLexer.g</DependentUpon>
@@ -361,7 +362,7 @@
   <!-- ANTLR HACK #3 Antlr generator :) -->
   <Target Name="GenerateParser" Inputs="@(Antlr3)" Outputs="%(Antlr3.OutputFiles)">
     <!-- <Message Text="$(MSBuildProjectDirectory)"/> -->
-    <Exec Command="java -cp ..\..\..\tool\antlrworks-1.3.1.jar org.antlr.Tool -message-format vs2005 @(Antlr3)" />
+    <Exec Command="java -cp ..\..\..\tool\antlrworks-1.3.1.jar org.antlr.Tool -Xconversiontimeout 10000 -message-format vs2005 @(Antlr3)" />
   </Target>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
