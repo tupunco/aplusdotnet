@@ -1,33 +1,21 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using AplusCore.Compiler.Grammar;
 using AplusCore.Compiler.AST;
-using System.Threading;
-using System.Globalization;
-using Antlr.Runtime;
-using AplusCore.Compiler.Grammar.Ascii;
+using AplusCore.Compiler.Grammar;
 
 namespace AplusCoreUnitTests.AstNode
 {
     [TestClass]
     public class UserDefinedFunctionsTest
     {
-
-        private AplusLexer lexer;
-        private AplusParser parser;
-
         [TestCategory("AstNode"), TestCategory("User Defined Function tests"), TestMethod]
         public void UserDefOneLineA()
         {
             string line = "f{}: 5";
-            this.lexer = new AplusLexer(new ANTLRStringStream(line));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(line);
 
-            Assert.IsTrue(this.parser.Parse(), "User Defined Function Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "User Defined Function Parsing FAILED!");
+
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
                 Node.UserDefFunction(
@@ -39,17 +27,17 @@ namespace AplusCoreUnitTests.AstNode
 
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("User Defined Function tests"), TestMethod]
         public void UserDefOneLineB()
         {
             string line = "f{}: \n5";
-            this.lexer = new AplusLexer(new ANTLRStringStream(line));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(line);
 
-            Assert.IsTrue(this.parser.Parse(), "User Defined Function Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "User Defined Function Parsing FAILED!");
+
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
                 Node.UserDefFunction(
@@ -58,22 +46,21 @@ namespace AplusCoreUnitTests.AstNode
                     Node.ConstantList(Node.IntConstant("5"))
                 )
             );
-
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
-
 
         [TestCategory("AstNode"), TestCategory("User Defined Function tests"), TestMethod]
         public void UserDefMultiLineA()
         {
             string line = "f{a;b}: { 1 2\n3;\n'bello'\n\n}";
-            this.lexer = new AplusLexer(new ANTLRStringStream(line));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(line);
 
-            Assert.IsTrue(this.parser.Parse(), "User Defined Function Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "User Defined Function Parsing FAILED!");
+
             #region expected AST
+
             ExpressionList expectedTree = Node.ExpressionList(
                 Node.UserDefFunction(
                     Node.UnQualifiedName("f"),
@@ -87,18 +74,19 @@ namespace AplusCoreUnitTests.AstNode
 
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("User Defined Function tests"), TestMethod]
         public void UserDefMultiLineB()
         {
             string line = "f{\nc\n}: -c";
-            this.lexer = new AplusLexer(new ANTLRStringStream(line));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(line);
 
-            Assert.IsTrue(this.parser.Parse(), "User Defined Function Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "User Defined Function Parsing FAILED!");
+
             #region expected AST
+
             ExpressionList expectedTree = Node.ExpressionList(
                 Node.UserDefFunction(
                     Node.UnQualifiedName("f"),
@@ -109,18 +97,19 @@ namespace AplusCoreUnitTests.AstNode
 
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("User Defined Function tests"), TestMethod]
         public void UserDefDyadicForm()
         {
             string line = "a f b: 11";
-            this.lexer = new AplusLexer(new ANTLRStringStream(line));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(line);
 
-            Assert.IsTrue(this.parser.Parse(), "User Defined Function Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "User Defined Function Parsing FAILED!");
+
             #region expected AST
+
             ExpressionList expectedTree = Node.ExpressionList(
                 Node.UserDefFunction(
                     Node.UnQualifiedName("f"),
@@ -131,18 +120,19 @@ namespace AplusCoreUnitTests.AstNode
 
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("User Defined Function tests"), TestMethod]
         public void UserDefMonadicForm()
         {
             string line = "f b: 11";
-            this.lexer = new AplusLexer(new ANTLRStringStream(line));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(line);
 
-            Assert.IsTrue(this.parser.Parse(), "User Defined Function Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "User Defined Function Parsing FAILED!");
+
             #region expected AST
+
             ExpressionList expectedTree = Node.ExpressionList(
                 Node.UserDefFunction(
                     Node.UnQualifiedName("f"),
@@ -153,9 +143,7 @@ namespace AplusCoreUnitTests.AstNode
 
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
-
-
     }
 }

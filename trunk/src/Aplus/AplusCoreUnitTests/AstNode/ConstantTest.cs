@@ -1,28 +1,20 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Antlr.Runtime;
-
 using AplusCore.Compiler.AST;
 using AplusCore.Compiler.Grammar;
-using AplusCore.Compiler.Grammar.Ascii;
 
 namespace AplusCoreUnitTests.AstNode
 {
     [TestClass]
     public class ConstantTest
     {
-        private AplusLexer lexer;
-        private AplusParser parser;
-
-
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
         public void IntConstantTest()
         {
             string input = "1";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Integer input parse FAILED");
+            Assert.IsTrue(parser.Parse(), "Integer input parse FAILED");
 
             ExpressionList expectedNodeA = Node.ExpressionList(
                 Node.ExpressionList(
@@ -35,21 +27,19 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
-
+            Assert.IsTrue(parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
         public void IntConstantListTest()
         {
             string input = "2 5 6 [2]";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Indexed int list parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Indexed int list parsing FAILED!");
 
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
@@ -70,18 +60,16 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
         public void FloatConstantTest()
         {
             string input = "1.3";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Float input parse FAILED");
+            Assert.IsTrue(parser.Parse(), "Float input parse FAILED");
 
             ExpressionList expectedNodeA = Node.ExpressionList(
                 Node.ExpressionList(
@@ -94,21 +82,19 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
-
+            Assert.IsTrue(parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
         public void FloatConstantListTest()
         {
             string input = "-3. .12 -2.2 4e2 -2.1e2 4.1e+4 .2.2.23.4 Inf -Inf";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Float list parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Float list parsing FAILED!");
 
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
@@ -131,18 +117,16 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
         public void InfinityConstantTest()
         {
             string input = "Inf -Inf Inf";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Float input parse FAILED");
+            Assert.IsTrue(parser.Parse(), "Float input parse FAILED");
 
             ExpressionList expectedTree = Node.ExpressionList(
                 Node.ExpressionList(
@@ -154,20 +138,17 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Invalid Node created! (Helper method used)");
-
-            Assert.IsTrue(this.parser.Tree == expectedTree, "Operator == Compare Failed!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.IsTrue(parser.Tree == expectedTree, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
         public void SymbolConstantTest()
         {
             string input = "`test";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Symbol input parse FAILED");
+            Assert.IsTrue(parser.Parse(), "Symbol input parse FAILED");
 
             ExpressionList expectedNodeA = Node.ExpressionList(
                 Node.ExpressionList(
@@ -180,20 +161,19 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.IsTrue(parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
         public void SymbolConstantListTest()
         {
             string input = "`see1_2.1 `_2.2 `";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Symbol constant list parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Symbol constant list parsing FAILED!");
 
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
@@ -207,8 +187,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
@@ -216,10 +195,9 @@ namespace AplusCoreUnitTests.AstNode
         {
             string input = "'te''st'";
             string expectedText = "te'st";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Singe quoted constant input parse FAILED");
+            Assert.IsTrue(parser.Parse(), "Singe quoted constant input parse FAILED");
 
             ExpressionList expectedNodeA = Node.ExpressionList(
                 Node.ExpressionList(
@@ -233,10 +211,10 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.IsTrue(parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
@@ -244,10 +222,9 @@ namespace AplusCoreUnitTests.AstNode
         {
             string input = "'こんにちは世界'";
             string expectedText = "こんにちは世界";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Singe quoted constant input parse FAILED");
+            Assert.IsTrue(parser.Parse(), "Singe quoted constant input parse FAILED");
 
             ExpressionList expectedNodeA = Node.ExpressionList(
                 Node.ExpressionList(
@@ -261,22 +238,20 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.IsTrue(parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
-
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
         public void DoubleQuotedKanaKanjiConstantTest()
         {
             string input = "\"こんにちは世界\"";
             string expectedText = "こんにちは世界";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Double quoted constant input parse FAILED");
+            Assert.IsTrue(parser.Parse(), "Double quoted constant input parse FAILED");
 
             ExpressionList expectedNodeA = Node.ExpressionList(
                 Node.ExpressionList(
@@ -284,8 +259,8 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
-            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.AreEqual(expectedNodeA, parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.IsTrue(parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
@@ -293,10 +268,9 @@ namespace AplusCoreUnitTests.AstNode
         {
             string input = "\"@tes\\11st\"";
             string expectedText = "@tes\tst";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Double quoted constant input parse FAILED");
+            Assert.IsTrue(parser.Parse(), "Double quoted constant input parse FAILED");
 
             ExpressionList expectedNodeA = Node.ExpressionList(
                 Node.ExpressionList(
@@ -304,18 +278,17 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
-            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.AreEqual(expectedNodeA, parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.IsTrue(parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
         public void NullConstantTest1()
         {
             string input = "";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Null constant input parse FAILED");
+            Assert.IsTrue(parser.Parse(), "Null constant input parse FAILED");
 
             ExpressionList expectedNodeA = Node.ExpressionList(
                 Node.ExpressionList(
@@ -328,20 +301,19 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.IsTrue(parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
         public void NullConstantTest2()
         {
             string input = "()";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Null constant input parse FAILED");
+            Assert.IsTrue(parser.Parse(), "Null constant input parse FAILED");
 
             ExpressionList expectedNodeA = Node.ExpressionList(
                 Node.ExpressionList(
@@ -354,20 +326,19 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.IsTrue(parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
-         public void NullConstantTest3()
+        public void NullConstantTest3()
         {
             string input = "\t(\t ) ";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Null constant input parse FAILED");
+            Assert.IsTrue(parser.Parse(), "Null constant input parse FAILED");
 
             ExpressionList expectedNodeA = Node.ExpressionList(
                 Node.ExpressionList(
@@ -380,10 +351,10 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedNodeA, this.parser.Tree, "Invalid Node created! (Helper method used)");
-            Assert.AreEqual(expectedNodeB, this.parser.Tree, "Invalid Node created!");
+            Assert.AreEqual(expectedNodeA, parser.Tree, "Invalid Node created! (Helper method used)");
+            Assert.AreEqual(expectedNodeB, parser.Tree, "Invalid Node created!");
 
-            Assert.IsTrue(this.parser.Tree == expectedNodeA, "Operator == Compare Failed!");
+            Assert.IsTrue(parser.Tree == expectedNodeA, "Operator == Compare Failed!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
@@ -409,10 +380,9 @@ namespace AplusCoreUnitTests.AstNode
         public void StrandTest1()
         {
             string input = "(;`3s`ss1`122[1];-Inf;_g;a.b[0 1];c;)";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Strand parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Strand parsing FAILED!");
 
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
@@ -451,18 +421,16 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Basic AST Node testing"), TestMethod]
         public void StrandTest2()
         {
             string input = "(3;'test';;`11DA`AVV;(\"test\";6.7,8);)";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Strand parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Strand parsing FAILED!");
 
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
@@ -493,7 +461,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
 
         }
 
@@ -501,10 +469,9 @@ namespace AplusCoreUnitTests.AstNode
         public void MultiLineStrandTest()
         {
             string input = "(3;\n'hello')";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Strand parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Strand parsing FAILED!");
 
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
@@ -517,7 +484,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         /// <summary>
@@ -544,11 +511,10 @@ namespace AplusCoreUnitTests.AstNode
         {
             string input = "\"ABCDEFGHIJKLMONPRSTUVWYZ abcdefghijklmnopqrstuvwyz 0123456789\"";
             string expectedStr = "ABCDEFGHIJKLMONPRSTUVWYZ abcdefghijklmnopqrstuvwyz 0123456789";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
             // If this throws an exception (MismatchedSetException) then we ran into the bug..
-            Assert.IsTrue(this.parser.Parse(), "ANTLR Bug test failed parsing");
+            Assert.IsTrue(parser.Parse(), "ANTLR Bug test failed parsing");
             
             ExpressionList expectedTree =
                 Node.ExpressionList(
@@ -557,8 +523,7 @@ namespace AplusCoreUnitTests.AstNode
                     )
                 );
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
-
     }
 }

@@ -1,32 +1,20 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading;
-using System.Globalization;
-using Antlr.Runtime;
-using AplusCore.Compiler.Grammar;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using AplusCore.Compiler.AST;
-using AplusCore.Compiler;
-using AplusCore.Compiler.Grammar.Ascii;
+using AplusCore.Compiler.Grammar;
 
 namespace AplusCoreUnitTests.AstNode
 {
     [TestClass]
     public class Operator
     {
-        private AplusLexer lexer;
-        private AplusParser parser;
-
         [TestCategory("AstNode"), TestCategory("Operator AST Node tests"), TestMethod]
         public void monadicOperatorTest1()
         {
             string input = "+/ 5 6 , */ 45 6";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Monadic operator Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Monadic operator Parsing FAILED!");
 
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
@@ -52,17 +40,16 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Operator AST Node tests"), TestMethod]
         public void monadicEachOperatorTest1()
         {
             string input = "((((log)) each 5 7))";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Monadic operator Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Monadic operator Parsing FAILED!");
 
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
@@ -78,17 +65,16 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Operator AST Node tests"), TestMethod]
         public void monadicEachOperatorTest2()
         {
             string input = "| each {(5;-2.7;-Inf)}";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Monadic operator Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Monadic operator Parsing FAILED!");
 
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
@@ -111,17 +97,16 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Operator AST Node tests"), TestMethod]
         public void dyadicEachOperatorTest1()
         {
             string input = "3 ((f[0])each) 7";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Dyadic operator Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Dyadic operator Parsing FAILED!");
 
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
@@ -146,17 +131,16 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Operator AST Node tests"), TestMethod]
         public void dyadicEachOperatorTest2()
         {
             string input = "(3;4) <= each (8;1)";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Dyadic operator Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Dyadic operator Parsing FAILED!");
 
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
@@ -184,7 +168,7 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
     }
 }
