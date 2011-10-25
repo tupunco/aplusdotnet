@@ -1,32 +1,20 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading;
-using System.Globalization;
-using Antlr.Runtime;
-using AplusCore.Compiler.Grammar;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using AplusCore.Compiler.AST;
-using AplusCore.Compiler;
-using AplusCore.Compiler.Grammar.Ascii;
+using AplusCore.Compiler.Grammar;
 
 namespace AplusCoreUnitTests.AstNode
 {
     [TestClass]
     public class Function
     {
-        private AplusLexer lexer;
-        private AplusParser parser;
-
         [TestCategory("AstNode"), TestCategory("Function AST Node tests"), TestMethod]
         public void MonadicFunction1()
         {
             string input = "+*%- 1 2 3 4.0";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Monadic Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Monadic Parsing FAILED!");
 
             ConstantList floatList = Node.ConstantList(Node.IntConstant("1"));
             floatList.AddLast(Node.IntConstant("2"));
@@ -45,18 +33,16 @@ namespace AplusCoreUnitTests.AstNode
                 )
             ));
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Function AST Node tests"), TestMethod]
         public void MonadicFunction2()
         {
             string input = "((((+))))*5";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Monadic Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Monadic Parsing FAILED!");
 
             Node expectedTree = Node.ExpressionList(Node.ExpressionList(
                 Node.MonadicFunction(
@@ -70,18 +56,16 @@ namespace AplusCoreUnitTests.AstNode
                 )
             ));
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Function AST Node tests"), TestMethod]
         public void MonadicFunction3()
         {
             string input = "|{-76}";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Monadic Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Monadic Parsing FAILED!");
 
             Node expectedTree = Node.ExpressionList(
                 Node.ExpressionList(
@@ -94,18 +78,16 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Function AST Node tests"), TestMethod]
         public void MonadicFunction4()
         {
             string input = "(iota 3 4)[1; 1 3]";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Monadic Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Monadic Parsing FAILED!");
 
             Node expectedTree = Node.ExpressionList(
                 Node.ExpressionList(
@@ -130,18 +112,16 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Function AST Node tests"), TestMethod]
         public void DyadicFunction1()
         {
             string input = "1 * 2 - 4 pi 3";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Dyadic Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Dyadic Parsing FAILED!");
 
             Node expectedTree = Node.ExpressionList(Node.ExpressionList(
                 Node.DyadicFunction(Node.Token(Tokens.MULTIPLY),
@@ -156,18 +136,16 @@ namespace AplusCoreUnitTests.AstNode
                 )
             ));
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Function AST Node tests"), TestMethod]
         public void DyadicFunction2()
         {
             string input = "(3 ,2) < (3,6) + 1 8";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Dyadic Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Dyadic Parsing FAILED!");
 
             Node expectedTree = Node.ExpressionList(
                 Node.ExpressionList(
@@ -202,18 +180,16 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Function AST Node tests"), TestMethod]
         public void DyadicFunction3()
         {
             string input = " {g} >= 2 * %{2}";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Dyadic Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Dyadic Parsing FAILED!");
 
             Node expectedTree = Node.ExpressionList(
                 Node.ExpressionList(
@@ -238,18 +214,16 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Function AST Node tests"), TestMethod]
         public void DyadicFunction4()
         {
             string input = "*{(2,3);b[iota 2]}";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Dyadic Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Dyadic Parsing FAILED!");
 
             Node expectedTree = Node.ExpressionList(
                 Node.ExpressionList(
@@ -279,18 +253,16 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Function AST Node tests"), TestMethod]
         public void MiscellaneousFunction()
         {
             string input = "4 + + + 5";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Dyadic Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Dyadic Parsing FAILED!");
 
             Node expectedTree = Node.ExpressionList(Node.ExpressionList(
                 Node.DyadicFunction(
@@ -310,18 +282,16 @@ namespace AplusCoreUnitTests.AstNode
                 )
             ));
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Function AST Node tests"), TestMethod]
         public void GeneralFunctionOnLeftTest()
         {
             string input = "+{1;2} - 3";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Dyadic Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Dyadic Parsing FAILED!");
 
             Node expectedTree = Node.ExpressionList(Node.ExpressionList(
                 Node.DyadicFunction(
@@ -334,16 +304,14 @@ namespace AplusCoreUnitTests.AstNode
                 )
             ));
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Function AST Node tests"), TestMethod]
         public void UserDefinedFunctionCall()
         {
             string input = "f{a.g;'abc'[1];(3.4;_h)}";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
             Node expectedTree = Node.ExpressionList(
                 Node.ExpressionList(
@@ -370,9 +338,8 @@ namespace AplusCoreUnitTests.AstNode
                 )
             );
 
-            Assert.IsTrue(this.parser.Parse(), "Dyadic Parsing FAILED!");
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.IsTrue(parser.Parse(), "Dyadic Parsing FAILED!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
-
     }
 }

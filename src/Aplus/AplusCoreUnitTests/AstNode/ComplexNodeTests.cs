@@ -1,32 +1,20 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading;
-using System.Globalization;
-using Antlr.Runtime;
-using AplusCore.Compiler.Grammar;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using AplusCore.Compiler.AST;
-using AplusCore.Compiler;
-using AplusCore.Compiler.Grammar.Ascii;
+using AplusCore.Compiler.Grammar;
 
 namespace AplusCoreUnitTests.AstNode
 {
     [TestClass]
     public class ComplexNodeTests
     {
-        private AplusLexer lexer;
-        private AplusParser parser;
-
         [TestCategory("AstNode"), TestCategory("Complex AST Node tests"), TestMethod]
         public void ExpressionListTestA()
         {
             string input = "+{2;(4 5)}; -{12}; { 1;3;\n4;5}";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Expression List Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Expression List Parsing FAILED!");
 
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
@@ -50,18 +38,16 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Complex AST Node tests"), TestMethod]
         public void ExpressionListTestB()
         {
             string input = "+{(2);4 5}; -{(12)}; { 1;3;\n4;5}";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Expression List Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Expression List Parsing FAILED!");
 
             #region expected AST
             ExpressionList expectedTree = Node.ExpressionList(
@@ -85,19 +71,16 @@ namespace AplusCoreUnitTests.AstNode
             );
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Complex AST Node tests"), TestMethod]
-        //[Ignore] // TODO: This test runs really really slow!! fix?
         public void VeryComplexTest()
         {
             string input = "3;c:={ {10[10][11][12]} + 1 6 -2 +. 4 10 3 +. 4 5 6 + 11 + c:=(+5;1);1+2};{(;;2;;);1;}";
-            this.lexer = new AplusLexer(new ANTLRStringStream(input));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
 
-            Assert.IsTrue(this.parser.Parse(), "Expression List Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Expression List Parsing FAILED!");
 
             #region expected AST
             ExpressionList expectedTree =
@@ -170,11 +153,9 @@ namespace AplusCoreUnitTests.AstNode
                     )
                 )
             );
-
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
-
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
     }
 }

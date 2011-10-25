@@ -69,6 +69,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AstNode\TestUtils.cs" />
     <Compile Include="AstNode\ComplexNodeTests.cs" />
     <Compile Include="AstNode\ConstantTest.cs" />
     <Compile Include="AstNode\ControlFlowTests.cs" />

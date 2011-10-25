@@ -1,32 +1,20 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using System.Threading;
-using System.Globalization;
-using AplusCore.Compiler.Grammar;
 using AplusCore.Compiler.AST;
-using Antlr.Runtime;
-using AplusCore.Compiler.Grammar.Ascii;
+using AplusCore.Compiler.Grammar;
 
 namespace AplusCoreUnitTests.AstNode
 {
     [TestClass]
     public class ControlFlowTests
     {
-        private AplusLexer lexer;
-        private AplusParser parser;
-
         [TestCategory("AstNode"), TestCategory("Control Flow Tests"), TestMethod]
         public void DyadicDoTest()
         {
             string line = "1+2 do { 3;4 }";
-            this.lexer = new AplusLexer(new ANTLRStringStream(line));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(line);
 
-            Assert.IsTrue(this.parser.Parse(), "Dyadic Do Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Dyadic Do Parsing FAILED!");
 
             #region expected AST
             Node expectedTree = Node.ExpressionList(Node.ExpressionList(
@@ -43,17 +31,16 @@ namespace AplusCoreUnitTests.AstNode
             ));
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Control Flow Tests"), TestMethod]
         public void MonadicDoTest()
         {
             string line = "do { 3;4 }";
-            this.lexer = new AplusLexer(new ANTLRStringStream(line));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(line);
 
-            Assert.IsTrue(this.parser.Parse(), "Monadic Do Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Monadic Do Parsing FAILED!");
 
             #region expected AST
             Node expectedTree = Node.ExpressionList(Node.ExpressionList(
@@ -66,17 +53,16 @@ namespace AplusCoreUnitTests.AstNode
             ));
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Control Flow Tests"), TestMethod]
         public void ConditionalTestA()
         {
             string line = "1 + if x <7 else 11";
-            this.lexer = new AplusLexer(new ANTLRStringStream(line));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(line);
 
-            Assert.IsTrue(this.parser.Parse(), "Conditional Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Conditional Parsing FAILED!");
 
             #region expected AST
             Node expectedTree = Node.ExpressionList(Node.ExpressionList(
@@ -91,17 +77,16 @@ namespace AplusCoreUnitTests.AstNode
             ));
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Control Flow Tests"), TestMethod]
         public void ConditionalTestB()
         {
             string line = "1 + if (x <7) else 11";
-            this.lexer = new AplusLexer(new ANTLRStringStream(line));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(line);
 
-            Assert.IsTrue(this.parser.Parse(), "Conditional Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Conditional Parsing FAILED!");
 
             #region expected AST
             Node expectedTree = Node.ExpressionList(Node.ExpressionList(
@@ -119,17 +104,16 @@ namespace AplusCoreUnitTests.AstNode
             ));
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Control Flow Tests"), TestMethod]
         public void WhileTestA()
         {
             string line = "while x <7";
-            this.lexer = new AplusLexer(new ANTLRStringStream(line));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(line);
 
-            Assert.IsTrue(this.parser.Parse(), "Conditional Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Conditional Parsing FAILED!");
 
             #region expected AST
             Node expectedTree = Node.ExpressionList(Node.ExpressionList(
@@ -143,17 +127,16 @@ namespace AplusCoreUnitTests.AstNode
             ));
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Control Flow Tests"), TestMethod]
         public void WhileTestB()
         {
             string line = "while (x <7)";
-            this.lexer = new AplusLexer(new ANTLRStringStream(line));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(line);
 
-            Assert.IsTrue(this.parser.Parse(), "Conditional Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Conditional Parsing FAILED!");
 
             #region expected AST
             Node expectedTree = Node.ExpressionList(Node.ExpressionList(
@@ -167,17 +150,16 @@ namespace AplusCoreUnitTests.AstNode
             ));
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
 
         [TestCategory("AstNode"), TestCategory("Control Flow Tests"), TestMethod]
         public void CaseTestA()
         {
             string line = "case (2) {1;2;3;4;}";
-            this.lexer = new AplusLexer(new ANTLRStringStream(line));
-            this.parser = new AplusParser(new CommonTokenStream(lexer));
+            AplusParser parser = TestUtils.BuildASCIIParser(line);
 
-            Assert.IsTrue(this.parser.Parse(), "Conditional Parsing FAILED!");
+            Assert.IsTrue(parser.Parse(), "Conditional Parsing FAILED!");
 
             #region expected AST
             Node expectedTree = Node.ExpressionList(Node.ExpressionList(
@@ -194,8 +176,7 @@ namespace AplusCoreUnitTests.AstNode
             ));
             #endregion
 
-            Assert.AreEqual(expectedTree, this.parser.Tree, "Incorrect AST generated!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
-
     }
 }
