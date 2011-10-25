@@ -341,5 +341,52 @@ namespace AplusCoreUnitTests.AstNode
             Assert.IsTrue(parser.Parse(), "Dyadic Parsing FAILED!");
             Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
+
+        [TestCategory("AstNode"), TestCategory("Function AST Node tests"), TestMethod]
+        public void DyadicUserDefInfixInvoke()
+        {
+            string input = "1 f 2";
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
+            parser.FunctionInfo = new AplusCore.Compiler.FunctionInformation(".");
+            parser.FunctionInfo.RegisterDyadic(".f");
+
+            Node expectedTree = Node.ExpressionList(
+                Node.ExpressionList(
+                    Node.UserDefInvoke(
+                        Node.Identifier("f", IdentifierType.UnQualifiedName),
+                        Node.ExpressionList(
+                            Node.ConstantList(Node.IntConstant("2")),
+                            Node.ConstantList(Node.IntConstant("1"))
+                        )
+                    )
+                )
+            );
+
+            Assert.IsTrue(parser.Parse(), "Parsing of infix invocation of user defined function failed");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
+        }
+
+        [TestCategory("AstNode"), TestCategory("Function AST Node tests"), TestMethod]
+        public void MonadicUserDefInfixInvoke()
+        {
+            string input = "f 2";
+            AplusParser parser = TestUtils.BuildASCIIParser(input);
+            parser.FunctionInfo = new AplusCore.Compiler.FunctionInformation(".");
+            parser.FunctionInfo.RegisterMonadic(".f");
+
+            Node expectedTree = Node.ExpressionList(
+                Node.ExpressionList(
+                    Node.UserDefInvoke(
+                        Node.Identifier("f", IdentifierType.UnQualifiedName),
+                        Node.ExpressionList(
+                            Node.ConstantList(Node.IntConstant("2"))
+                        )
+                    )
+                )
+            );
+
+            Assert.IsTrue(parser.Parse(), "Parsing of infix invocation of user defined function failed");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
+        }
     }
 }

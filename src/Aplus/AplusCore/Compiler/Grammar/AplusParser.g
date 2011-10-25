@@ -57,7 +57,7 @@ dependencyDefinition returns [AST.Dependency node]
 
 userDefinedFunction  returns [AST.UserDefFunction node]
 	@init { SetupUserDefFunction(); }
-	@after { $node.Variables = this.variables; TearDownUserDefFunction(); }
+	@after { RegisterUserDefFunction($node); $node.Variables = this.variables; TearDownUserDefFunction(); }
 	:	variableName										{ this.function = $variableName.node; }
 		expressionGroup Colon functionBody
 			{ $node = AST.Node.UserDefFunction($variableName.node, $expressionGroup.node, $functionBody.node, $text); }

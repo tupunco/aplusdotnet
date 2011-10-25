@@ -25,6 +25,7 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        public new Identifier Identifier { get { return this.name; } }
         public Node Codeblock { get { return this.codeblock; } }
         public ExpressionList Parameters { get { return this.parameters; } }
         public Variables Variables { get; set; }

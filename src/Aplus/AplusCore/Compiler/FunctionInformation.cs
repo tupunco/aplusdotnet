@@ -84,6 +84,28 @@ namespace AplusCore.Compiler
 
         #endregion
 
+        #region Function registration
+
+        /// <summary>
+        /// Register the given <see cref="id"/> as a Monadic function.
+        /// </summary>
+        /// <param name="id">The name of the Monadic function.</param>
+        public void RegisterMonadic(string id)
+        {
+            this.monadicFunctions.Add(QualifiedName(id));
+        }
+
+        /// <summary>
+        /// Register the given <see cref="id"/> as a Dyadic function.
+        /// </summary>
+        /// <param name="id">The name of the Dyadic function.</param>
+        public void RegisterDyadic(string id)
+        {
+            this.dyadicFunctions.Add(QualifiedName(id));
+        }
+
+        #endregion
+
         #region Utilitly
 
         private string QualifiedName(string id)
