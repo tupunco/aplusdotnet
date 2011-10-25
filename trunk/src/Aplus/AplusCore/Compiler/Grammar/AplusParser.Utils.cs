@@ -93,19 +93,40 @@ namespace AplusCore.Compiler.Grammar
             this.variables = null;
         }
 
+        private void RegisterUserDefFunction(AST.UserDefFunction node)
+        {
+            if (this.FunctionInfo == null)
+            {
+                return;
+            }
+
+            switch (node.Parameters.Length)
+            {
+                case 1:
+                    this.FunctionInfo.RegisterMonadic(node.Identifier.Name);
+                    break;
+                case 2:
+                    this.FunctionInfo.RegisterDyadic(node.Identifier.Name);
+                    break;
+                default:
+                    // Function has more than two arguments or has none.
+                    break;
+            }
+        }
+
         private bool IsOperator(IToken nextToken)
         {
-            return (nextToken != null) && this.FunctionInfo != null && this.FunctionInfo.IsOperator(nextToken.Text);
+            return (nextToken != null) && (this.FunctionInfo != null) && this.FunctionInfo.IsOperator(nextToken.Text);
         }
 
         private bool IsDyadic(IToken nextToken)
         {
-            return (nextToken != null) && this.FunctionInfo != null && this.FunctionInfo.IsDyadic(nextToken.Text);
+            return (nextToken != null) && (this.FunctionInfo != null) && this.FunctionInfo.IsDyadic(nextToken.Text);
         }
 
         private bool IsMonadic(IToken nextToken)
         {
-            return (nextToken != null) && this.FunctionInfo != null && this.FunctionInfo.IsMonadic(nextToken.Text);
+            return (nextToken != null) && (this.FunctionInfo != null) && this.FunctionInfo.IsMonadic(nextToken.Text);
         }
 
         private AST.Node BuildMonadic(AST.Token symbol, AST.Node argument)

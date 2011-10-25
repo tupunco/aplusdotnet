@@ -145,5 +145,42 @@ namespace AplusCoreUnitTests.AstNode
 
             Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
         }
+
+        [TestCategory("AstNode"), TestCategory("User Defined Function tests"), TestMethod]
+        public void InfixUserDefinitionandInvoke()
+        {
+            string line = "a f b: { a + b }\n 1 f 2";
+            AplusParser parser = TestUtils.BuildASCIIParser(line);
+            parser.FunctionInfo = new AplusCore.Compiler.FunctionInformation(".");
+
+            Node expectedTree = Node.ExpressionList(
+                Node.UserDefFunction(
+                    Node.Identifier("f", IdentifierType.UnQualifiedName),
+                    Node.ExpressionList(
+                        Node.UnQualifiedName("a"),
+                        Node.UnQualifiedName("b")
+                    ),
+                    Node.ExpressionList(
+                        Node.DyadicFunction(
+                            Node.Token(Tokens.ADD, "+"),
+                            Node.UnQualifiedName("a"),
+                            Node.UnQualifiedName("b")
+                        )
+                    )
+                ),
+                Node.ExpressionList(
+                    Node.UserDefInvoke(
+                        Node.UnQualifiedName("f"),
+                        Node.ExpressionList(
+                            Node.ConstantList(Node.IntConstant("2")),
+                            Node.ConstantList(Node.IntConstant("1"))
+                        )
+                    )
+                )
+            );
+
+            Assert.IsTrue(parser.Parse(), "User Defined Function Parsing FAILED!");
+            Assert.AreEqual(expectedTree, parser.Tree, "Incorrect AST generated!");
+        }
     }
 }
