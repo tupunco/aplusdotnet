@@ -196,7 +196,7 @@ namespace AplusCore.Compiler.AST
         private static string ToDot(string parent, Constant node)
         {
             string name = String.Format("Constant{0}", counter++);
-            text.AppendFormat("  {0} [label=\"{1}\"];\n", name, node.Value);
+            text.AppendFormat("  {0} [label=\"{1}\"];\n", name, node.AsString);
             return name;
         }
 
