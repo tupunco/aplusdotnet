@@ -86,7 +86,7 @@ namespace AplusCore.Compiler.AST
         /// <returns>True if: node is a DyadicFunction and it's token's type is equal to the one we supplied</returns>
         internal static bool TestDyadicToken(Node node, Tokens tokenType)
         {
-            return (node is DyadicFunction) && (((DyadicFunction)node).TokenType == tokenType);
+            return (node is DyadicFunction) && (((DyadicFunction)node).Token.Type == tokenType);
         }
 
         /// <summary>

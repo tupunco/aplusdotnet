@@ -8,6 +8,9 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents a built-in dyadic function in an A+ AST.
+    /// </summary>
     public class DyadicFunction : Node
     {
         #region Variables
@@ -20,15 +23,40 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
-        public new Token Token { get { return this.token; } }
-        public Tokens TokenType { get { return this.token.Type; } }
-        public Node Left { get { return this.leftExpression; } }
-        public Node Right { get { return this.rightExpression; } }
+        /// <summary>
+        /// Gets the <see cref="Token"/> of the dyadic function.
+        /// </summary>
+        public new Token Token
+        {
+            get { return this.token; }
+        }
+
+        /// <summary>
+        /// Gets the left hand argument of the dyadic function.
+        /// </summary>
+        public Node Left
+        {
+            get { return this.leftExpression; }
+        }
+
+        /// <summary>
+        /// Gets the right hand argument of the dyadic function.
+        /// </summary>
+        public Node Right
+        {
+            get { return this.rightExpression; }
+        }
 
         #endregion
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="DyadicFunction"/> AST node.
+        /// </summary>
+        /// <param name="token">The <see cref="Token"/> to use for the dyadic function.</param>
+        /// <param name="leftExpression">The left hand argument of the dyadic function.</param>
+        /// <param name="rightExpression">The right hand argument of the dyadic function.</param>
         public DyadicFunction(Token token, Node leftExpression, Node rightExpression)
         {
             this.token = token;
@@ -116,7 +144,7 @@ namespace AplusCore.Compiler.AST
                                 DLR.Expression.Constant(ATypes.ANull)
                             )
                         ),
-                        // Or($right, $left)
+                    // Or($right, $left)
                         DLR.Expression.Assign(
                             valueParam,
                             DLR.Expression.Call(
@@ -125,7 +153,7 @@ namespace AplusCore.Compiler.AST
                                 rightParam, leftParam, environment
                             )
                         ),
-                        // Cast($right, $left)
+                    // Cast($right, $left)
                         DLR.Expression.Assign(
                             valueParam,
                             DLR.Expression.Call(
@@ -194,6 +222,13 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
+        /// <summary>
+        /// Build a <see cref="DyadicFunction"/> using the given arguments.
+        /// </summary>
+        /// <param name="token">The <see cref="Token"/> to use for the dyadic function.</param>
+        /// <param name="leftExpression">The left hand argument of the dyadic function.</param>
+        /// <param name="rightExpression">The right hand argument of the dyadic function.</param>
+        /// <returns>Returns a <see cref="DyadicFunction"/> representing a built-in function.</returns>
         public static Node DyadicFunction(Token token, Node leftExpression, Node rightExpression)
         {
             return new DyadicFunction(token, leftExpression, rightExpression);
