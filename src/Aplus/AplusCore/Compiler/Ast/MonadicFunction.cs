@@ -8,6 +8,9 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents a built-in monadic function in an A+ AST.
+    /// </summary>
     public class MonadicFunction : Node
     {
         #region Variables
@@ -19,42 +22,35 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
-        public new Token Token { get { return this.token; } }
-        public Tokens TokenType { get { return this.token.Type; } }
-        public Node Expression { get { return this.expression; } }
+        /// <summary>
+        /// Gets the built-in <see cref="Token"/> for the monadic function.
+        /// </summary>
+        public new Token Token
+        {
+            get { return this.token; } 
+        }
+
+        /// <summary>
+        /// Gets the argument for the monadic function.
+        /// </summary>
+        public Node Expression
+        {
+            get { return this.expression; }
+        }
 
         #endregion
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="MonadicFunction"/> AST node.
+        /// </summary>
+        /// <param name="token">The <see cref="Token"/> to use for the monadic function.</param>
+        /// <param name="expression">The argument of the monadic function.</param>
         public MonadicFunction(Token token, Node expression)
         {
             this.token = token;
             this.expression = expression;
-        }
-
-        #endregion
-
-        #region Overrides
-
-        public override string ToString()
-        {
-            return String.Format("Monadic({0} {1})", this.token, this.expression);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is MonadicFunction)
-            {
-                MonadicFunction other = (MonadicFunction)obj;
-                return this.token.Equals(other.token) && this.expression.Equals(other.expression);
-            }
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return this.token.GetHashCode() ^ this.expression.GetHashCode();
         }
 
         #endregion
@@ -128,18 +124,46 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
+
+        #region overrides
+
+        public override string ToString()
+        {
+            return String.Format("Monadic({0} {1})", this.token, this.expression);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is MonadicFunction)
+            {
+                MonadicFunction other = (MonadicFunction)obj;
+                return this.token.Equals(other.token) && this.expression.Equals(other.expression);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.token.GetHashCode() ^ this.expression.GetHashCode();
+        }
+
+        #endregion
     }
 
     #region Construction helper
 
     public partial class Node
     {
-
+        /// <summary>
+        /// Builds a <see cref="Node"/> representing a built-in monadic function.
+        /// </summary>
+        /// <param name="token">The <see cref="Token"/> to use for the monadic function.</param>
+        /// <param name="expression">The argument of the monadic function.</param>
+        /// <returns>Returns a <see cref="MonadicFunction"/> representing a built-in function.</returns>
         public static Node MonadicFunction(Token token, Node expression)
         {
             return new MonadicFunction(token, expression);
         }
-
     }
 
     #endregion

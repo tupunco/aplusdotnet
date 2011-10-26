@@ -53,7 +53,7 @@ namespace AplusCore.Compiler.AST
 
             bool incrementMode = true;
             if (this.expression is MonadicFunction &&
-                ((MonadicFunction)this.expression).TokenType == Tokens.EXPONENTIAL)
+                ((MonadicFunction)this.expression).Token.Type == Tokens.EXPONENTIAL)
             {
                 // Change the counter's 'way'
                 incrementMode = false;

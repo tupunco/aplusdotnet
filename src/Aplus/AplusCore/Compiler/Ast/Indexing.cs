@@ -10,6 +10,9 @@ using DYN = System.Dynamic;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents an indexing expression in an A+ AST.
+    /// </summary>
     public class Indexing : Node
     {
         #region Variables
@@ -21,13 +24,31 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
-        internal Node Item { get { return this.item; } }
-        internal ExpressionList IndexExpression { get { return this.indexExpression; } }
+        /// <summary>
+        /// Gets the target <see cref="Node"/> of the indexing.
+        /// </summary>
+        public Node Item
+        {
+            get { return this.item; } 
+        }
+
+        /// <summary>
+        /// Gets the indexing expressions.
+        /// </summary>
+        public ExpressionList IndexExpression
+        {
+            get { return this.indexExpression; }
+        }
 
         #endregion
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Indexing"/> AST node.
+        /// </summary>
+        /// <param name="item">The target of the indexing.</param>
+        /// <param name="indexExpression">The indexer expressions.</param>
         public Indexing(Node item, ExpressionList indexExpression)
         {
             this.item = item;
@@ -116,6 +137,12 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
+        /// <summary>
+        /// Builds a <see cref="Node"/> representing an indexing expression.
+        /// </summary>
+        /// <param name="item">The target of the indexing.</param>
+        /// <param name="indexExpression">The indexer expressions.</param>
+        /// <returns>Returns a <see cref="Indexing"/> AST node.</returns>
         public static Indexing Indexing(Node item, ExpressionList indexExpression)
         {
             return new Indexing(item, indexExpression);
