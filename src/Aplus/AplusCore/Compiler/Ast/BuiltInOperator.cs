@@ -9,6 +9,12 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents an standalone built-in operator in an A+ AST.
+    /// </summary>
+    /// <remarks>
+    /// This node will build a DLR lambda expression for the given built-in operator.
+    /// </remarks>
     public class BuiltInOperator : Node
     {
         #region Variables
@@ -19,12 +25,22 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
-        internal Operator Operator { get { return this.op; } }
+        /// <summary>
+        /// Gets the built-in operator.
+        /// </summary>
+        internal Operator Operator
+        {
+            get { return this.op; }
+        }
 
         #endregion
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="BuiltInOperator"/> AST node.
+        /// </summary>
+        /// <param name="op">The <see cref="AST.Operator"/> to wrap.</param>
         public BuiltInOperator(Operator op)
         {
             this.op = op;
@@ -99,7 +115,7 @@ namespace AplusCore.Compiler.AST
             DLR.Expression function;
             if (op.isBuiltin)
             {
-                function = AST.Node.BuiltInFunction(op.Function).Generate(scope);
+                function = AST.Node.BuiltInFunction((Token)op.Function).Generate(scope);
             }
             else
             {
@@ -121,7 +137,7 @@ namespace AplusCore.Compiler.AST
             DLR.Expression result;
             if (op is EachOperator)
             {
-                result = 
+                result =
                     DLR.Expression.IfThenElse(
                         DLR.Expression.Property(functionVariable, "IsFunctionScalar"),
                         DLR.Expression.Goto(
@@ -239,9 +255,14 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
-        public static BuiltInOperator BuiltInOperator(Node op)
+        /// <summary>
+        /// Build a AST node which represents a standalone built-in operator.
+        /// </summary>
+        /// <param name="op">The <see cref="AST.Operator"/> to build the function from.</param>
+        /// <returns><see cref="AST.BuiltInOperator"/> AST node.</returns>
+        public static BuiltInOperator BuiltInOperator(Operator op)
         {
-            return new BuiltInOperator((Operator)op);
+            return new BuiltInOperator(op);
         }
     }
 

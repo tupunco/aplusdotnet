@@ -191,7 +191,7 @@ operatorSymbol returns [AST.Operator node]
 									if(func is AST.Operator)
 									{
 										// Found an operator, wrap it as a Built-in operator
-										$opTail.node.Function = AST.Node.BuiltInOperator(func);
+										$opTail.node.Function = AST.Node.BuiltInOperator((AST.Operator)func);
 									}
 									else
 									{

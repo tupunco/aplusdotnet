@@ -12,6 +12,18 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents an standalone built-in function in an A+ AST.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This node represents a single built-in function if it
+    /// is not used for an operator or dyadic/monadic function.
+    /// </para>
+    /// <para>
+    /// This node will build a DLR lambda expression for the given built-in function.
+    /// </para>
+    /// </remarks>
     public class BuiltInFunction : Node
     {
         #region Variables
@@ -22,12 +34,22 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
-        internal Token Function { get { return this.function; } }
+        /// <summary>
+        /// Gets the dyadic/monadic token witch represents the wrapped function.
+        /// </summary>
+        public Token Function
+        {
+            get { return this.function; }
+        }
 
         #endregion
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="BuiltInFunction"/> AST node.
+        /// </summary>
+        /// <param name="function">The <see cref="AST.Token"/> to wrap.</param>
         public BuiltInFunction(Token function)
         {
             this.function = function;
@@ -156,13 +178,13 @@ namespace AplusCore.Compiler.AST
             DLR.ParameterExpression methodLeftArg = DLR.Expression.Parameter(typeof(AType), "_LEFT_ARG_");
             DLR.ParameterExpression methodRightArg = DLR.Expression.Parameter(typeof(AType), "_RIGHT_ARG_");
             DLR.LabelTarget methodReturnTarget = DLR.Expression.Label(typeof(AType), "_RESULT_");
-            
+
             DLR.Expression codeBlock = DLR.Expression.Block(
                 DLR.Expression.IfThenElse(
                     DLR.Expression.Equal(methodLeftArg, DLR.Expression.Constant(null)),
                     BuildMonadicCase(this.function, methodReturnTarget, methodEnvArg, methodRightArg),
                     BuildDyadicCase(this.function, methodReturnTarget, methodEnvArg, methodRightArg, methodLeftArg)
-                    
+
                 ),
                 DLR.Expression.Label(methodReturnTarget, DLR.Expression.Constant(default(AType), typeof(AType)))
             );
@@ -198,18 +220,20 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
-
     }
 
     #region Construction helper
 
     public partial class Node
     {
-        public static BuiltInFunction BuiltInFunction(Node token)
+        /// <summary>
+        /// Build a AST node which represents a standalone built-in function.
+        /// </summary>
+        /// <param name="token">The <see cref="AST.Token"/> to build the function from.</param>
+        /// <returns><see cref="AST.BuiltInFunction"/> AST node.</returns>
+        public static BuiltInFunction BuiltInFunction(Token token)
         {
-            Debug.Assert(token is Token);
-
-            return new BuiltInFunction((Token)token);
+            return new BuiltInFunction(token);
         }
     }
 
