@@ -8,6 +8,9 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Specifies the constant type in the A+ AST.
+    /// </summary>
     public enum ConstantType
     {
         Undefined = 0,
@@ -20,6 +23,9 @@ namespace AplusCore.Compiler.AST
         Null
     }
 
+    /// <summary>
+    /// Represents a constant in an A+ AST.
+    /// </summary>
     public class Constant : Node
     {
         #region Variables
@@ -31,15 +37,29 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
-        public ConstantType Type { get { return this.type; } }
-        public object Value { get { return this.value; } }
-
-        public int AsInt { get { return Int32.Parse(value); } }
+        /// <summary>
+        /// Gets the <see cref="ConstantType"/> the node represents.
+        /// </summary>
+        public ConstantType Type
+        {
+            get { return this.type; }
+        }
 
         /// <summary>
+        /// Gets the value of the constant as an integer.
+        /// </summary>
+        public int AsInt
+        {
+            get { return Int32.Parse(value); }
+        }
+
+        /// <summary>
+        /// Gets the value of the constant as an <see cref="AType"/> number.
+        /// </summary>
+        /// <remarks>
         /// Returns the numbers as an AInteger or an AFloat.
         /// AFloat will be returned if the value can not be represented as an integer.
-        /// </summary>
+        /// </remarks>
         public AType AsNumericAType
         {
             get
@@ -56,8 +76,17 @@ namespace AplusCore.Compiler.AST
             }
         }
 
-        public string AsString { get { return this.value; } }
+        /// <summary>
+        /// Gets the value of the constant node as a string.
+        /// </summary>
+        public string AsString
+        {
+            get { return this.value; }
+        }
 
+        /// <summary>
+        /// Gets the value of the constant node as a double.
+        /// </summary>
         public double AsFloat
         {
             get
@@ -78,6 +107,11 @@ namespace AplusCore.Compiler.AST
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Constant"/> AST node.
+        /// </summary>
+        /// <param name="value">The value of the constant.</param>
+        /// <param name="type">The type of the constant.</param>
         public Constant(string value, ConstantType type)
         {
             this.value = value;
@@ -90,33 +124,39 @@ namespace AplusCore.Compiler.AST
 
         public override DLR.Expression Generate(AplusScope scope)
         {
+            DLR.Expression result;
             // NOTE: do we need to generate this? most Constants will be encapsulated in ConstantList
             switch (this.type)
             {
                 case ConstantType.CharacterConstant:
-                    return DLR.Expression.Constant(Runtime.Helpers.BuildString(this.AsString));
+                    result = DLR.Expression.Constant(Runtime.Helpers.BuildString(this.AsString));
+                    break;
 
                 case ConstantType.Null:
-                    return DLR.Expression.Constant(Utils.ANull());
+                    result = DLR.Expression.Constant(Utils.ANull());
+                    break;
 
                 case ConstantType.Integer:
-                    return DLR.Expression.Constant(this.AsNumericAType);
+                    result = DLR.Expression.Constant(this.AsNumericAType);
+                    break;
 
                 case ConstantType.NegativeInfinity:
                 case ConstantType.PositiveInfinity:
                 case ConstantType.Double:
-                    return DLR.Expression.Constant(AFloat.Create(this.AsFloat));
+                    result = DLR.Expression.Constant(AFloat.Create(this.AsFloat));
+                    break;
 
                 case ConstantType.Symbol:
-                    return DLR.Expression.Constant(ASymbol.Create(this.AsString));
+                    result = DLR.Expression.Constant(ASymbol.Create(this.AsString));
+                    break;
 
                 case ConstantType.Undefined:
                 default:
                     // This Should NEVER happen
-                    break;
-
+                    throw new Exception("Should Not reach this point!..");
             }
-            throw new Exception("Should Not reach this point!..");
+
+            return result;
         }
 
         #endregion
@@ -126,7 +166,6 @@ namespace AplusCore.Compiler.AST
         public override string ToString()
         {
             return String.Format("Constant({0})", this.value);
-
         }
 
         public override bool Equals(object obj)
@@ -152,26 +191,38 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
-
+        /// <summary>
+        /// Build an integer constant.
+        /// </summary>
+        /// <param name="value">The integer value as a string</param>
+        /// <returns>Returns an <see cref="AST.Constant"/> with a <see cref="ConstantType.Integer"/>.</returns>
         public static Constant IntConstant(string value)
         {
             return new Constant(StringProcessor.ProcessAPLNumber(value), ConstantType.Integer);
         }
 
+        /// <summary>
+        /// Build a float constant.
+        /// </summary>
+        /// <param name="value">The float value as a string</param>
+        /// <returns>Returns an <see cref="AST.Constant"/> with a <see cref="ConstantType.Double"/>.</returns>
         public static Constant FloatConstant(string value)
         {
             return new Constant(StringProcessor.ProcessAPLNumber(value), ConstantType.Double);
         }
 
         /// <summary>
-        /// Creates an infinite constant based on the first character of the input
+        /// Creates an infinite constant based on the first character of the input.
         /// </summary>
         /// <remarks>
         /// Because this needs to work in APL mode also, we check the length of the input value.
         /// If it is above 3 then it is the negative infinity.
         /// </remarks>
         /// <param name="value">input: '-Inf' or 'Inf'</param>
-        /// <returns>negative or positive infinite constant</returns>
+        /// <returns>
+        /// Returns an <see cref="AST.Constant"/> with a
+        /// <see cref="ConstantType.NegativeInfinity"/> or <see cref="ConstantType.PositiveInfinity"/>.
+        /// </returns>
         public static Constant InfConstant(string value)
         {
             // Check if value.Length > "Inf".Length
@@ -185,14 +236,30 @@ namespace AplusCore.Compiler.AST
             }
         }
 
+        /// <summary>
+        /// Build a symbol constant.
+        /// </summary>
+        /// <remarks>
+        /// The leading ` (backtick) will be removed if found.
+        /// </remarks>
+        /// <param name="value">The symbol value as a string.</param>
+        /// <returns>Returns an <see cref="AST.Constant"/> with a <see cref="ConstantType.Symbol"/>.</returns>
         public static Constant SymbolConstant(string value)
         {
-            string processedSymbol = value.StartsWith("`") 
+            string processedSymbol = value.StartsWith("`")
                 ? value.Substring(1, value.Length - 1)
                 : value;
             return new Constant(processedSymbol, ConstantType.Symbol);
         }
 
+        /// <summary>
+        /// Build a character constant from a single qouted string.
+        /// </summary>
+        /// <remarks>
+        /// The leading and trailing single qoutes will be removed.
+        /// </remarks>
+        /// <param name="text">The text constant.</param>
+        /// <returns>Returns an <see cref="AST.Constant"/> with a <see cref="ConstantType.CharacterConstant"/>.</returns>
         public static Constant SingeQuotedConstant(string text)
         {
             // Remove the leading and trailing single quotes (if there is any)
@@ -202,6 +269,14 @@ namespace AplusCore.Compiler.AST
             return new Constant(processedText.Replace("''", "'"), ConstantType.CharacterConstant);
         }
 
+        /// <summary>
+        /// Build a character constant from a double qouted string.
+        /// </summary>
+        /// <remarks>
+        /// The leading and trailing double qoutes will be removed.
+        /// </remarks>
+        /// <param name="text">The text constant.</param>
+        /// <returns>Returns an <see cref="AST.Constant"/> with a <see cref="ConstantType.CharacterConstant"/>.</returns>
         public static Constant DoubleQuotedConstant(string text)
         {
             // Remove the leading and trailing double quotes (if there is any)
@@ -211,11 +286,14 @@ namespace AplusCore.Compiler.AST
             return new Constant(StringProcessor.ProcessEscapes(processedText), ConstantType.CharacterConstant);
         }
 
+        /// <summary>
+        /// Build a null constant.
+        /// </summary>
+        /// <returns>Returns an <see cref="AST.Constant"/> with a <see cref="ConstantType.Null"/>.</returns>
         public static Constant NullConstant()
         {
             return new Constant("", ConstantType.Null);
         }
-
     }
 
     #endregion
