@@ -15,6 +15,9 @@ using DYN = System.Dynamic;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents an Assignment in an A+ AST.
+    /// </summary>
     public class Assign : Node
     {
         #region Variables
@@ -26,13 +29,31 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
-        public Node Target { get { return this.target; } }
-        public Node Expression { get { return this.expression; } }
+        /// <summary>
+        /// Gets the target of the assignment.
+        /// </summary>
+        public Node Target
+        {
+            get { return this.target; }
+        }
+
+        /// <summary>
+        /// Gets the value of the assignment.
+        /// </summary>
+        public Node Expression
+        {
+            get { return this.expression; }
+        }
 
         #endregion
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Assign"/> AST node.
+        /// </summary>
+        /// <param name="target">The target of the assignment.</param>
+        /// <param name="expression">The value of the assignment.</param>
         public Assign(Node target, Node expression)
         {
             this.target = target;
@@ -101,7 +122,7 @@ namespace AplusCore.Compiler.AST
                     result = GenerateIndexAssign(scope, target, value);
                 }
             }
-            else if(Node.TestMonadicToken(this.target, Grammar.Tokens.VALUE))
+            else if (Node.TestMonadicToken(this.target, Grammar.Tokens.VALUE))
             {
                 var method = typeof(Value).GetMethod("Assign");
                 var targetDLR = ((MonadicFunction)this.target).Expression.Generate(scope);
@@ -113,7 +134,7 @@ namespace AplusCore.Compiler.AST
                     environment
                 );
             }
-            else if(Node.TestDyadicToken(this.target, Grammar.Tokens.VALUEINCONTEXT))
+            else if (Node.TestDyadicToken(this.target, Grammar.Tokens.VALUEINCONTEXT))
             {
                 var targetNode = (DyadicFunction)this.target;
                 var method = typeof(ValueInContext).GetMethod("Assign");
@@ -128,7 +149,7 @@ namespace AplusCore.Compiler.AST
                     environment
                 );
             }
-            else if(Node.TestDyadicToken(this.target, Grammar.Tokens.PICK))
+            else if (Node.TestDyadicToken(this.target, Grammar.Tokens.PICK))
             {
                 result = BuildPickAssign(scope, value);
             }
@@ -410,9 +431,9 @@ namespace AplusCore.Compiler.AST
                         isStrand: true
                     )
                 );
-                
+
                 // gather the global variables for dependency validation/invalidation. 
-                if((scope.IsMethod && id.IsEnclosed) || !scope.IsMethod)
+                if ((scope.IsMethod && id.IsEnclosed) || !scope.IsMethod)
                 {
                     targetVariables.Add(id.BuildQualifiedName(runtime.CurrentContext));
                 }
@@ -619,7 +640,7 @@ namespace AplusCore.Compiler.AST
                         callbackParameter
                     ),
                     DLR.Expression.Dynamic(
-                        // TODO: do not instantiate the binder here
+                // TODO: do not instantiate the binder here
                         new Runtime.Binder.CallbackBinder(),
                         typeof(object),
                         callbackParameter,
@@ -743,18 +764,22 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
-
     }
 
     #region Construction helper
 
     public partial class Node
     {
+        /// <summary>
+        /// Build a AST node representing an assignment.
+        /// </summary>
+        /// <param name="target">The target of the assignment.</param>
+        /// <param name="expression">The value of the assignment.</param>
+        /// <returns><see cref="Assign">Assignment</see> AST node.</returns>
         public static Assign Assign(Node target, Node expression)
         {
             return new Assign(target, expression);
         }
-
     }
 
     #endregion
