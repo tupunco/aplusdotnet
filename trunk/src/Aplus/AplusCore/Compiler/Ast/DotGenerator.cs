@@ -392,7 +392,7 @@ namespace AplusCore.Compiler.AST
             string name = String.Format("Monadic{0}", counter++);
             string exprName = ToDot(name, node.Expression);
 
-            text.AppendFormat("  {0} [label=\"{1} ({2})\"];\n", name, node.Token.Text, node.TokenType);
+            text.AppendFormat("  {0} [label=\"{1} ({2})\"];\n", name, node.Token.Text, node.Token.Type);
             text.AppendFormat("  {0} -> {1};\n", name, exprName);
 
             return name;

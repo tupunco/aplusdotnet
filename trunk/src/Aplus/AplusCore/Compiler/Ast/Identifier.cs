@@ -8,11 +8,17 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Specifies the type of an identifier
+    /// </summary>
     public enum IdentifierType
     {
         UnQualifiedName, QualifiedName, SystemName
     }
 
+    /// <summary>
+    /// Represents an identifier in an A+ AST.
+    /// </summary>
     public class Identifier : Node
     {
         #region Variables
@@ -23,25 +29,20 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
-        #region Constructor
-
-        public Identifier(string varibleName, IdentifierType type)
-        {
-            this.variableName = varibleName;
-            this.type = type;
-            this.isEnclosed = false;
-        }
-
-        #endregion
-
         #region Properties
 
+        /// <summary>
+        /// Gets or sets the name of the identifier.
+        /// </summary>
         public string Name
         {
             get { return this.variableName; }
             set { this.variableName = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="IdentifierType">type</see> of the identifier.
+        /// </summary>
         public IdentifierType Type
         {
             get { return this.type; }
@@ -49,12 +50,28 @@ namespace AplusCore.Compiler.AST
         }
 
         /// <summary>
-        /// Specifies if the identifier (during the parsing of code) was enclosed inside parentheses.
+        /// Gets or sets if the identifier was enclosed inside parantheses.
         /// </summary>
         public bool IsEnclosed
         {
             get { return this.isEnclosed; }
             set { this.isEnclosed = value; }
+        }
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="Identifier"/> AST node.
+        /// </summary>
+        /// <param name="varibleName">Name of the identifier.</param>
+        /// <param name="type">The <see cref="IdentifierType">type</see> of the identifier.</param>
+        public Identifier(string varibleName, IdentifierType type)
+        {
+            this.variableName = varibleName;
+            this.type = type;
+            this.isEnclosed = false;
         }
 
         #endregion
@@ -221,10 +238,10 @@ namespace AplusCore.Compiler.AST
         #region Internal methods
 
         /// <summary>
-        /// returns a Qualified Name based on the variable's type and the current context
+        /// Build a Qualified name based on the type of the identifier and the current context.
         /// </summary>
-        /// <param name="currentContext">The current context to use for UnQualified names</param>
-        /// <returns>Fully Qualified variable name</returns>
+        /// <param name="currentContext">The name of the current context</param>
+        /// <returns>Return fully qualified name.</returns>
         internal string BuildQualifiedName(string currentContext)
         {
             if (this.type == IdentifierType.UnQualifiedName)
@@ -240,10 +257,10 @@ namespace AplusCore.Compiler.AST
         }
 
         /// <summary>
-        /// Returns a pair of strings, containing a Context Name and a Variable name
+        /// Builds a pair of strings, containing the name of the context and the name of the identifier.
         /// </summary>
-        /// <param name="currentContext"></param>
-        /// <returns></returns>
+        /// <param name="currentContext">The name of the current context.</param>
+        /// <returns>Returns a pair of strings, containing the name of the context and the name of the identifier.</returns>
         internal string[] CreateContextNames(string currentContext)
         {
             if (this.type == IdentifierType.QualifiedName)
@@ -254,7 +271,6 @@ namespace AplusCore.Compiler.AST
             return new string[] { currentContext, this.variableName };
         }
 
-
         #endregion
 
         #region overrides
@@ -262,7 +278,6 @@ namespace AplusCore.Compiler.AST
         public override string ToString()
         {
             return String.Format("Identifier({0})", this.variableName);
-
         }
 
         public override bool Equals(object obj)
@@ -288,26 +303,52 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
+        /// <summary>
+        /// Builds an <see cref="Identifier"/> for the given name and <see cref="IdentifierType">type</see>see.
+        /// </summary>
+        /// <param name="variableName">The name of the identifier.</param>
+        /// <param name="type">The <see cref="IdentifierType">type</see> of the identifier.</param>
+        /// <returns>Returns an <see cref="Identifier"/>.</returns>
         public static Identifier Identifier(string variableName, IdentifierType type)
         {
             return new Identifier(variableName, type);
         }
 
+        /// <summary>
+        /// Builds a Qualified name for the given identifier name.
+        /// </summary>
+        /// <param name="variableName">Name of the identifier.</param>
+        /// <returns>
+        /// Returns an <see cref="Identifier"/> with <see cref="IdentifierType.QualifiedName"/> as the identifier type.
+        /// </returns>
         public static Identifier QualifiedName(string variableName)
         {
             return new Identifier(variableName, IdentifierType.QualifiedName);
         }
 
+        /// <summary>
+        /// Builds a Unqualified name for the given identifier name.
+        /// </summary>
+        /// <param name="variableName">Name of the identifier.</param>
+        /// <returns>
+        /// Returns an <see cref="Identifier"/> with <see cref="IdentifierType.UnQualifiedName"/> as the identifier type.
+        /// </returns>
         public static Identifier UnQualifiedName(string variableName)
         {
             return new Identifier(variableName, IdentifierType.UnQualifiedName);
         }
 
+        /// <summary>
+        /// Builds a system name for the given identifier name.
+        /// </summary>
+        /// <param name="variableName">Name of the identifier.</param>
+        /// <returns>
+        /// Returns an <see cref="Identifier"/> with <see cref="IdentifierType.UnQualifiedName"/> as the identifier type.
+        /// </returns>
         public static Identifier SystemName(string varibaleName)
         {
             return new Identifier(varibaleName, IdentifierType.SystemName);
         }
-
     }
 
     #endregion

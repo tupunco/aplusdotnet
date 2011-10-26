@@ -97,7 +97,7 @@ namespace AplusCore.Compiler.AST
         /// <returns>True if: node is a MonadicFunction and it's token's type is equal to the one we supplied</returns>
         internal static bool TestMonadicToken(Node node, Tokens tokenType)
         {
-            return (node is MonadicFunction) && (((MonadicFunction)node).TokenType == tokenType);
+            return (node is MonadicFunction) && (((MonadicFunction)node).Token.Type == tokenType);
         }
 
         #endregion
