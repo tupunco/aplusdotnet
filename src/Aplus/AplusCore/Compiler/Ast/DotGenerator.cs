@@ -203,7 +203,7 @@ namespace AplusCore.Compiler.AST
         private static string ToDot(string parent, ConstantList node)
         {
             string name = String.Format("ConstantList{0}", counter++);
-            foreach (Constant item in node.List)
+            foreach (Constant item in node)
             {
                 string itemName = ToDot(name, item);
                 text.AppendFormat("  {0} -> {1};\n", name, itemName);

@@ -9,7 +9,10 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
-    public class ConstantList : Node
+    /// <summary>
+    /// Represents a series of <see cref="Constant"/>s as a Constant List in an A+ AST.
+    /// </summary>
+    public class ConstantList : Node, IEnumerable<Constant>
     {
         #region Variables
 
@@ -26,14 +29,11 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
-        #region Properties
-
-        public LinkedList<Constant> List { get { return this.list; } }
-
-        #endregion
-
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="ConstantList"/> AST node.
+        /// </summary>
         public ConstantList()
         {
             this.list = new LinkedList<Constant>();
@@ -52,12 +52,10 @@ namespace AplusCore.Compiler.AST
             }
         }
 
-        public void AddFirst(Constant item)
-        {
-            UpdateType(item.Type);
-            this.list.AddFirst(item);
-        }
-
+        /// <summary>
+        /// Adds the given <see cref="Constant"/> to the <see cref="ConstantList"/>.
+        /// </summary>
+        /// <param name="item">The <see cref="Constant"/> to add.</param>
         public void AddLast(Constant item)
         {
             UpdateType(item.Type);
@@ -76,7 +74,7 @@ namespace AplusCore.Compiler.AST
             }
 
             AType items = null;
-            
+
             if (this.type == ConstantType.Integer)
             {
                 bool convertToFloat = false;
@@ -98,7 +96,7 @@ namespace AplusCore.Compiler.AST
                     items.ConvertToFloat();
                 }
             }
-                // Treat the Infinite constants same as floats
+            // Treat the Infinite constants same as floats
             else if (this.type == ConstantType.Double ||
                     this.type == ConstantType.PositiveInfinity ||
                     this.type == ConstantType.NegativeInfinity)
@@ -126,6 +124,24 @@ namespace AplusCore.Compiler.AST
             // Example: .Constant<AplusCore.Types.AArray`1[AplusCore.Types.AInteger]>(1 2)
             return result;
 
+        }
+
+        #endregion
+
+        #region IEnumerable<Constant> Members
+
+        public IEnumerator<Constant> GetEnumerator()
+        {
+            return this.list.GetEnumerator();
+        }
+
+        #endregion
+
+        #region IEnumerable Members
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return ((System.Collections.IEnumerable)this.list).GetEnumerator();
         }
 
         #endregion
@@ -181,17 +197,11 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
-        public static ConstantList ConstantList()
-        {
-            ConstantList list = new ConstantList();
-            return list;
-        }
-
         /// <summary>
-        /// Construct a Constant List with the inital Constant items
+        /// Build a <see cref="AST.ConstantList"/> from the given <see cref="AST.Constant"/>s.
         /// </summary>
-        /// <param name="constants"></param>
-        /// <returns>Constant List containing the initial constants</returns>
+        /// <param name="constants">Series of <see cref="AST.Constant"/>s.</param>
+        /// <returns>Returns a <see cref="AST.ConstantList"/> containing the given <see cref="AST.Constant"/>s.</returns>
         public static ConstantList ConstantList(params Constant[] constants)
         {
             ConstantList list = new ConstantList();
@@ -202,9 +212,7 @@ namespace AplusCore.Compiler.AST
 
             return list;
         }
-
     }
 
     #endregion
-
 }
