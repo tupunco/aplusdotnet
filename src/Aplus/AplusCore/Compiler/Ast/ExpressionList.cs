@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 using AplusCore.Types;
 
@@ -8,6 +8,9 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents a series of <see cref="Node"/>s in an A+ AST.
+    /// </summary>
     public class ExpressionList : Node
     {
         #region Variables
@@ -18,14 +21,34 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
-        public int Length { get { return this.nodeList.Count; } }
-        public LinkedList<Node> Items { get { return this.nodeList; } }
-        public Node this[int index] { get { return this.nodeList.ElementAt<Node>(index); } }
+        /// <summary>
+        /// Gets the number of <see cref="Node"/>s in the <see cref="ExpressionList"/>.
+        /// </summary>
+        public int Length
+        {
+            get { return this.nodeList.Count; }
+        }
+
+        /// <summary>
+        /// Gets the list of <see cref="Node"/>s in the <see cref="ExpressionList"/>.
+        /// </summary>
+        public LinkedList<Node> Items
+        {
+            get { return this.nodeList; }
+        }
+
+        public Node this[int index]
+        {
+            get { return this.nodeList.ElementAt<Node>(index); }
+        }
 
         #endregion
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="ExpressionList"/> AST node.
+        /// </summary>
         public ExpressionList()
         {
             this.nodeList = new LinkedList<Node>();
@@ -35,11 +58,19 @@ namespace AplusCore.Compiler.AST
 
         #region Methods
 
+        /// <summary>
+        /// Add the <see cref="Node"/> as the first item to the <see cref="ExpressionList"/>.
+        /// </summary>
+        /// <param name="item">The <see cref="Node"/> to add.</param>
         public void AddFirst(Node item)
         {
             this.nodeList.AddFirst(item);
         }
 
+        /// <summary>
+        /// Add the <see cref="Node"/> as the last item to the <see cref="ExpressionList"/>.
+        /// </summary>
+        /// <param name="item">The <see cref="Node"/> to add.</param>
         public void AddLast(Node item)
         {
             this.nodeList.AddLast(item);
@@ -71,7 +102,6 @@ namespace AplusCore.Compiler.AST
 
         public override string ToString()
         {
-            //string tmp = String.Join(" ", this.nodeList.ToList().ConvertAll<string>(item => item.ToString()).ToArray());
             string tmp = String.Join(" ", this.nodeList.ToStringArray<Node>());
             return String.Format("ExpressionList({0})", tmp);
         }
@@ -120,24 +150,14 @@ namespace AplusCore.Compiler.AST
     public partial class Node
     {
         /// <summary>
-        /// Construct an Expression List AST Node
-        /// </summary>
-        /// <returns>Expression List AST Node</returns>
-        public static ExpressionList ExpressionList()
-        {
-            ExpressionList nodeList = new ExpressionList();
-            return nodeList;
-        }
-
-        /// <summary>
-        /// Construct an Expression List AST Node wiht an initial set of node list
+        /// Build an <see cref="ExpressionList"/> AST Node with an initial set of <see cref="Node"/>s
         /// </summary>
         /// <remarks>
         /// The order of input nodes are preserved, thus each node is added to the end of
         /// the Expression List.
         /// </remarks>
-        /// <param name="nodes">List of nodes to add to Expression List</param>
-        /// <returns>Expression List AST Node</returns>
+        /// <param name="nodes">Series of <see cref="Node"/>s.</param>
+        /// <returns>Returns an <see cref="ExpersisonList"/> containing the give nodes</returns>
         public static ExpressionList ExpressionList(params Node[] nodes)
         {
             ExpressionList list = new ExpressionList();
