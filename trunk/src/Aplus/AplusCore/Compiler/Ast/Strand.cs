@@ -8,7 +8,12 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
-    //Order: right to left.
+    /// <summary>
+    /// Represents a strand construction in an A+ AST.
+    /// </summary>
+    /// <remarks>
+    /// The order of the <see cref="Node"/>s in the strand is right to left.
+    /// </remarks>
     public class Strand : Node
     {
         #region Variables
@@ -17,8 +22,20 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
+        #region Properties
+
+        public LinkedList<Node> Items
+        {
+            get { return this.arguments; }
+        }
+
+        #endregion
+
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Strand"/> AST node.
+        /// </summary>
         public Strand()
         {
             this.arguments = new LinkedList<Node>();
@@ -26,17 +43,12 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
-        #region Properties
-
-        internal LinkedList<Node> Items
-        {
-            get { return this.arguments; }
-        }
-
-        #endregion
-
         #region Methods
 
+        /// <summary>
+        /// Adss the <see cref="Node"/> to the end of the strand.
+        /// </summary>
+        /// <param name="item">The <see cref="Node"/> to add.</param>
         public void AddLast(Node item)
         {
             this.arguments.AddLast(item);
@@ -76,8 +88,7 @@ namespace AplusCore.Compiler.AST
 
         public override string ToString()
         {
-            string tmp = String.Join(" ", this.arguments.ToList().ConvertAll<string>(item => item.ToString()).ToArray());
-            return String.Format("Strand({0})", tmp);
+            return String.Format("Strand({0})", String.Join(" ", this.arguments.ToStringArray()));
         }
 
         public override bool Equals(object obj)
@@ -123,20 +134,21 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
-        public static Strand Strand()
-        {
-            Strand strand = new Strand();
-            return strand;
-        }
+        /// <summary>
+        /// Builds a <see cref="Node"/> representing a <see cref="Strand"/> construction.
+        /// </summary>
+        /// <param name="nodes">The <see cref="Node"/>s to add to the <see cref="Strand"/>.</param>
+        /// <returns>Returns a <see cref="Strand"/> containing the given <see cref="Node"/>s.</returns>
         public static Strand Strand(params Node[] nodes)
         {
-            Strand strand = new Strand();
-            foreach (Node node in nodes)
-            {
-                strand.AddLast(node);
-            }
-            return strand;
+            return Strand(nodes as IEnumerable<Node>);
         }
+
+        /// <summary>
+        /// Builds a <see cref="Node"/> representing a <see cref="Strand"/> construction.
+        /// </summary>
+        /// <param name="nodes">The <see cref="Node"/>s to add to the <see cref="Strand"/>.</param>
+        /// <returns>Returns a <see cref="Strand"/> containing the given <see cref="Node"/>s.</returns>
         public static Strand Strand(IEnumerable<Node> nodes)
         {
             Strand strand = new Strand();
