@@ -311,7 +311,7 @@ namespace AplusCore.Compiler.AST
     public partial class Node
     {
         /// <summary>
-        /// Builds an <see cref="Identifier"/> for the given name and <see cref="IdentifierType">type</see>see.
+        /// Builds an <see cref="Identifier"/> with the given name and <see cref="IdentifierType">type</see>.
         /// </summary>
         /// <param name="variableName">The name of the identifier.</param>
         /// <param name="type">The <see cref="IdentifierType">type</see> of the identifier.</param>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 
 using AplusCore.Runtime;
 using AplusCore.Types;
@@ -11,12 +10,15 @@ using DYN = System.Dynamic;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents a invocation of a user defined function in an A+ AST.
+    /// </summary>
     public class UserDefInvoke : Node
     {
         #region Variables
 
-        private ExpressionList arguments;
         private Identifier method;
+        private ExpressionList arguments;
 
         #endregion
 
@@ -30,13 +32,31 @@ namespace AplusCore.Compiler.AST
             get { return NodeTypes.UserDefInvoke; }
         }
 
-        public ExpressionList Arguments { get { return this.arguments; } }
-        public Identifier Method { get { return this.method; } }
+        /// <summary>
+        /// Gets the identifier of the user defined function.
+        /// </summary>
+        public Identifier Method
+        {
+            get { return this.method; }
+        }
+
+        /// <summary>
+        /// Gets the arguments of the user defined function.
+        /// </summary>
+        public ExpressionList Arguments
+        {
+            get { return this.arguments; }
+        }
 
         #endregion
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="UserDefInvoke"/> AST node.
+        /// </summary>
+        /// <param name="method">The identifier of the user defined function to invoke.</param>
+        /// <param name="arguments">The arguments for the user defined function.</param>
         public UserDefInvoke(Identifier method, ExpressionList arguments)
         {
             this.method = method;
@@ -161,14 +181,18 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
-
-        public static UserDefInvoke UserDefInvoke(Node methodIdentifier, Node arguments)
+        /// <summary>
+        /// Builds a <see cref="UserDefInvoke">user defined function invoke</see> node.
+        /// </summary>
+        /// <param name="method">The identifier of the user defined function to invoke.</param>
+        /// <param name="arguments">The arguments for the user defined function.</param>
+        /// <returns>Returns a <see cref="UserDefInvoke"> node.</returns>
+        public static UserDefInvoke UserDefInvoke(Node method, Node arguments)
         {
-            Debug.Assert(methodIdentifier is Identifier);
+            Debug.Assert(method is Identifier);
             Debug.Assert(arguments is ExpressionList);
-            return new UserDefInvoke((Identifier)methodIdentifier, (ExpressionList)arguments);
+            return new UserDefInvoke((Identifier)method, (ExpressionList)arguments);
         }
-
     }
 
     #endregion
