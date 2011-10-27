@@ -6,6 +6,36 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
+    public enum NodeTypes
+    {
+        Undefined,
+        Assign,
+        BuiltInFunction,
+        BuiltInOperator,
+        Case,
+        Constant,
+        ConstantList,
+        Dependency,
+        DyadicDo,
+        DyadicFunction,
+        EachOperator,
+        ExpressionList,
+        Identifier,
+        If,
+        Indexing,
+        MonadicDo,
+        MonadicFunction,
+        RankOperator,
+        Strand,
+        SystemCommand,
+        Token,
+        UserDefFunction,
+        UserDefOperator,
+        UserDefOperatorInvoke,
+        UserDefInvoke,
+        While,
+    }
+
     /// <summary>
     /// Represents a Node in an A+ AST.
     /// </summary>
@@ -16,6 +46,18 @@ namespace AplusCore.Compiler.AST
     /// </remarks>
     public partial class Node
     {
+        #region Properties
+
+        /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public virtual NodeTypes NodeType
+        {
+            get { return NodeTypes.Undefined; }
+        }
+
+        #endregion
+
         #region Construction helper
 
         /// <summary>

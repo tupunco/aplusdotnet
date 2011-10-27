@@ -22,6 +22,14 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.UserDefInvoke; }
+        }
+
         public ExpressionList Arguments { get { return this.arguments; } }
         public Identifier Method { get { return this.method; } }
 
@@ -55,9 +63,9 @@ namespace AplusCore.Compiler.AST
                 List<Node> items = new List<Node>(this.arguments.Items);
                 // 2. Add the parameters in !reverse! order except the last one
                 for (int i = 0; i < items.Count - 1; i++)
-			    {
+                {
                     callArguments.AddFirst(items[i].Generate(scope));
-			    }
+                }
 
                 Node lastItem = items[items.Count - 1];
                 bool isPick = Node.TestDyadicToken(lastItem, Grammar.Tokens.PICK);

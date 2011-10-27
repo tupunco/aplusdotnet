@@ -19,6 +19,14 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.While; }
+        }
+
         public Node Expression { get { return this.expression; } }
         public Node CodeBlock { get { return this.codeBlock; } }
 
@@ -49,22 +57,22 @@ namespace AplusCore.Compiler.AST
                 DLR.Expression.Loop(
                     DLR.Expression.Block(
                         DLR.Expression.IfThen(
-                        // Test if the condition is equal to 0
-                            // Invert the inner test's result 
+                // Test if the condition is equal to 0
+                // Invert the inner test's result 
                             DLR.Expression.Not(
-                                // This part will test if the condition is true (this means it is not 0)
+                // This part will test if the condition is true (this means it is not 0)
                                 DLR.Expression.IsTrue(
                                     this.expression.Generate(scope),
                                     typeof(Helpers).GetMethod("BooleanTest")
                                 )
                             ),
-                            // Break out from the loop with the last computed value
+                // Break out from the loop with the last computed value
                             DLR.Expression.Break(breakLabel, returnValue)
                         ),
-                        // Compute & assign the value
+                // Compute & assign the value
                         DLR.Expression.Assign(returnValue, this.codeBlock.Generate(scope))
                     ),
-                    // The label where to jump in case of break
+                // The label where to jump in case of break
                     breakLabel
                 )
             );

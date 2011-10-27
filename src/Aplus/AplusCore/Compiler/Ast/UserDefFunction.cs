@@ -25,6 +25,14 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.UserDefFunction; }
+        }
+
         public new Identifier Identifier { get { return this.name; } }
         public Node Codeblock { get { return this.codeblock; } }
         public ExpressionList Parameters { get { return this.parameters; } }
@@ -147,7 +155,7 @@ namespace AplusCore.Compiler.AST
 
             // ensure the result type to be an AType
             DLR.Expression result = DLR.Expression.Convert(setMethod, typeof(AType));
-            
+
             return result;
         }
 

@@ -20,6 +20,14 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.If; }
+        }
+
         public Node Expression { get { return this.expression; } }
         public Node TrueCase { get { return this.trueCase; } }
         public Node FalseCase { get { return this.falseCase; } }

@@ -18,6 +18,14 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.MonadicDo; }
+        }
+
         public Node Codeblock { get { return this.codeblock; } }
 
         #endregion
@@ -92,7 +100,7 @@ namespace AplusCore.Compiler.AST
 
             DLR.Expression result = DLR.Expression.TryCatch(
                 block,
-                catchBlock 
+                catchBlock
             );
 
             return result;

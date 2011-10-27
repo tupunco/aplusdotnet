@@ -20,6 +20,14 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.SystemCommand; }
+        }
+
         public string Command { get { return this.command; } }
 
         public string Argument
@@ -209,7 +217,7 @@ namespace AplusCore.Compiler.AST
                                     DLR.Expression.Constant(variable),
                                     DLR.Expression.Constant(this.argument)
                                 )
-                            );  
+                            );
                         }
                     }
                     else
