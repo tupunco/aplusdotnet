@@ -9,6 +9,9 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents a system command in an A+ AST.
+    /// </summary>
     public class SystemCommand : Node
     {
         #region Variables
@@ -28,8 +31,17 @@ namespace AplusCore.Compiler.AST
             get { return NodeTypes.SystemCommand; }
         }
 
-        public string Command { get { return this.command; } }
+        /// <summary>
+        /// Gets the name of the system command.
+        /// </summary>
+        public string Command
+        {
+            get { return this.command; }
+        }
 
+        /// <summary>
+        /// Gets or sets the argument of the system command.
+        /// </summary>
         public string Argument
         {
             get { return this.argument; }
@@ -40,6 +52,11 @@ namespace AplusCore.Compiler.AST
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="SystemCommand"/> AST node.
+        /// </summary>
+        /// <param name="argument">The name of the system command.</param>
+        /// <param name="command">The argument for the system command.</param>
         public SystemCommand(string command, string argument = null)
         {
             this.command = command;
@@ -241,6 +258,22 @@ namespace AplusCore.Compiler.AST
             return String.Format("SystemCommand({0} {1})", this.command, this.argument);
         }
 
+        public override bool Equals(object obj)
+        {
+            if (!(obj is SystemCommand))
+            {
+                return false;
+            }
+
+            SystemCommand other = (SystemCommand)obj;
+            return this.command == other.command && this.argument == other.argument;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.command.GetHashCode() ^ (this.argument != null ? this.argument.GetHashCode() : 0);
+        }
+
         #endregion
     }
 
@@ -248,6 +281,12 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
+        /// <summary>
+        /// Builds a <see cref="SystemCommand"/> node.
+        /// </summary>
+        /// <param name="command">The name of the system command.</param>
+        /// <param name="argument">The argument of the system command.</param>
+        /// <returns>Returns a <see cref="SystemCommand"/>.</returns>
         public static SystemCommand SystemCommand(string command, string argument = null)
         {
             return new SystemCommand(command, argument);

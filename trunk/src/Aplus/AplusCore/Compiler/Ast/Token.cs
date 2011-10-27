@@ -4,22 +4,15 @@ using AplusCore.Compiler.Grammar;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents a token in an A+ AST.
+    /// </summary>
     public class Token : Node
     {
-        #region Private Fields
+        #region Variables
 
         private string text;
         private Tokens tokenType;
-
-        #endregion
-
-        #region Constructor
-
-        public Token(Tokens tokenType, string text = null)
-        {
-            this.tokenType = tokenType;
-            this.text = text;
-        }
 
         #endregion
 
@@ -33,12 +26,37 @@ namespace AplusCore.Compiler.AST
             get { return NodeTypes.Token; }
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="Tokens">type</see> of the token.
+        /// </summary>
         public Tokens Type
         {
             get { return this.tokenType; }
             set { this.tokenType = value; }
         }
-        public string Text { get { return this.text; } }
+
+        /// <summary>
+        /// Gets the string representation of the token.
+        /// </summary>
+        public string Text
+        {
+            get { return this.text; }
+        }
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="Token"/> AST node.
+        /// </summary>
+        /// <param name="tokenType">The <see cref="Tokens">type</see> of the token.</param>
+        /// <param name="text">The string representation of the token.</param>
+        public Token(Tokens tokenType, string text = null)
+        {
+            this.tokenType = tokenType;
+            this.text = text;
+        }
 
         #endregion
 
@@ -51,7 +69,7 @@ namespace AplusCore.Compiler.AST
 
         public override int GetHashCode()
         {
-            return this.tokenType.GetHashCode() ^ this.text.GetHashCode();
+            return this.tokenType.GetHashCode() ^ (this.text != null ? this.text.GetHashCode() : 0);
         }
 
         public override bool Equals(object obj)
@@ -73,11 +91,16 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
+        /// <summary>
+        /// Builds a <see cref="Token"/>.
+        /// </summary>
+        /// <param name="tokentype">The <see cref="Tokens">type</see> of the token.</param>
+        /// <param name="text">The string representation of the token.</param>
+        /// <returns>Returns a <see cref="Token"/>.</returns>
         public static Token Token(Tokens tokentype, string text = null)
         {
             return new Token(tokentype, text);
         }
-
     }
 
     #endregion

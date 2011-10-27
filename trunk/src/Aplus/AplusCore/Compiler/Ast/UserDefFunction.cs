@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 
 using AplusCore.Compiler.Grammar;
 using AplusCore.Runtime;
@@ -12,6 +11,9 @@ using DYN = System.Dynamic;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents a definition of a user function in an A+ AST.
+    /// </summary>
     public class UserDefFunction : Node
     {
         #region Variables
@@ -33,15 +35,46 @@ namespace AplusCore.Compiler.AST
             get { return NodeTypes.UserDefFunction; }
         }
 
-        public new Identifier Identifier { get { return this.name; } }
-        public Node Codeblock { get { return this.codeblock; } }
-        public ExpressionList Parameters { get { return this.parameters; } }
+        /// <summary>
+        /// Gets the name of the user defined function.
+        /// </summary>
+        public new Identifier Identifier
+        {
+            get { return this.name; }
+        }
+
+        /// <summary>
+        /// Gets the paramters of the user defined function.
+        /// </summary>
+        public ExpressionList Parameters
+        {
+            get { return this.parameters; }
+        }
+
+        /// <summary>
+        /// Gets the codeblock of the user defined function.
+        /// </summary>
+        public Node Codeblock
+        {
+            get { return this.codeblock; }
+        }
+
+        /// <summary>
+        /// Gets the variables associated with the user defined function.
+        /// </summary>
         public Variables Variables { get; set; }
 
         #endregion
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="UserDefFunction"/> AST node.
+        /// </summary>
+        /// <param name="name">The name of the user defined function.</param>
+        /// <param name="parameters">The parameters for the user defined function.</param>
+        /// <param name="codeblock">The codeblock for the user defined function.</param>
+        /// <param name="code">The string representation of the user defined function.</param>
         public UserDefFunction(Identifier name, ExpressionList parameters, Node codeblock, string code)
         {
             this.name = name;
@@ -192,6 +225,14 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
+        /// <summary>
+        /// Builds a <see cref="UserDefFunction">user defined function</see>.
+        /// </summary>
+        /// <param name="name">The name of the user defined function.</param>
+        /// <param name="parameters">The parameters for the user defined function.</param>
+        /// <param name="codeblock">The codeblock for the user defined function.</param>
+        /// <param name="code">The string representation of the user defined function.</param>
+        /// <returns>Returns a  <see cref="UserDefFunction">user defined function</see>.</returns>
         public static UserDefFunction UserDefFunction(Node name, ExpressionList parameters, Node codeblock, string code = "")
         {
             Debug.Assert(name is Identifier);
