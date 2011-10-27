@@ -16,6 +16,8 @@ namespace AplusCore.Compiler
 
         private HashSet<string> localFunctions;
         private HashSet<string> globalFunctions;
+        private HashSet<string> dyadicOperators;
+        private HashSet<string> monadicOperators;
 
         #endregion
 
@@ -36,6 +38,8 @@ namespace AplusCore.Compiler
 
         public FunctionInformation(string context)
         {
+            this.dyadicOperators = new HashSet<string>();
+            this.monadicOperators = new HashSet<string>();
             this.globalFunctions = new HashSet<string>();
             this.localFunctions = new HashSet<string>();
             this.context = context;
@@ -45,10 +49,14 @@ namespace AplusCore.Compiler
 
         #region Query utils
 
-        public bool IsOperator(string id)
+        public bool IsDyadicOperator(string id)
         {
-            //return this.OperatorFunctions.ContainsKey(QualifiedName(id));
-            return false;
+            return this.dyadicOperators.Contains(QualifiedName(id));
+        }
+
+        public bool IsMonadicOperator(string id)
+        {
+            return this.monadicOperators.Contains(QualifiedName(id));
         }
 
         public bool IsGlobalFunction(string id)
@@ -69,9 +77,25 @@ namespace AplusCore.Compiler
             {
                 AFunc func = function.Value.Data as AFunc;
 
-                if (func.Valence > 1)
+                if (func.Valence <= 1)
                 {
                     // skip the niladic functions
+                    continue;
+                }
+
+                if (func.IsOperator)
+                {
+                    if (func.IsDyadic)
+                    {
+                        this.dyadicOperators.Add(function.Key);
+                    }
+                    else
+                    {
+                        this.monadicOperators.Add(function.Key);
+                    }
+                }
+                else
+                {
                     this.globalFunctions.Add(function.Key);
                 }
             }

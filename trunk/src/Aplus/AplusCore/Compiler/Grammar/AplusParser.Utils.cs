@@ -103,9 +103,14 @@ namespace AplusCore.Compiler.Grammar
             this.FunctionInfo.RegisterGlobalFunction(node.Identifier.Name);
         }
 
-        private bool IsOperator(IToken nextToken)
+        private bool IsDyadicOperator(IToken nextToken)
         {
-            return (nextToken != null) && (this.FunctionInfo != null) && this.FunctionInfo.IsOperator(nextToken.Text);
+            return (nextToken != null) && (this.FunctionInfo != null) && this.FunctionInfo.IsDyadicOperator(nextToken.Text);
+        }
+
+        private bool IsMonadicOperator(IToken nextToken)
+        {
+            return (nextToken != null) && (this.FunctionInfo != null) && this.FunctionInfo.IsMonadicOperator(nextToken.Text);
         }
 
         private bool IsGlobalFunction(IToken nextToken)
