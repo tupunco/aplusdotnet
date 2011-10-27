@@ -29,6 +29,7 @@ statements returns [AST.ExpressionList node]
 statement returns [AST.Node node]
 	:	systemCommand						{ node = $systemCommand.node; }
 	|	dependencyDefinition				{ node = $dependencyDefinition.node; }
+	|	userDefinedOperator					{ node = $userDefinedOperator.node; }
 	|	userDefinedFunction					{ node = $userDefinedFunction.node; }
 	|	expressionList						{ node = $expressionList.node; }
 	;
@@ -52,6 +53,34 @@ dependencyDefinition returns [AST.Dependency node]
 			{
 				$node.Indexer = $indexer.node;
 			}
+		}
+	;
+
+userDefinedOperator returns [AST.UserDefOperator node]
+	@init { SetupUserDefFunction(); }
+	@after { TearDownUserDefFunction(); }
+	:	LP func=variableName name=variableName RP rhs=variableName 
+		Colon functionBody
+		{
+			$node = AST.Node.MonadicUserDefOperator($name.node, $func.node, $rhs.node, $functionBody.node, $text);
+		}
+	|	LP func=variableName name=variableName opcondition=variableName RP rhs=variableName
+		Colon functionBody
+		{
+			$node = AST.Node.DyadicUserDefOperator($name.node, $func.node, $opcondition.node, $rhs.node, $functionBody.node, $text);
+		}
+	|	lhs=variableName LP func=variableName name=variableName RP rhs=variableName
+		Colon functionBody
+		{
+			$node = AST.Node.MonadicUserDefOperator($name.node, $func.node, $lhs.node, $rhs.node, $functionBody.node, $text);
+		}
+	|	lhs=variableName LP func=variableName name=variableName opcondition=variableName RP rhs=variableName
+		Colon functionBody
+		{ 
+			$node = AST.Node.DyadicUserDefOperator($name.node,
+												   $func.node, $opcondition.node,
+												   $lhs.node, $rhs.node,
+												   $functionBody.node, $text);
 		}
 	;
 
