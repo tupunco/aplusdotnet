@@ -35,6 +35,7 @@
         private bool derived;
 
         private bool isOperator;
+        private bool isDyadic;
 
         #endregion
 
@@ -53,6 +54,14 @@
         public bool IsOperator
         {
             get { return this.isOperator; }
+        }
+
+        /// <summary>
+        /// Specifies if the <see cref="AFunc"/> is a dyadic user defined operator.
+        /// </summary>
+        public bool IsDyadic
+        {
+            get { return this.isDyadic; }
         }
 
         #endregion
@@ -86,10 +95,11 @@
             return new AReference(function);
         }
 
-        public static AType CreateUserOperator(string name, object method, int valence, string codestring)
+        public static AType CreateUserOperator(string name, bool isDyadic, object method, int valence, string codestring)
         {
             AFunc op = new AFunc(name, method, valence, codestring);
             op.isOperator = true;
+            op.isDyadic = isDyadic;
             return new AReference(op);
         }
 
