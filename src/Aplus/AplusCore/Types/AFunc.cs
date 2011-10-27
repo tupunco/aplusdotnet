@@ -34,6 +34,8 @@
         /// </summary>
         private bool derived;
 
+        private bool isOperator;
+
         #endregion
 
         #region Properties
@@ -44,6 +46,14 @@
         public string Name { get { return this.name; } }
         public bool IsBuiltin { get { return this.builtin; } }
         public bool IsDerived { get { return this.derived; } }
+
+        /// <summary>
+        /// Specifies if the <see cref="AFunc"/> is a user defined operator.
+        /// </summary>
+        public bool IsOperator
+        {
+            get { return this.isOperator; }
+        }
 
         #endregion
 
@@ -74,6 +84,13 @@
             function.builtin = true;
             function.derived = derived;
             return new AReference(function);
+        }
+
+        public static AType CreateUserOperator(string name, object method, int valence, string codestring)
+        {
+            AFunc op = new AFunc(name, method, valence, codestring);
+            op.isOperator = true;
+            return new AReference(op);
         }
 
         #endregion
