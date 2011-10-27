@@ -12,6 +12,9 @@ using DYN = System.Dynamic;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents a dependeny definition in an A+ AST.
+    /// </summary>
     public class Dependency : Node
     {
         #region Variables
@@ -34,24 +37,50 @@ namespace AplusCore.Compiler.AST
             get { return NodeTypes.Dependency; }
         }
 
-        internal Identifier Variable { get { return this.variable; } }
-        internal Node FunctionBody { get { return this.functionBody; } }
+        /// <summary>
+        /// Gets the name of the variable of the dependency.
+        /// </summary>
+        public Identifier Variable
+        {
+            get { return this.variable; }
+        }
 
-        internal Identifier Indexer
+        /// <summary>
+        /// Gets the body of the dependency definition.
+        /// </summary>
+        public Node FunctionBody
+        {
+            get { return this.functionBody; }
+        }
+
+        /// <summary>
+        /// Specifies if the dependency definition is an itemwise definition.
+        /// </summary>
+        public bool IsItemwise
+        {
+            get { return this.indexer != null; }
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the itemwise argument.
+        /// </summary>
+        public Identifier Indexer
         {
             get { return this.indexer; }
             set { this.indexer = value; }
-        }
-
-        internal bool IsItemwise
-        {
-            get { return this.indexer != null; }
         }
 
         #endregion
 
         #region Constructors
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Dependency"/> AST node.
+        /// </summary>
+        /// <param name="variable">The name of the dependency definition.</param>
+        /// <param name="functionBody">The body of the dependency definition.</param>
+        /// <param name="codeText">The string representation of the dependency defintion.</param>
+        /// <param name="variables">The variables associated with the dependency definition.</param>
         public Dependency(Identifier variable, Node functionBody, string codeText, Variables variables)
         {
             this.variable = variable;
@@ -236,12 +265,47 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
+
+        #region overrides
+
+        public override string ToString()
+        {
+            return string.Format("Dependency({0}[{1}] {2})", this.variable, this.indexer, this.functionBody);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Dependency))
+            {
+                return false;
+            }
+
+            Dependency other = (Dependency)obj;
+            return this.variable == other.variable && this.indexer == other.indexer &&
+                this.functionBody == other.functionBody;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.variable.GetHashCode() ^ this.functionBody.GetHashCode() ^
+                (this.IsItemwise ? this.indexer.GetHashCode() : 0);
+        }
+
+        #endregion
     }
 
     #region Construction helper
 
     partial class Node
     {
+        /// <summary>
+        /// Builds a <see cref="Dependency"/> node.
+        /// </summary>
+        /// <param name="variable">The name of the dependency definition.</param>
+        /// <param name="functionBody">The body of the dependency definition.</param>
+        /// <param name="codeText">The string representation of the dependency defintion.</param>
+        /// <param name="variables">The variables associated with the dependency definition.</param>
+        /// <returns>Returns a <see cref="Dependency"/> node.</returns>
         public static Dependency Dependency(Identifier variable, Node functionBody, string codeText, Variables variables)
         {
             return new Dependency(variable, functionBody, codeText, variables);
