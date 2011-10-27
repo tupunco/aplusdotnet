@@ -95,23 +95,12 @@ namespace AplusCore.Compiler.Grammar
 
         private void RegisterUserDefFunction(AST.UserDefFunction node)
         {
-            if (this.FunctionInfo == null)
+            if (this.FunctionInfo == null || node.Parameters.Length == 0)
             {
                 return;
             }
 
-            switch (node.Parameters.Length)
-            {
-                case 1:
-                    this.FunctionInfo.RegisterMonadic(node.Identifier.Name);
-                    break;
-                case 2:
-                    this.FunctionInfo.RegisterDyadic(node.Identifier.Name);
-                    break;
-                default:
-                    // Function has more than two arguments or has none.
-                    break;
-            }
+            this.FunctionInfo.RegisterGlobalFunction(node.Identifier.Name);
         }
 
         private bool IsOperator(IToken nextToken)
@@ -119,14 +108,9 @@ namespace AplusCore.Compiler.Grammar
             return (nextToken != null) && (this.FunctionInfo != null) && this.FunctionInfo.IsOperator(nextToken.Text);
         }
 
-        private bool IsDyadic(IToken nextToken)
+        private bool IsGlobalFunction(IToken nextToken)
         {
-            return (nextToken != null) && (this.FunctionInfo != null) && this.FunctionInfo.IsDyadic(nextToken.Text);
-        }
-
-        private bool IsMonadic(IToken nextToken)
-        {
-            return (nextToken != null) && (this.FunctionInfo != null) && this.FunctionInfo.IsMonadic(nextToken.Text);
+            return (nextToken != null) && (this.FunctionInfo != null) && this.FunctionInfo.IsGlobalFunction(nextToken.Text);
         }
 
         private AST.Node BuildMonadic(AST.Token symbol, AST.Node argument)
@@ -260,6 +244,29 @@ namespace AplusCore.Compiler.Grammar
             return node;
         }
 
+        /// <summary>
+        /// Updates the given <see cref="AST.UserDefInvoke"/> node with the given <paramref name="argument"/> information.
+        /// </summary>
+        /// <param name="function">The <see cref="AST.UserDefInvoke"/> to update.</param>
+        /// <param name="argument">The argument(s) to use for the node update.</param>
+        /// <returns>The updated <see cref="AST.UserDefInvoke"/> node.</returns>
+        private AST.UserDefInvoke UpdateUserDefInvoke(AST.UserDefInvoke function, AST.Node argument)
+        {
+            if (argument is AST.ExpressionList)
+            {
+                AST.ExpressionList arguments = (AST.ExpressionList)argument;
+                foreach (AST.Node node in arguments.Items)
+                {
+                    function.Arguments.AddLast(node);
+                }
+            }
+            else
+            {
+                function.Arguments.AddLast(argument);
+            }
+
+            return function;
+        }
         #endregion
     }
 }

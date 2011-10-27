@@ -119,8 +119,8 @@ expression returns [AST.Node node]
 				else if($func.node is AST.UserDefInvoke)
 				{
 					AST.UserDefInvoke funcInvoke = (AST.UserDefInvoke)$func.node;
-					funcInvoke.Arguments.Items.AddLast(new LinkedListNode<AST.Node>($rhs.node));
-					funcInvoke.Arguments.Items.AddLast(new LinkedListNode<AST.Node>($lhs.node));
+					funcInvoke.Arguments.AddLast($rhs.node);
+					funcInvoke.Arguments.AddLast($lhs.node);
 					node = funcInvoke;
 				}
 				else
@@ -149,9 +149,7 @@ expression returns [AST.Node node]
 				}
 				else if($func.node is AST.UserDefInvoke)
 				{
-					AST.UserDefInvoke funcInvoke = (AST.UserDefInvoke)$func.node;
-					funcInvoke.Arguments.Items.AddFirst(new LinkedListNode<AST.Node>($arg.node));
-					node = funcInvoke;
+					node = UpdateUserDefInvoke((AST.UserDefInvoke)$func.node, $arg.node);
 				}
 				else
 				{
@@ -164,7 +162,7 @@ expression returns [AST.Node node]
 monadicFunctionSelector returns [AST.Node node]
 	:	operatorSymbol							{ node = $operatorSymbol.node; }
 	|	functionSymbol							{ node = $functionSymbol.token; }
-	|	{  IsMonadic(input.LT(1)) }? variableName 
+	|	{  IsGlobalFunction(input.LT(1)) }? variableName 
 				{ node = AST.Node.UserDefInvoke($variableName.node, AST.Node.ExpressionList()); }
 	;
 
@@ -172,7 +170,7 @@ monadicFunctionSelector returns [AST.Node node]
 dyadicFunctionSelector returns [AST.Node node]
 	:	operatorSymbol							{ node = $operatorSymbol.node; }
 	|	functionSymbol							{ node = $functionSymbol.token; }
-	|	{  IsDyadic(input.LT(1)) }? variableName 
+	|	{  IsGlobalFunction(input.LT(1)) }? variableName 
 				{ node = AST.Node.UserDefInvoke($variableName.node, AST.Node.ExpressionList()); }
 	;
 
@@ -360,7 +358,7 @@ simpleExpression returns [AST.Node node]
 				if( ($termExpression.node is AST.Identifier) )
 				{
 					node = AST.Node.UserDefInvoke($termExpression.node, $expressionGroup.node);
-					
+
 				}
 				else
 				{

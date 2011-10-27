@@ -348,7 +348,7 @@ namespace AplusCoreUnitTests.AstNode
             string input = "1 f 2";
             AplusParser parser = TestUtils.BuildASCIIParser(input);
             parser.FunctionInfo = new AplusCore.Compiler.FunctionInformation(".");
-            parser.FunctionInfo.RegisterDyadic(".f");
+            parser.FunctionInfo.RegisterGlobalFunction(".f");
 
             Node expectedTree = Node.ExpressionList(
                 Node.ExpressionList(
@@ -372,7 +372,7 @@ namespace AplusCoreUnitTests.AstNode
             string input = "f 2";
             AplusParser parser = TestUtils.BuildASCIIParser(input);
             parser.FunctionInfo = new AplusCore.Compiler.FunctionInformation(".");
-            parser.FunctionInfo.RegisterMonadic(".f");
+            parser.FunctionInfo.RegisterGlobalFunction(".f");
 
             Node expectedTree = Node.ExpressionList(
                 Node.ExpressionList(

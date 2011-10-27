@@ -13,8 +13,9 @@ namespace AplusCore.Compiler
         #region Variables
 
         private string context;
-        private HashSet<string> monadicFunctions;
-        private HashSet<string> dyadicFunctions;
+
+        private HashSet<string> localFunctions;
+        private HashSet<string> globalFunctions;
 
         #endregion
 
@@ -35,8 +36,8 @@ namespace AplusCore.Compiler
 
         public FunctionInformation(string context)
         {
-            this.monadicFunctions = new HashSet<string>();
-            this.dyadicFunctions = new HashSet<string>();
+            this.globalFunctions = new HashSet<string>();
+            this.localFunctions = new HashSet<string>();
             this.context = context;
         }
 
@@ -50,14 +51,14 @@ namespace AplusCore.Compiler
             return false;
         }
 
-        public bool IsDyadic(string id)
+        public bool IsGlobalFunction(string id)
         {
-            return this.dyadicFunctions.Contains(QualifiedName(id));
+            return this.globalFunctions.Contains(QualifiedName(id));
         }
 
-        public bool IsMonadic(string id)
+        public bool IsLocalFunction(string id)
         {
-            return this.monadicFunctions.Contains(QualifiedName(id));
+            return this.localFunctions.Contains(id);
         }
 
         public void LoadInfo(ScopeStorage scope)
@@ -68,16 +69,10 @@ namespace AplusCore.Compiler
             {
                 AFunc func = function.Value.Data as AFunc;
 
-                switch (func.Valence)
+                if (func.Valence > 1)
                 {
-                    case 2:
-                        this.monadicFunctions.Add(function.Key);
-                        break;
-                    case 3:
-                        this.dyadicFunctions.Add(function.Key);
-                        break;
-                    default:
-                        break;
+                    // skip the niladic functions
+                    this.globalFunctions.Add(function.Key);
                 }
             }
         }
@@ -87,21 +82,21 @@ namespace AplusCore.Compiler
         #region Function registration
 
         /// <summary>
-        /// Register the given <see cref="id"/> as a Monadic function.
+        /// Register the given <see cref="id"/> as a global function.
         /// </summary>
-        /// <param name="id">The name of the Monadic function.</param>
-        public void RegisterMonadic(string id)
+        /// <param name="id">The name of the global function.</param>
+        public void RegisterGlobalFunction(string id)
         {
-            this.monadicFunctions.Add(QualifiedName(id));
+            this.globalFunctions.Add(QualifiedName(id));
         }
 
         /// <summary>
-        /// Register the given <see cref="id"/> as a Dyadic function.
+        /// Register the given <see cref="id"/> as a local function.
         /// </summary>
-        /// <param name="id">The name of the Dyadic function.</param>
-        public void RegisterDyadic(string id)
+        /// <param name="id">The name of the local function.</param>
+        public void RegisterLocalFunction(string id)
         {
-            this.dyadicFunctions.Add(QualifiedName(id));
+            this.localFunctions.Add(id);
         }
 
         #endregion
