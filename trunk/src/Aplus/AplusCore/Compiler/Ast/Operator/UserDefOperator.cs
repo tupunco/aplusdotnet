@@ -186,7 +186,10 @@ namespace AplusCore.Compiler.AST
 
             // wrap the lambda method inside an AFunc
             DLR.Expression wrappedLambda = DLR.Expression.Call(
-                typeof(AFunc).GetMethod("Create", new Type[] { typeof(string), typeof(object), typeof(int), typeof(string) }),
+                typeof(AFunc).GetMethod(
+                    "CreateUserOperator",
+                    new Type[] { typeof(string), typeof(object), typeof(int), typeof(string) }
+                ),
                 DLR.Expression.Constant(operatorName),
                 method,
                 DLR.Expression.Constant(methodParameters.Count),
