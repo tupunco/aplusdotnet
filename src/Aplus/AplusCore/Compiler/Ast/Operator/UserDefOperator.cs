@@ -89,6 +89,14 @@ namespace AplusCore.Compiler.AST
             set { this.codeText = value; }
         }
 
+        /// <summary>
+        /// Specifeis if the user defined operator is a dyadic operator.
+        /// </summary>
+        public bool IsDyadicOperator
+        {
+            get { return this.condition != null; }
+        }
+
         #endregion
 
         #region Constructors
@@ -186,11 +194,9 @@ namespace AplusCore.Compiler.AST
 
             // wrap the lambda method inside an AFunc
             DLR.Expression wrappedLambda = DLR.Expression.Call(
-                typeof(AFunc).GetMethod(
-                    "CreateUserOperator",
-                    new Type[] { typeof(string), typeof(object), typeof(int), typeof(string) }
-                ),
+                typeof(AFunc).GetMethod("CreateUserOperator"),
                 DLR.Expression.Constant(operatorName),
+                DLR.Expression.Constant(this.IsDyadicOperator),
                 method,
                 DLR.Expression.Constant(methodParameters.Count),
                 DLR.Expression.Constant(this.codeText)
