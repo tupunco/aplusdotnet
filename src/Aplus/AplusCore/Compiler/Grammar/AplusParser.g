@@ -240,6 +240,11 @@ opTail returns [AST.Operator node]
 	:	Each								{ node = AST.Node.EachOperator(new AST.Token(Tokens.EACH, $Each.Text)); }
 	|	Rank condition						{ node = AST.Node.RankOperator(new AST.Token(Tokens.RANK, $Rank.Text));
 											  ((AST.RankOperator)node).Condition = $condition.node; }
+	|	{ IsDyadicOperator(input.LT(1)) }? variableName (condition | functionSymbol)		
+		{ 
+			node = AST.Node.UserDefOperatorInvoke($variableName.node, $condition.node ?? $functionSymbol.token); 
+		}
+	|	{ IsMonadicOperator(input.LT(1)) }? variableName {  node = AST.Node.UserDefOperatorInvoke($variableName.node, null);  }
 	;
 
 functionSymbol returns [AST.Token token]

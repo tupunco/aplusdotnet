@@ -85,6 +85,7 @@
     <Compile Include="Compiler\Ast\Operator\EachOperator.cs" />
     <Compile Include="Compiler\Ast\Operator\Operator.cs" />
     <Compile Include="Compiler\Ast\Operator\RankOperator.cs" />
+    <Compile Include="Compiler\Ast\Operator\UserDefOperatorInvoke.cs" />
     <Compile Include="Compiler\Ast\Strand.cs" />
     <Compile Include="Compiler\Ast\SystemCommand.cs" />
     <Compile Include="Compiler\Ast\DotGenerator.cs" />
