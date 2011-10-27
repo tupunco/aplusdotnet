@@ -22,6 +22,14 @@ namespace AplusCore.Compiler.AST
         #region Properties
 
         /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.ExpressionList; }
+        }
+
+        /// <summary>
         /// Gets the number of <see cref="Node"/>s in the <see cref="ExpressionList"/>.
         /// </summary>
         public int Length

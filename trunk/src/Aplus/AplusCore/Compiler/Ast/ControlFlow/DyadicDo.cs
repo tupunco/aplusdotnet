@@ -21,6 +21,14 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.DyadicDo; }
+        }
+
         public Node Codeblock { get { return this.codeblock; } }
         public Node Expression { get { return this.expression; } }
 
@@ -47,7 +55,7 @@ namespace AplusCore.Compiler.AST
             DLR.ParameterExpression scalar = DLR.Expression.Parameter(typeof(AType), "_ScalarResult_");
             DLR.ParameterExpression counter = DLR.Expression.Parameter(typeof(int), "COUNTER");
             DLR.ParameterExpression exitValue = DLR.Expression.Parameter(typeof(int), "EXITVALUE");
-            
+
             DLR.LabelTarget exitLabel = DLR.Expression.Label(typeof(AType), "EXIT");
             DLR.ParameterExpression returnValue = DLR.Expression.Parameter(typeof(AType), "RETURN");
 
@@ -137,7 +145,7 @@ namespace AplusCore.Compiler.AST
                     // The expression was true, exit from the loop with the last value of the expression block
                                 DLR.Expression.Break(exitLabel, returnValue)
                             ),
-                    
+
                     // Otherwise run the inner codeblock
                             DLR.Expression.Assign(returnValue, this.codeblock.Generate(scope)),
 
@@ -226,14 +234,14 @@ namespace AplusCore.Compiler.AST
                     scalar, DLR.Expression.Constant(true)
                 );
 
-            DLR.Expression block = 
+            DLR.Expression block =
                 DLR.Expression.Block(
                     DLR.Expression.Assign(scalar, value),
                     DLR.Expression.IfThen(
                         DLR.Expression.OrElse(
-                            // Test and get item from the array
+                // Test and get item from the array
                             DLR.Expression.IsFalse(test),
-                            // Test if the scalar is a tolerably whole number
+                // Test if the scalar is a tolerably whole number
                             DLR.Expression.Not(DLR.Expression.Property(scalar, "IsTolerablyWholeNumber"))
                         ),
                         DLR.Expression.Throw(

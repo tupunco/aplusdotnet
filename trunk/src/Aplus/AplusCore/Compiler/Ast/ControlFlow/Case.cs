@@ -21,6 +21,14 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.Case; }
+        }
+
         public Node Expression { get { return this.expression; } }
         public ExpressionList CaseList { get { return this.caseList; } }
 
@@ -88,7 +96,7 @@ namespace AplusCore.Compiler.AST
         /// <summary>
         /// Method to use for comparing target value and case values
         /// </summary>
-        private static MethodInfo comparisonMethod = 
+        private static MethodInfo comparisonMethod =
             typeof(Case).GetMethod("CaseCheck", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>

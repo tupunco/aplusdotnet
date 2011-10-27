@@ -35,6 +35,14 @@ namespace AplusCore.Compiler.AST
         #region Properties
 
         /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.BuiltInFunction; }
+        }
+
+        /// <summary>
         /// Gets the dyadic/monadic token witch represents the wrapped function.
         /// </summary>
         public Token Function

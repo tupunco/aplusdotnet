@@ -32,6 +32,14 @@ namespace AplusCore.Compiler.AST
         #region Properties
 
         /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.Identifier; }
+        }
+
+        /// <summary>
         /// Gets or sets the name of the identifier.
         /// </summary>
         public string Name
@@ -166,7 +174,6 @@ namespace AplusCore.Compiler.AST
 
         private DLR.Expression BuildGlobalAccessor(
             AplusScope scope, Aplus runtime, DLR.Expression variableContainer, string[] contextParts)
-
         {
             DLR.ParameterExpression environment = scope.GetRuntimeExpression();
             DLR.Expression name = DLR.Expression.Constant(BuildQualifiedName(runtime.CurrentContext));

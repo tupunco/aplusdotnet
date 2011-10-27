@@ -23,11 +23,19 @@ namespace AplusCore.Compiler.AST
         #region Properties
 
         /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.MonadicFunction; }
+        }
+
+        /// <summary>
         /// Gets the built-in <see cref="Token"/> for the monadic function.
         /// </summary>
         public new Token Token
         {
-            get { return this.token; } 
+            get { return this.token; }
         }
 
         /// <summary>
@@ -96,7 +104,7 @@ namespace AplusCore.Compiler.AST
             // Handle the result monadic function a little differently:
             if (this.token.Type == Tokens.RESULT)
             {
-                result = scope.ReturnTarget != null 
+                result = scope.ReturnTarget != null
                     // If inside of a function create a return expression Tree
                     ? DLR.Expression.Return(scope.ReturnTarget, argument, typeof(AType))
                     // Otherwise just return the value

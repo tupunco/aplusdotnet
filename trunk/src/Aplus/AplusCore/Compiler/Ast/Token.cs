@@ -25,6 +25,14 @@ namespace AplusCore.Compiler.AST
 
         #region Properties
 
+        /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.Token; }
+        }
+
         public Tokens Type
         {
             get { return this.tokenType; }

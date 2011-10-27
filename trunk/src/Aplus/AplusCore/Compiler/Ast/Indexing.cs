@@ -25,11 +25,19 @@ namespace AplusCore.Compiler.AST
         #region Properties
 
         /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.Indexing; }
+        }
+
+        /// <summary>
         /// Gets the target <see cref="Node"/> of the indexing.
         /// </summary>
         public Node Item
         {
-            get { return this.item; } 
+            get { return this.item; }
         }
 
         /// <summary>

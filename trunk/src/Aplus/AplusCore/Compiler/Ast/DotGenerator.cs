@@ -50,103 +50,87 @@ namespace AplusCore.Compiler.AST
 
         private static string ToDot(string parent, Node node)
         {
-            Type type = node.GetType();
+            string result;
 
-            if (type == typeof(Assign))
+            switch (node.NodeType)
             {
-                return ToDot(parent, (Assign)node);
-            }
-            else if (type == typeof(BuiltInFunction))
-            {
-                return ToDot(parent, (BuiltInFunction)node);
-            }
-            else if (type == typeof(BuiltInOperator))
-            {
-                return ToDot(parent, (BuiltInOperator)node);
-            }
-            else if (type == typeof(Case))
-            {
-                return ToDot(parent, (Case)node);
-            }
-            else if (type == typeof(Constant))
-            {
-                return ToDot(parent, (Constant)node);
-            }
-            else if (type == typeof(ConstantList))
-            {
-                return ToDot(parent, (ConstantList)node);
-            }
-            else if (type == typeof(Dependency))
-            {
-                return ToDot(parent, (Dependency)node);
-            }
-            else if (type == typeof(DyadicDo))
-            {
-                return ToDot(parent, (DyadicDo)node);
-            }
-            else if (type == typeof(DyadicFunction))
-            {
-                return ToDot(parent, (DyadicFunction)node);
-            }
-            else if (type == typeof(EachOperator))
-            {
-                return ToDot(parent, (EachOperator)node);
-            }
-            else if (type == typeof(ExpressionList))
-            {
-                return ToDot(parent, (ExpressionList)node);
-            }
-            else if (type == typeof(Identifier))
-            {
-                return ToDot(parent, (Identifier)node);
-            }
-            else if (type == typeof(If))
-            {
-                return ToDot(parent, (If)node);
-            }
-            else if (type == typeof(Indexing))
-            {
-                return ToDot(parent, (Indexing)node);
-            }
-            else if (type == typeof(MonadicDo))
-            {
-                return ToDot(parent, (MonadicDo)node);
-            }
-            else if (type == typeof(MonadicFunction))
-            {
-                return ToDot(parent, (MonadicFunction)node);
-            }
-            else if (type == typeof(RankOperator))
-            {
-                return ToDot(parent, (RankOperator)node);
-            }
-            else if (type == typeof(Strand))
-            {
-                return ToDot(parent, (Strand)node);
-            }
-            else if (type == typeof(SystemCommand))
-            {
-                return ToDot(parent, (SystemCommand)node);
-            }
-            else if (type == typeof(Token))
-            {
-                return ToDot(parent, (Token)node);
-            }
-            else if (type == typeof(UserDefFunction))
-            {
-                return ToDot(parent, (UserDefFunction)node);
-            }
-            else if (type == typeof(UserDefInvoke))
-            {
-                return ToDot(parent, (UserDefInvoke)node);
-            }
-            else if (type == typeof(While))
-            {
-                return ToDot(parent, (While)node);
+                case NodeTypes.Assign:
+                    result = ToDot(parent, (Assign)node);
+                    break;
+                case NodeTypes.BuiltInFunction:
+                    result = ToDot(parent, (BuiltInFunction)node);
+                    break;
+                case NodeTypes.BuiltInOperator:
+                    result = ToDot(parent, (BuiltInOperator)node);
+                    break;
+                case NodeTypes.Case:
+                    result = ToDot(parent, (Case)node);
+                    break;
+                case NodeTypes.Constant:
+                    result = ToDot(parent, (Constant)node);
+                    break;
+                case NodeTypes.ConstantList:
+                    result = ToDot(parent, (ConstantList)node);
+                    break;
+                case NodeTypes.Dependency:
+                    result = ToDot(parent, (Dependency)node);
+                    break;
+                case NodeTypes.DyadicDo:
+                    result = ToDot(parent, (DyadicDo)node);
+                    break;
+                case NodeTypes.DyadicFunction:
+                    result = ToDot(parent, (DyadicFunction)node);
+                    break;
+                case NodeTypes.EachOperator:
+                    result = ToDot(parent, (EachOperator)node);
+                    break;
+                case NodeTypes.ExpressionList:
+                    result = ToDot(parent, (ExpressionList)node);
+                    break;
+                case NodeTypes.Identifier:
+                    result = ToDot(parent, (Identifier)node);
+                    break;
+                case NodeTypes.If:
+                    result = ToDot(parent, (If)node);
+                    break;
+                case NodeTypes.Indexing:
+                    result = ToDot(parent, (Indexing)node);
+                    break;
+                case NodeTypes.MonadicDo:
+                    result = ToDot(parent, (MonadicDo)node);
+                    break;
+                case NodeTypes.MonadicFunction:
+                    result = ToDot(parent, (MonadicFunction)node);
+                    break;
+                case NodeTypes.RankOperator:
+                    result = ToDot(parent, (RankOperator)node);
+                    break;
+                case NodeTypes.Strand:
+                    result = ToDot(parent, (Strand)node);
+                    break;
+                case NodeTypes.SystemCommand:
+                    result = ToDot(parent, (SystemCommand)node);
+                    break;
+                case NodeTypes.Token:
+                    result = ToDot(parent, (Token)node);
+                    break;
+                case NodeTypes.UserDefFunction:
+                    result = ToDot(parent, (UserDefFunction)node);
+                    break;
+                case NodeTypes.UserDefOperator:
+                    result = ToDot(parent, (UserDefOperator)node);
+                    break;
+                case NodeTypes.UserDefInvoke:
+                    result = ToDot(parent, (UserDefInvoke)node);
+                    break;
+                case NodeTypes.While:
+                    result = ToDot(parent, (While)node);
+                    break;
+                default:
+                    throw new Exception("Type");
             }
 
-
-            throw new Exception("Type");
+            return result;
         }
 
         private static string ToDot(string parent, Assign node)
@@ -441,6 +425,33 @@ namespace AplusCore.Compiler.AST
 
             text.AppendFormat("  {0} -> {1};\n", name, parametersName);
             text.AppendFormat("  {0} -> {1};\n", name, codeblockName);
+
+            return name;
+        }
+
+        private static string ToDot(string parent, UserDefOperator node)
+        {
+            string name = String.Format("OperatorDef{0}", counter++);
+            text.AppendFormat(" {0} ");
+
+            if (node.Condition != null)
+            {
+                text.AppendFormat("[label=\"({1} {2} {3})\"]\n", name, node.Function.Name, node.Name, node.Condition.Name);
+            }
+            else
+            {
+                text.AppendFormat("[label=\"({1} {2})\"]\n", name, node.Function.Name, node.Name);
+            }
+
+            if (node.LeftArgument != null)
+            {
+                string leftArg = ToDot(name, node.LeftArgument);
+                text.AppendFormat("  {0} -> {1};\n", name, leftArg);
+            }
+
+            string rightArg = ToDot(name, node.RightArgument);
+            text.AppendFormat(" {0} -> {1};\n", name, rightArg);
+            text.AppendFormat(" {0} -> {1};\n", name, ToDot(name, node.Codeblock));
 
             return name;
         }

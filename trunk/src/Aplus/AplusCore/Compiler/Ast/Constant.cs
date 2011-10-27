@@ -38,6 +38,14 @@ namespace AplusCore.Compiler.AST
         #region Properties
 
         /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.Constant; }
+        }
+
+        /// <summary>
         /// Gets the <see cref="ConstantType"/> the node represents.
         /// </summary>
         public ConstantType Type

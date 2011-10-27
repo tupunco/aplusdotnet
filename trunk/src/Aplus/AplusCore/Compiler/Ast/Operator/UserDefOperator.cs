@@ -29,6 +29,14 @@ namespace AplusCore.Compiler.AST
         #region Properties
 
         /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.UserDefOperator; }
+        }
+
+        /// <summary>
         /// Gets the name of the user defined operator.
         /// </summary>
         public Identifier Name

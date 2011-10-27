@@ -11,6 +11,14 @@
 
         #region Properties
 
+        /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.UserDefOperatorInvoke; }
+        }
+
         public Node Condition
         {
             get { return this.condition; }

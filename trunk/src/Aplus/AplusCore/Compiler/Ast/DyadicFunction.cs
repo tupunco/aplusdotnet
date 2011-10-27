@@ -24,6 +24,14 @@ namespace AplusCore.Compiler.AST
         #region Properties
 
         /// <summary>
+        /// Gets the <see cref="NodeTypes">type</see> of the Node.
+        /// </summary>
+        public override NodeTypes NodeType
+        {
+            get { return NodeTypes.DyadicFunction; }
+        }
+
+        /// <summary>
         /// Gets the <see cref="Token"/> of the dyadic function.
         /// </summary>
         public new Token Token
