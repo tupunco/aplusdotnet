@@ -75,6 +75,7 @@
     <Compile Include="AstNode\ControlFlowTests.cs" />
     <Compile Include="AstNode\Function.cs" />
     <Compile Include="AstNode\Operator.cs" />
+    <Compile Include="AstNode\UserDefinedOperators.cs" />
     <Compile Include="Dlr\AbstractTest.cs" />
     <Compile Include="Dlr\Assignments\Append.cs" />
     <Compile Include="Dlr\Assignments\Assign.cs" />
@@ -221,6 +222,7 @@
     <Compile Include="Dlr\Indexing.cs" />
     <Compile Include="Dlr\IndexingAssign.cs" />
     <Compile Include="Dlr\InvokeFunction.cs" />
+    <Compile Include="Dlr\Operator\UserDefinedOperator.cs" />
     <Compile Include="Dlr\SlotFiller.cs" />
     <Compile Include="Dlr\SystemCommand.cs" />
     <Compile Include="Dlr\UserDefinedFunction.cs" />
