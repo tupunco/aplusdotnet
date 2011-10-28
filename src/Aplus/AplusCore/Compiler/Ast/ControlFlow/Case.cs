@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 
 using AplusCore.Runtime.Function.Dyadic;
@@ -10,6 +9,18 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents the case control flow in an A+ AST.
+    /// </summary>
+    /// <remarks>
+    /// <example>
+    /// case(x) {
+    ///     1; x+1;
+    ///     2; 2*x;
+    ///     -1
+    /// }
+    /// </example>
+    /// </remarks>
     public class Case : Node
     {
         #region Variables
@@ -30,8 +41,21 @@ namespace AplusCore.Compiler.AST
             get { return NodeTypes.Case; }
         }
 
-        public Node Expression { get { return this.expression; } }
-        public ExpressionList CaseList { get { return this.caseList; } }
+        /// <summary>
+        /// Gets the target expression of the <see cref="Case"/> node.
+        /// </summary>
+        public Node Expression
+        {
+            get { return this.expression; }
+        }
+
+        /// <summary>
+        /// Gets the cases for the <see cref="Case"/> node.
+        /// </summary>
+        public ExpressionList CaseList
+        {
+            get { return this.caseList; }
+        }
 
         /// <summary>
         /// Gets the default case of the <see cref="Case"/> node.
@@ -45,6 +69,11 @@ namespace AplusCore.Compiler.AST
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Case"/> AST node.
+        /// </summary>
+        /// <param name="expression">The target expression of the case node.</param>
+        /// <param name="caseList">Series of cases for the case node.</param>
         public Case(Node expression, ExpressionList caseList)
         {
             this.expression = expression;
@@ -182,15 +211,15 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
+        /// <summary>
+        /// Builds a <see cref="Case"/> node.
+        /// </summary>
+        /// <param name="expression">The target expression of the <see cref="Case"/> node.</param>
+        /// <param name="caseList">Series of cases for the <see cref="Case"/> node.</param>
+        /// <returns>Returns the <see cref="Case"/> node.</returns>
         public static Case Case(Node expression, ExpressionList caseList)
         {
             return new Case(expression, caseList);
-        }
-
-        public static Case Case(Node expression, Node caseList)
-        {
-            Debug.Assert(caseList is ExpressionList);
-            return new Case(expression, (ExpressionList)caseList);
         }
     }
 
