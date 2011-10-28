@@ -59,6 +59,15 @@ namespace AplusCoreUnitTests.Dlr.ControlFlow
         }
 
         [TestCategory("DLR"), TestCategory("ControlFlow"), TestCategory("Case"), TestMethod]
+        public void OnlyDefaultCase()
+        {
+            AType expected = AInteger.Create(-123);
+            AType result = this.engine.Execute<AType>("case (Z:=-124) { Z:=Z + 1 }");
+
+            Assert.AreEqual<AType>(expected, result, "Incorrect result produced");
+        }
+
+        [TestCategory("DLR"), TestCategory("ControlFlow"), TestCategory("Case"), TestMethod]
         public void MultipleSameCase()
         {
             AType expected = Helpers.BuildString("hello");
