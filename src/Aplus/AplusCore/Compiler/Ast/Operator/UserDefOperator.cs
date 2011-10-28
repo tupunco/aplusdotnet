@@ -164,10 +164,10 @@ namespace AplusCore.Compiler.AST
             LinkedList<DLR.ParameterExpression> methodParameters = new LinkedList<DLR.ParameterExpression>();
 
             // add parameters to the linkedlist
-            BuildParameterExpression(methodScope, methodParameters, rightArgument);
-            BuildParameterExpression(methodScope, methodParameters, condition);
-            BuildParameterExpression(methodScope, methodParameters, function);
             BuildParameterExpression(methodScope, methodParameters, leftArgument);
+            BuildParameterExpression(methodScope, methodParameters, function);
+            BuildParameterExpression(methodScope, methodParameters, condition);
+            BuildParameterExpression(methodScope, methodParameters, rightArgument);
 
             // add parameter for AplusEnviroment
             methodParameters.AddFirst(methodScope.RuntimeExpression);
