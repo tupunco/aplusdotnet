@@ -16,6 +16,7 @@ namespace AplusCore.Compiler.AST
 
         private Node expression;
         private ExpressionList caseList;
+        private Node defaultCase;
 
         #endregion
 
@@ -32,6 +33,14 @@ namespace AplusCore.Compiler.AST
         public Node Expression { get { return this.expression; } }
         public ExpressionList CaseList { get { return this.caseList; } }
 
+        /// <summary>
+        /// Gets the default case of the <see cref="Case"/> node.
+        /// </summary>
+        public Node DefaultCase
+        {
+            get { return this.defaultCase; }
+        }
+
         #endregion
 
         #region Constructor
@@ -39,8 +48,9 @@ namespace AplusCore.Compiler.AST
         public Case(Node expression, ExpressionList caseList)
         {
             this.expression = expression;
-            // TODO: correct expression list to have correct number of elements for case node
             this.caseList = caseList;
+
+            NormalizeCases();
         }
 
         #endregion
@@ -51,22 +61,7 @@ namespace AplusCore.Compiler.AST
         {
             // Target condition
             DLR.Expression target = this.expression.Generate(scope);
-
-            DLR.Expression defaultCase;
-
-            if (this.caseList.Length % 2 == 1)
-            {
-                // odd number of cases, last one is the default case
-                defaultCase = this.caseList.Items.Last.Value.Generate(scope);
-                // remove the default case from the list
-                this.caseList.Items.RemoveLast();
-            }
-            else
-            {
-                // No default case, set it to an ANull
-                defaultCase = DLR.Expression.Constant(Utils.ANull());
-            }
-
+            DLR.Expression defaultCase = this.defaultCase.Generate(scope);
             List<DLR.SwitchCase> cases = new List<DLR.SwitchCase>();
 
             for (int i = 0; i < this.caseList.Length; i += 2)
@@ -126,6 +121,28 @@ namespace AplusCore.Compiler.AST
 
         #endregion
 
+        #region Utility
+
+        /// <summary>
+        /// Normalizes the cases. Sets the default case based on the number of cases.
+        /// </summary>
+        private void NormalizeCases()
+        {
+            if (this.caseList.Length % 2 == 1)
+            {
+                // odd number of cases, the last one is the default case
+                this.defaultCase = this.caseList.Items.Last.Value;
+                this.caseList.Items.RemoveLast();
+            }
+            else
+            {
+                // there is no default case, add a Null (by definition) as default
+                this.defaultCase = Node.NullConstant();
+            }
+        }
+
+        #endregion
+
         #region overrides
 
         public override string ToString()
@@ -146,7 +163,7 @@ namespace AplusCore.Compiler.AST
 
         public override int GetHashCode()
         {
-            return this.expression.GetHashCode() ^ this.caseList.GetHashCode();
+            return this.expression.GetHashCode() ^ this.caseList.GetHashCode() ^ this.defaultCase.GetHashCode();
         }
 
         #endregion
