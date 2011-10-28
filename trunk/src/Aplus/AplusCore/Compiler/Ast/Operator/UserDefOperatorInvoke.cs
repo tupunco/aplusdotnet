@@ -1,10 +1,18 @@
-﻿namespace AplusCore.Compiler.AST
+﻿using System.Collections.Generic;
+
+using AplusCore.Runtime;
+using AplusCore.Types;
+
+using DLR = System.Linq.Expressions;
+using DYN = System.Dynamic;
+
+namespace AplusCore.Compiler.AST
 {
     public class UserDefOperatorInvoke : Operator
     {
         #region Variables
 
-        private Node name;
+        private Identifier name;
         private Node condition;
 
         #endregion
@@ -29,10 +37,43 @@
 
         #region Constructors
 
-        public UserDefOperatorInvoke(Node name)
+        public UserDefOperatorInvoke(Identifier name)
             : base(null)
         {
             this.name = name;
+        }
+
+        #endregion
+
+        #region DLR Generator
+
+        public override DLR.Expression Generate(AplusScope scope)
+        {
+            Aplus runtime = scope.GetRuntime();
+
+            // arguments for the dynamic method call
+            LinkedList<DLR.Expression> callArguments = new LinkedList<DLR.Expression>();
+
+            // add the parameters in !reverse! order
+            if (this.leftarg != null)
+            {
+                callArguments.AddFirst(this.leftarg.Generate(scope));
+            }
+
+            callArguments.AddFirst(this.function.Generate(scope));
+
+            if (this.condition != null)
+            {
+                callArguments.AddFirst(this.condition.Generate(scope));
+            }
+
+            callArguments.AddFirst(this.rightarg.Generate(scope));
+
+            // add A+ environment as first argument for user defined functions
+            callArguments.AddFirst(scope.GetRuntimeExpression());
+            callArguments.AddFirst(this.name.Generate(scope));
+
+            return AST.UserDefInvoke.BuildInvoke(runtime, callArguments);
         }
 
         #endregion
@@ -42,12 +83,12 @@
 
     public partial class Node
     {
-        public static UserDefOperatorInvoke UserDefOperatorInvoke(Node name)
+        public static UserDefOperatorInvoke UserDefOperatorInvoke(Identifier name)
         {
             return new UserDefOperatorInvoke(name);
         }
 
-        public static UserDefOperatorInvoke UserDefOperatorInvoke(Node name, Node condition)
+        public static UserDefOperatorInvoke UserDefOperatorInvoke(Identifier name, Node condition)
         {
             UserDefOperatorInvoke userOp = new UserDefOperatorInvoke(name);
             userOp.Condition = condition;
