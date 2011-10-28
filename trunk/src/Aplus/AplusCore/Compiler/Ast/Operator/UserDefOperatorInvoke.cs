@@ -77,6 +77,47 @@ namespace AplusCore.Compiler.AST
         }
 
         #endregion
+
+        #region overrides
+
+        public override string ToString()
+        {
+            return string.Format("UserDefOpInvoke(({0} {1} {2}) {3} {4})",
+                this.function, this.name, this.condition, this.leftarg, this.rightarg);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is UserDefOperatorInvoke))
+            {
+                return false;
+            }
+
+            UserDefOperatorInvoke opInvoke = (UserDefOperatorInvoke)obj;
+
+            return (this.function == opInvoke.function) && (this.name == opInvoke.name)
+                && (this.condition == opInvoke.condition)
+                && (this.leftarg == opInvoke.leftarg) && (this.rightarg == opInvoke.rightarg);
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = this.function.GetHashCode() ^ this.name.GetHashCode() ^ this.rightarg.GetHashCode();
+
+            if (this.leftarg != null)
+            {
+                hash ^= this.leftarg.GetHashCode();
+            }
+
+            if (this.condition != null)
+            {
+                hash ^= this.condition.GetHashCode();
+            }
+
+            return hash;
+        }
+
+        #endregion
     }
 
     #region Construction helper
