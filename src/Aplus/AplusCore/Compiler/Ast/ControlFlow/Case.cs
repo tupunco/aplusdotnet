@@ -59,31 +59,40 @@ namespace AplusCore.Compiler.AST
 
         public override DLR.Expression Generate(AplusScope scope)
         {
+            DLR.Expression result;
             // Target condition
             DLR.Expression target = this.expression.Generate(scope);
-            DLR.Expression defaultCase = this.defaultCase.Generate(scope);
-            List<DLR.SwitchCase> cases = new List<DLR.SwitchCase>();
+            DLR.Expression defaultNode = this.defaultCase.Generate(scope);
 
-            for (int i = 0; i < this.caseList.Length; i += 2)
+            if (this.caseList.Length > 0)
             {
-                // Add each case
-                //  1. (i+1) is the case's codeblock
-                //  2. (i) is the case's test value
-                cases.Add(
-                    DLR.Expression.SwitchCase(
-                        this.caseList[i + 1].Generate(scope),
-                        this.caseList[i].Generate(scope)
-                    )
+                List<DLR.SwitchCase> cases = new List<DLR.SwitchCase>();
+
+                for (int i = 0; i < this.caseList.Length; i += 2)
+                {
+                    // Add each case
+                    //  1. (i+1) is the case's codeblock
+                    //  2. (i) is the case's test value
+                    cases.Add(
+                        DLR.Expression.SwitchCase(
+                            this.caseList[i + 1].Generate(scope),
+                            this.caseList[i].Generate(scope)
+                        )
+                    );
+                }
+
+                result = DLR.Expression.Switch(
+                    typeof(AType),
+                    target,
+                    defaultNode,
+                    comparisonMethod,
+                    cases
                 );
             }
-
-            DLR.Expression result = DLR.Expression.Switch(
-                typeof(AType),
-                target,
-                defaultCase,
-                comparisonMethod,
-                cases
-            );
+            else
+            {
+                result = DLR.Expression.Block(target, defaultNode);
+            }
 
             return result;
         }
