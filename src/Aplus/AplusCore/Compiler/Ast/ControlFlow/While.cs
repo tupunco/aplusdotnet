@@ -1,13 +1,13 @@
-﻿using System;
-using System.Text;
-
-using AplusCore.Runtime;
+﻿using AplusCore.Runtime;
 using AplusCore.Types;
 
 using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents a while control statment in an A+ AST.
+    /// </summary>
     public class While : Node
     {
         #region Variables
@@ -27,13 +27,31 @@ namespace AplusCore.Compiler.AST
             get { return NodeTypes.While; }
         }
 
-        public Node Expression { get { return this.expression; } }
-        public Node CodeBlock { get { return this.codeBlock; } }
+        /// <summary>
+        /// Gets the expression of the <see cref="While"/> node.
+        /// </summary>
+        public Node Expression
+        {
+            get { return this.expression; }
+        }
+
+        /// <summary>
+        /// Gets the codeblock of the <see cref="While"/> node.
+        /// </summary>
+        public Node CodeBlock
+        {
+            get { return this.codeBlock; }
+        }
 
         #endregion
 
         #region Constructor
 
+        /// <summary>
+        ///  Initializes a new instance of <see cref="While"/> AST Node.
+        /// </summary>
+        /// <param name="expression">The expression for the node.</param>
+        /// <param name="codeBlock">The codeblock of the node.</param>
         public While(Node expression, Node codeBlock)
         {
             this.expression = expression;
@@ -88,7 +106,7 @@ namespace AplusCore.Compiler.AST
 
         public override string ToString()
         {
-            return String.Format("WHILE({0} {1})", this.expression, this.codeBlock);
+            return string.Format("WHILE({0} {1})", this.expression, this.codeBlock);
         }
 
         public override bool Equals(object obj)
@@ -110,11 +128,16 @@ namespace AplusCore.Compiler.AST
         #endregion
     }
 
-
     #region Construction helper
 
     public partial class Node
     {
+        /// <summary>
+        /// Builds a <see cref="While"/> node.
+        /// </summary>
+        /// <param name="expression">The expression for the <see cref="While"/> node.</param>
+        /// <param name="codeBlock">The codeblock for the node.</param>
+        /// <returns>Returns a <see cref="While"/> AST node.</returns>
         public static While While(Node expression, Node codeBlock)
         {
             return new While(expression, codeBlock);

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 
 using AplusCore.Runtime;
 using AplusCore.Types;
@@ -8,6 +7,9 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents a monadic do control statement in an A+ AST.
+    /// </summary>
     public class MonadicDo : Node
     {
         #region Variables
@@ -26,12 +28,22 @@ namespace AplusCore.Compiler.AST
             get { return NodeTypes.MonadicDo; }
         }
 
-        public Node Codeblock { get { return this.codeblock; } }
+        /// <summary>
+        /// Gets the codeblock for the monadic do.
+        /// </summary>
+        public Node Codeblock
+        {
+            get { return this.codeblock; } 
+        }
 
         #endregion
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="MonadicDo"/> AST node.
+        /// </summary>
+        /// <param name="codeblock">The codeblock for the monadic do.</param>
         public MonadicDo(Node codeblock)
         {
             this.codeblock = codeblock;
@@ -112,7 +124,7 @@ namespace AplusCore.Compiler.AST
 
         public override string ToString()
         {
-            return String.Format("Do({0})", this.codeblock);
+            return string.Format("Do({0})", this.codeblock);
         }
 
         public override bool Equals(object obj)
@@ -138,6 +150,11 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
+        /// <summary>
+        /// Builds a <see cref="MonadicDo"/> node.
+        /// </summary>
+        /// <param name="codeblock">The codeblock for the monadic do.</param>
+        /// <returns>Returns a <see cref="MonadicDo"/> node.</returns>
         public static MonadicDo MonadicDo(Node codeblock)
         {
             return new MonadicDo(codeblock);
