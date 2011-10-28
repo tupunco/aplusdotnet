@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 
 using AplusCore.Runtime;
 using AplusCore.Types;
@@ -8,6 +7,9 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents an if/if-else control statement in an A+ AST.
+    /// </summary>
     public class If : Node
     {
         #region Variables
@@ -28,15 +30,48 @@ namespace AplusCore.Compiler.AST
             get { return NodeTypes.If; }
         }
 
-        public Node Expression { get { return this.expression; } }
-        public Node TrueCase { get { return this.trueCase; } }
-        public Node FalseCase { get { return this.falseCase; } }
-        public bool HaveFalseCase { get { return this.falseCase != Node.NullConstant(); } }
+        /// <summary>
+        /// Gets the expression of the <see cref="If"/> node.
+        /// </summary>
+        public Node Expression
+        {
+            get { return this.expression; }
+        }
+
+        /// <summary>
+        /// Gets the true case of the <see cref="If"/> node.
+        /// </summary>
+        public Node TrueCase
+        {
+            get { return this.trueCase; }
+        }
+
+        /// <summary>
+        /// Gets the false case of the <see cref="If"/> node.
+        /// </summary>
+        public Node FalseCase
+        {
+            get { return this.falseCase; }
+        }
+
+        /// <summary>
+        /// Specifies if the <see cref="If"/> node has a false case.
+        /// </summary>
+        public bool HaveFalseCase
+        {
+            get { return this.falseCase != Node.NullConstant(); }
+        }
 
         #endregion
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="If">if/if-else</see> AST node.
+        /// </summary>
+        /// <param name="expression">The expression for the if/if-else node.</param>
+        /// <param name="trueCase">The true case of the node.</param>
+        /// <param name="falseCase">the false case of the node.</param>
         public If(Node expression, Node trueCase, Node falseCase)
         {
             this.expression = expression;
@@ -130,16 +165,28 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
+        /// <summary>
+        /// Builds an <see cref="If">if-else</see> node.
+        /// </summary>
+        /// <param name="expression">The expression for the node.</param>
+        /// <param name="trueCase">The true case of the node.</param>
+        /// <param name="falseCase">The false case of the node.</param>
+        /// <returns>Returns a <see cref="If">if-else</see> node.</returns>
         public static If IfElse(Node expression, Node trueCase, Node falseCase)
         {
             return new If(expression, trueCase, falseCase);
         }
 
+        /// <summary>
+        /// Builds an <see cref="If">if-else</see> node, with a ANull as false case.
+        /// </summary>
+        /// <param name="expression">The expression for the node.</param>
+        /// <param name="trueCase">The true case of the node.</param>
+        /// <returns>Returns a <see cref="If">if</see> node, with a ANull as false case.</returns>
         public static If If(Node expression, Node trueCase)
         {
             return new If(expression, trueCase, Node.NullConstant());
         }
-
     }
 
     #endregion

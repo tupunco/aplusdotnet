@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 using AplusCore.Compiler.Grammar;
 using AplusCore.Runtime;
@@ -10,6 +9,9 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler.AST
 {
+    /// <summary>
+    /// Represents a dyadic do node in an A+ AST.
+    /// </summary>
     public class DyadicDo : Node
     {
         #region Variables
@@ -29,13 +31,31 @@ namespace AplusCore.Compiler.AST
             get { return NodeTypes.DyadicDo; }
         }
 
-        public Node Codeblock { get { return this.codeblock; } }
-        public Node Expression { get { return this.expression; } }
+        /// <summary>
+        /// Gets the start expression of the dyadic do.
+        /// </summary>
+        public Node Expression
+        {
+            get { return this.expression; }
+        }
+
+        /// <summary>
+        /// Gets the codeblock of the dyadic do.
+        /// </summary>
+        public Node Codeblock
+        {
+            get { return this.codeblock; }
+        }
 
         #endregion
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="DyadicDo"/> AST node.
+        /// </summary>
+        /// <param name="expression">The start expression of the dyadic do.</param>
+        /// <param name="codeblock">The codeblock of the dyadic do.</param>
         public DyadicDo(Node expression, Node codeblock)
         {
             this.expression = expression;
@@ -289,6 +309,12 @@ namespace AplusCore.Compiler.AST
 
     public partial class Node
     {
+        /// <summary>
+        /// Builds a <see cref="DyadicDo"/> node.
+        /// </summary>
+        /// <param name="expression">The start expression for the dyadic do.</param>
+        /// <param name="codeblock">The codeblock for the dyadic do.</param>
+        /// <returns>Returns the <see cref="DyadicDo"/> node.</returns>
         public static DyadicDo DyadicDo(Node expression, Node codeblock)
         {
             return new DyadicDo(expression, codeblock);
