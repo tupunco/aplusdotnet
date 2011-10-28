@@ -2,6 +2,8 @@
 
 using AplusCore.Compiler.Grammar;
 
+using DLR = System.Linq.Expressions;
+
 namespace AplusCore.Compiler.AST
 {
     /// <summary>
@@ -56,6 +58,15 @@ namespace AplusCore.Compiler.AST
         {
             this.tokenType = tokenType;
             this.text = text;
+        }
+
+        #endregion
+
+        #region DLR Generator
+
+        public override DLR.Expression Generate(AplusScope scope)
+        {
+            return Node.BuiltInFunction(this).Generate(scope);
         }
 
         #endregion
