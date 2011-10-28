@@ -132,30 +132,30 @@ namespace AplusCore.Compiler.AST
 
         public override DLR.Expression Generate(AplusScope scope)
         {
-            DLR.Expression result;
+            AType result;
             // NOTE: do we need to generate this? most Constants will be encapsulated in ConstantList
             switch (this.type)
             {
                 case ConstantType.CharacterConstant:
-                    result = DLR.Expression.Constant(Runtime.Helpers.BuildString(this.AsString));
+                    result = Runtime.Helpers.BuildString(this.AsString);
                     break;
 
                 case ConstantType.Null:
-                    result = DLR.Expression.Constant(Utils.ANull());
+                    result = Utils.ANull();
                     break;
 
                 case ConstantType.Integer:
-                    result = DLR.Expression.Constant(this.AsNumericAType);
+                    result = this.AsNumericAType;
                     break;
 
                 case ConstantType.NegativeInfinity:
                 case ConstantType.PositiveInfinity:
                 case ConstantType.Double:
-                    result = DLR.Expression.Constant(AFloat.Create(this.AsFloat));
+                    result = AFloat.Create(this.AsFloat);
                     break;
 
                 case ConstantType.Symbol:
-                    result = DLR.Expression.Constant(ASymbol.Create(this.AsString));
+                    result = ASymbol.Create(this.AsString);
                     break;
 
                 case ConstantType.Undefined:
@@ -164,7 +164,7 @@ namespace AplusCore.Compiler.AST
                     throw new Exception("Should Not reach this point!..");
             }
 
-            return result;
+            return DLR.Expression.Constant(result, typeof(AType));
         }
 
         #endregion

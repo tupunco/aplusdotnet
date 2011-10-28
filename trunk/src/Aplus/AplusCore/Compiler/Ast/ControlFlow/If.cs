@@ -86,20 +86,17 @@ namespace AplusCore.Compiler.AST
 
         public override DLR.Expression Generate(AplusScope scope)
         {
-            // Create a temp variable to store the result of the codeblocks
-            DLR.ParameterExpression tempVariable = DLR.Expression.Parameter(typeof(AType), "TEMP_RESULT");
+            // generate the following code:
+            //  ($expression ? ($truecase) : ($falsecase))
 
-            DLR.Expression result = DLR.Expression.Block(
-                new DLR.ParameterExpression[] { tempVariable },
-                DLR.Expression.IfThenElse(
-                       DLR.Expression.IsTrue(
-                            this.expression.Generate(scope),
-                            typeof(Helpers).GetMethod("BooleanTest")
-                        ),
-                        DLR.Expression.Assign(tempVariable, this.trueCase.Generate(scope)),
-                        DLR.Expression.Assign(tempVariable, this.falseCase.Generate(scope))
-                ),
-                tempVariable
+            DLR.Expression result =
+                DLR.Expression.Condition(
+                    DLR.Expression.IsTrue(
+                        this.expression.Generate(scope),
+                        typeof(Helpers).GetMethod("BooleanTest")
+                    ),
+                    this.trueCase.Generate(scope),
+                    this.falseCase.Generate(scope)
             );
 
             return result;
