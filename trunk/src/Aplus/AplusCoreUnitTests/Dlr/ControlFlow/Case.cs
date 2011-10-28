@@ -50,6 +50,15 @@ namespace AplusCoreUnitTests.Dlr.ControlFlow
         }
 
         [TestCategory("DLR"), TestCategory("ControlFlow"), TestCategory("Case"), TestMethod]
+        public void EmptyCase()
+        {
+            AType expected = AInteger.Create(3);
+            AType result = this.engine.Execute<AType>("case (0) { 3 }");
+
+            Assert.AreEqual<AType>(expected, result, "Incorrect result produced");
+        }
+
+        [TestCategory("DLR"), TestCategory("ControlFlow"), TestCategory("Case"), TestMethod]
         public void MultipleSameCase()
         {
             AType expected = Helpers.BuildString("hello");
