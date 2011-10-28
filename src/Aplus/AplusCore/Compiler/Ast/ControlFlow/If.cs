@@ -54,14 +54,6 @@ namespace AplusCore.Compiler.AST
             get { return this.falseCase; }
         }
 
-        /// <summary>
-        /// Specifies if the <see cref="If"/> node has a false case.
-        /// </summary>
-        public bool HaveFalseCase
-        {
-            get { return this.falseCase != Node.NullConstant(); }
-        }
-
         #endregion
 
         #region Constructor
@@ -105,9 +97,7 @@ namespace AplusCore.Compiler.AST
                             typeof(Helpers).GetMethod("BooleanTest")
                         ),
                         DLR.Expression.Assign(tempVariable, this.trueCase.Generate(scope)),
-                        DLR.Expression.Assign(tempVariable,
-                            this.HaveFalseCase ? this.falseCase.Generate(scope) : DLR.Expression.Constant(Utils.ANull())
-                        )
+                        DLR.Expression.Assign(tempVariable, this.falseCase.Generate(scope))
                 ),
                 tempVariable
             );
@@ -121,14 +111,7 @@ namespace AplusCore.Compiler.AST
 
         public override string ToString()
         {
-            if (this.HaveFalseCase)
-            {
-                return String.Format("IF({0} {1}) ELSE({2})", this.expression, this.trueCase, this.falseCase);
-            }
-            else
-            {
-                return String.Format("IF({0} {1})", this.expression, this.trueCase);
-            }
+            return string.Format("IF({0} {1}) ELSE({2})", this.expression, this.trueCase, this.falseCase);
         }
 
         public override bool Equals(object obj)
@@ -149,13 +132,7 @@ namespace AplusCore.Compiler.AST
 
         public override int GetHashCode()
         {
-            int hash = this.expression.GetHashCode() ^ this.trueCase.GetHashCode();
-            if (this.HaveFalseCase)
-            {
-                hash ^= this.falseCase.GetHashCode();
-            }
-
-            return hash;
+            return this.expression.GetHashCode() ^ this.trueCase.GetHashCode() ^ this.falseCase.GetHashCode();
         }
 
         #endregion

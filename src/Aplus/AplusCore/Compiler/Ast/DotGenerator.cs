@@ -328,18 +328,11 @@ namespace AplusCore.Compiler.AST
             text.AppendFormat("  {0} -> {1};\n", name, exprName);
             text.AppendFormat("  {0} -> {1};\n", name, trueCaseName);
 
-            if (node.HaveFalseCase)
-            {
-                text.AppendFormat("  {0} [label=\"IF-Else\"];\n", name);
-                text.AppendFormat("  subgraph cluster_{0}_false {{ style=dotted; color=red; label=\"False\";\n", name);
-                string falseCaseName = ToDot(name, node.FalseCase);
-                text.AppendFormat("  }}\n");
-                text.AppendFormat("  {0} -> {1};\n", name, falseCaseName);
-            }
-            else
-            {
-                text.AppendFormat("  {0} [label=\"IF\"];\n", name);
-            }
+            text.AppendFormat("  {0} [label=\"IF-Else\"];\n", name);
+            text.AppendFormat("  subgraph cluster_{0}_false {{ style=dotted; color=red; label=\"False\";\n", name);
+            string falseCaseName = ToDot(name, node.FalseCase);
+            text.AppendFormat("  }}\n");
+            text.AppendFormat("  {0} -> {1};\n", name, falseCaseName);
 
             return name;
         }
