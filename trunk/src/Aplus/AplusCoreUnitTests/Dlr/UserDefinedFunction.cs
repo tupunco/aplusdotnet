@@ -40,6 +40,17 @@ namespace AplusCoreUnitTests.Dlr
             Assert.AreEqual<AType>(AInteger.Create(2), result, "Function call made incorrect calculation");
         }
 
+        [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestCategory("Infix"), TestMethod]
+        public void FunctionCallInfix()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("a{c}: c+1", scope);
+
+            AType result = this.engine.Execute<AType>("a 1", scope);
+
+            Assert.AreEqual<AType>(AInteger.Create(2), result, "Infix Function call made incorrect calculation");
+        }
+
         [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestMethod]
         public void FunctionCallVariableLeak()
         {
@@ -49,6 +60,18 @@ namespace AplusCoreUnitTests.Dlr
             AType result = this.engine.Execute<AType>("a{1}", scope);
 
             Assert.AreEqual<AType>(AInteger.Create(2), result, "Function call made incorrect calculation");
+            Assert.IsFalse(scope.ContainsVariable(".d"), "Variable should NOT exist");
+        }
+
+        [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestCategory("Infix"), TestMethod]
+        public void FunctionCallVariableLeakInfix()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("a{c}: { d:=1; c+1 }", scope);
+
+            AType result = this.engine.Execute<AType>("a 1 ", scope);
+
+            Assert.AreEqual<AType>(AInteger.Create(2), result, "Infix Function call made incorrect calculation");
             Assert.IsFalse(scope.ContainsVariable(".d"), "Variable should NOT exist");
         }
 
@@ -63,6 +86,19 @@ namespace AplusCoreUnitTests.Dlr
             this.engine.Execute<AType>("e{f}: { d + f }", scope);
 
             this.engine.Execute<AType>("a{1}", scope);
+        }
+
+        [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestCategory("Infix"), TestMethod]
+        [ExpectedException(typeof(Error.Value))]
+        public void Function2FunctionVariableLeakInfix()
+        {
+            // variables defined in each function should not be visible for each other!
+
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("a{c}: { d:=1; e{1} }", scope);
+            this.engine.Execute<AType>("e{f}: { d + f }", scope);
+
+            this.engine.Execute<AType>("a 1", scope);
         }
 
         [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestMethod]
@@ -130,6 +166,22 @@ namespace AplusCoreUnitTests.Dlr
             Assert.AreEqual<AType>(AInteger.Create(3), result, "Function call made incorrect calculation");
         }
 
+        [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestCategory("Infix"), TestMethod]
+        public void FunctionCallAndAddInfixDiffTest()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("a{c}: c+c", scope);
+
+            AType expectedMonadic = AInteger.Create(3);
+            AType resultMonadic = this.engine.Execute<AType>("a{1} + 1", scope);
+
+            AType expectedInfix = AInteger.Create(4);
+            AType resultInfix = this.engine.Execute<AType>("a 1 + 1", scope);
+
+            Assert.AreEqual<AType>(expectedMonadic, resultMonadic, "Function call made incorrect calculation");
+            Assert.AreEqual<AType>(expectedInfix, resultInfix, "Infix Function call made incorrect calculation");
+        }
+
         [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestMethod]
         public void FunctionReturn()
         {
@@ -180,6 +232,15 @@ namespace AplusCoreUnitTests.Dlr
             ScriptScope scope = this.engine.CreateScope();
             AType function_a = this.engine.Execute<AType>("a{c;d}: c+d", scope);
             AType function_b = this.engine.Execute<AType>("a{2}", scope);
+        }
+
+        [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestCategory("Infix"), TestMethod]
+        [ExpectedException(typeof(Error.Valence))]
+        public void InfixFunctionValenceError()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("a{c;d}: c+d", scope);
+            this.engine.Execute<AType>("a 2 ", scope);
         }
 
         [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestMethod]
@@ -284,6 +345,18 @@ namespace AplusCoreUnitTests.Dlr
             AType result = this.engine.Execute<AType>("a{2}", scope);
 
             Assert.AreEqual<AType>(AInteger.Create(3), result, "Function call made incorrect calculation");
+        }
+
+        [TestCategory("DLR"), TestCategory("UserDefinedFunction"), TestMethod]
+        public void FunctionChangeContext()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("g{x}: -x", scope);
+            this.engine.Execute<AType>("f{x}: { eval '$cx A'; g{x} }", scope);
+
+            AType result = this.engine.Execute<AType>("f{2}", scope);
+
+            Assert.AreEqual<AType>(AInteger.Create(-2), result, "Function call made incorrect calculation");
         }
     }
 }
