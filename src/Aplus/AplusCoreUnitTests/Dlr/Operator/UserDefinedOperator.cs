@@ -34,6 +34,20 @@ namespace AplusCoreUnitTests.Dlr.Operator
             Assert.AreEqual<AType>(expected, result, "Operator call made incorrect calculation");
         }
 
+        [TestCategory("DLR"), TestCategory("UserDefinedOperator"), TestCategory("Infix"), TestMethod]
+        public void InfixMonadicOperatorCall()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("(f op)b: { f b }", scope);
+
+            AType expected = AArray.Create(ATypes.AInteger,
+                AInteger.Create(-2), AInteger.Create(-3), AInteger.Create(-4)
+            );
+            AType result = this.engine.Execute<AType>("- op 2 3 4", scope);
+
+            Assert.AreEqual<AType>(expected, result, "Operator call made incorrect calculation");
+        }
+
         [TestCategory("DLR"), TestCategory("UserDefinedOperator"), TestMethod]
         public void SimpleDyadicOperatorCall()
         {

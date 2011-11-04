@@ -54,5 +54,72 @@ namespace AplusCoreUnitTests.Dlr
 
             Assert.AreEqual<AType>(AInteger.Create(3), result);
         }
+
+        [TestCategory("DLR"), TestCategory("InvokeFunction"), TestCategory("Infix"), TestMethod]
+        public void InfixDyadicFunction()
+        {
+            AType expected = AInteger.Create(5);
+            ScriptScope scope = this.engine.CreateScope();
+
+            this.engine.Execute<AType>("f{x;y}: { x + y }", scope);
+            scope.SetVariable(".a", AInteger.Create(1));
+            scope.SetVariable(".b", AInteger.Create(2)); 
+            AType result = this.engine.Execute<AType>("2 f a f b", scope);
+
+            Assert.AreEqual<AType>(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("InvokeFunction"), TestCategory("Infix"), TestMethod]
+        public void InfixFunctionInsideFuncion()
+        {
+            AType expected = AInteger.Create(5);
+            ScriptScope scope = this.engine.CreateScope();
+
+            this.engine.Execute<AType>("g{x}: { x + 1 }", scope);
+            this.engine.Execute<AType>("f{x}: { g x }", scope);
+            AType result = this.engine.Execute<AType>("f 4", scope);
+
+            Assert.AreEqual<AType>(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("InvokeFunction"), TestCategory("Infix"), TestMethod]
+        public void InfixFunctionEvalInsideFuncion()
+        {
+            AType expected = AInteger.Create(5);
+            ScriptScope scope = this.engine.CreateScope();
+
+            this.engine.Execute<AType>("g{x}: -x", scope);
+            this.engine.Execute<AType>("f{x}: { eval 'g{h}: h+1'; g x }", scope);
+            AType result = this.engine.Execute<AType>("f 4", scope);
+
+            Assert.AreEqual<AType>(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("InvokeFunction"), TestCategory("Infix"), TestMethod]
+        [ExpectedException(typeof(AplusCore.Compiler.ParseException))]
+        public void InfixInvisibleFunctionEvalInsideFuncion()
+        {
+            this.engine.Execute<AType>("f{x}: { eval 'g{h}: h+1'; g x }");
+        }
+
+        [TestCategory("DLR"), TestCategory("InvokeFunction"), TestCategory("Infix"), TestMethod]
+        [ExpectedException(typeof(Error.Valence))]
+        public void InfixValenceErrorDyadicFunction()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+
+            this.engine.Execute<AType>("f{x;y}: { x + y }", scope);
+            this.engine.Execute<AType>("f f 2", scope);
+        }
+
+        [TestCategory("DLR"), TestCategory("InvokeFunction"), TestCategory("Infix"), TestMethod]
+        [ExpectedException(typeof(Error.Valence))]
+        public void InfixValenceErrorMonadicFunction()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+
+            this.engine.Execute<AType>("f{x}: { x + x }", scope);
+            this.engine.Execute<AType>("1 f 2", scope);
+        }
     }
 }
