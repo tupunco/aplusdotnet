@@ -1,5 +1,6 @@
 using System;
 
+using AplusCore.Runtime.Function.Tools;
 using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
@@ -40,7 +41,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
                 if (argument.Shape[0] == argument.Shape[1])
                 {
                     // square matrix
-                    result = SquareMatrixInverse(argument);
+                    result = SquareMatrixInverse(Matrix.MatrixFromAType(argument)).ToAType();
                     if (IsIllconditionedSquareMatrix(argument, result))
                     {
                         throw new Error.Domain(DomainErrorText);
@@ -49,8 +50,12 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
                 else
                 {
                     // not a square matrix
-                    // TODO: implement pseudo-inverse
-                    throw new NotImplementedException("pseudo-inverse not implemented yet");
+                    Matrix A = Matrix.MatrixFromAType(argument);
+                    Matrix AT = A.Transpose();
+                    Matrix ATA = AT * A;
+                    Matrix pseudoInverse = SquareMatrixInverse(ATA) * AT; // inv(A^T*A)*A^T
+
+                    result = pseudoInverse.ToAType();
                 }
             }
 
@@ -80,32 +85,30 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
             return argument;
         }
 
-        public AType SquareMatrixInverse(AType argument)
+        private Matrix SquareMatrixInverse(Matrix argument)
         {
-            AType result;
-            double[,] original = new double[argument.Shape[0], argument.Shape[1]];
-            double[,] inverse = new double[argument.Shape[0], argument.Shape[1]];
+            int rows = argument.Rows;
+            int columns = argument.Columns;
+            
+            Matrix original = argument.Clone();
+            Matrix inverse = new SimpleMatrix(rows, columns);
 
-            for (int i = 0; i < argument.Shape[0]; i++)
+            for (int i = 0; i < rows; i++)
             {
-                for (int j = 0; j < argument.Shape[1]; j++)
-                {
-                    original[i, j] = argument[i][j].asFloat;
-                    inverse[i, j] = (i == j) ? 1 : 0;
-                }
+                inverse[i, i] = 1;
             }
 
-            for (int i = 0; i < argument.Shape[0]; i++)
+            for (int i = 0; i < rows; i++)
             {
                 double reciprocal = 1 / original[i, i];
 
-                for (int k = 0; k < argument.Shape[0]; k++)
+                for (int k = 0; k < rows; k++)
                 {
                     original[i, k] *= reciprocal;
                     inverse[i, k] *= reciprocal;
                 }
 
-                for (int j = 0; j < argument.Shape[1]; j++)
+                for (int j = 0; j < columns; j++)
                 {
                     if (i == j)
                     {
@@ -114,7 +117,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
 
                     double quotient = original[j, i] / original[i, i];
 
-                    for (int k = 0; k < argument.Shape[0]; k++)
+                    for (int k = 0; k < argument.Rows; k++)
                     {
                         original[j, k] = original[j, k] - quotient * original[i, k];
                         inverse[j, k] = inverse[j, k] - quotient * inverse[i, k];
@@ -124,9 +127,9 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
 
             bool inverseExist = true;
 
-            for (int i = 0; i < argument.Shape[0]; i++)
+            for (int i = 0; i < rows; i++)
             {
-                for (int j = 0; j < argument.Shape[1]; j++)
+                for (int j = 0; j < columns; j++)
                 {
                     if ((i == j && original[i, j] != 1) ||
                         (i != j && original[i, j] != 0))
@@ -141,28 +144,14 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
                 throw new Error.Domain(DomainErrorText);
             }
 
-            result = AArray.Create(ATypes.AFloat);
-
-            for (int i = 0; i < argument.Shape[0]; i++)
-            {
-                AType row = AArray.Create(ATypes.AFloat);
-
-                for (int j = 0; j < argument.Shape[1]; j++)
-                {
-                    row.Add(AFloat.Create(inverse[i, j]));
-                }
-
-                result.Add(row);
-            }
-
-            return result;
+            return inverse;
         }
 
         #endregion
 
         #region Error Checking
 
-        public bool IsIllconditionedSquareMatrix(AType original, AType inverse)
+        private bool IsIllconditionedSquareMatrix(AType original, AType inverse)
         {
             double norm = 0;
             double inverseNorm = 0;
