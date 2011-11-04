@@ -250,6 +250,10 @@
     <Compile Include="Runtime\Function\System\SystemFunction.cs" />
     <Compile Include="Runtime\Function\System\SystemFunctionAttribute.cs" />
     <Compile Include="Runtime\Function\System\SystemVariables.cs" />
+    <Compile Include="Runtime\Function\Tools\Matrix.cs" />
+    <Compile Include="Runtime\Function\Tools\SimpleMatrix.cs" />
+    <Compile Include="Runtime\Function\Tools\ScaledMatrix.cs" />
+    <Compile Include="Runtime\Function\Tools\TransposedMatrix.cs" />
     <Compile Include="Runtime\MappedFile.cs" />
     <Compile Include="Runtime\Function\Monadic\MonadicFunctionInstance.cs" />
     <Compile Include="Runtime\Function\Monadic\NonScalar\Comprasion\GradeDown.cs" />
