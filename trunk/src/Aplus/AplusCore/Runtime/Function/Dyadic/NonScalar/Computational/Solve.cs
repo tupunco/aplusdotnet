@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using AplusCore.Types;
+using AplusCore.Runtime.Function.Tools;
 
 namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
 {
@@ -57,10 +58,10 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
                 return AFloat.Create(lhs.asFloat / rhs.asFloat);
             }
 
-            IMatrix constantsArray = new Matrix(ExtractConstants(constants));
-            IMatrix originalEquations = new Matrix(FloatFromAType(equations));
+            Matrix constantsArray = new SimpleMatrix(ExtractConstants(constants));
+            Matrix originalEquations = new SimpleMatrix(FloatFromAType(equations));
             int[] rowsSequence;
-            IMatrix eliminatedConstants;
+            Matrix eliminatedConstants;
             GaussianElimination(originalEquations, constantsArray, out rowsSequence, out eliminatedConstants);
 
             AType result = AArray.Create(ATypes.AFloat);
@@ -128,7 +129,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
             return result;
         }
 
-        private static double[][] BuildIndependentConstants(int[] rowsSequence, IMatrix eliminatedConstants)
+        private static double[][] BuildIndependentConstants(int[] rowsSequence, Matrix eliminatedConstants)
         {
             double[][] independentConstants = new double[rowsSequence.Length][];
 
@@ -173,11 +174,11 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
         /// <param name="constants">The constants of the equation system.</param>
         /// <param name="equations">The equations.</param>
         /// <returns>The solution with the least square difference.</returns>
-        private double[] OverDeterminedEquationSolve(double[] beta, double[] constants, IMatrix equations)
+        private double[] OverDeterminedEquationSolve(double[] beta, double[] constants, Matrix equations)
         {
-            IMatrix Jacobian = equations.Clone();
-            IMatrix equation = Multiply(Transpose(Jacobian), Jacobian); // JtT * Jt
-            IMatrix negatedTransposedEquations = Multiply(Transpose(Jacobian), -1); // - JtT   
+            Matrix Jacobian = equations.Clone();
+            Matrix equation =Jacobian.Transpose() * Jacobian; // JtT * Jt
+            Matrix negatedTransposedEquations = Jacobian.Transpose() * -1; // - JtT   
 
             double[] x = beta; // the starting x is from the beta
 
@@ -185,9 +186,9 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
             {
                 bool solutionBetter = false; // TODO: is it enough to check only the improvement of the "objective funtion"?
                 double sumOfDifference = FunctionSquareEvaluate(equations, constants, x).Sum();
-                IMatrix right = Multiply(negatedTransposedEquations, new Matrix(FunctionEvaluate(equations, constants, x)));
+                Matrix right = negatedTransposedEquations * new SimpleMatrix(FunctionEvaluate(equations, constants, x));
                 int[] rowsSequence;
-                IMatrix eliminatedConstants;
+                Matrix eliminatedConstants;
 
                 GaussianElimination(equation, right, out rowsSequence, out eliminatedConstants);
 
@@ -235,12 +236,12 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
         /// <param name="sequenceOfRows">The sequence of the pivot rows.</param>
         /// <param name="eliminatedConstants">The resulting constants after the elimination.</param>
         /// <returns>The eliminated matrix.</returns>
-        private IMatrix GaussianElimination(
-            IMatrix equation, IMatrix constants, out int[] sequenceOfRows, out IMatrix eliminatedConstants)
+        private Matrix GaussianElimination(
+            Matrix equation, Matrix constants, out int[] sequenceOfRows, out Matrix eliminatedConstants)
         {
             int rows = equation.Rows;
             int columns = equation.Columns;
-            IMatrix eliminatedMatrix = equation.Clone();
+            Matrix eliminatedMatrix = equation.Clone();
             eliminatedConstants = constants.Clone();
             sequenceOfRows = Enumerable.Repeat<int>(-1, columns).ToArray();
 
@@ -329,178 +330,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
 
         #endregion
 
-        #region Internal classes for matrix representation
-
-        interface IMatrix
-        {
-            int Rows { get; }
-            int Columns { get; }
-
-            double this[int i, int j] { get; set; }
-
-            IMatrix Clone();
-        }
-
-        class Matrix : IMatrix
-        {
-            #region Variables
-
-            private int rows;
-            private int columns;
-            private double[,] coeffs;
-
-            #endregion
-
-            #region Constructors
-
-            internal Matrix(double[,] coeffs)
-            {
-                this.rows = coeffs.GetLength(0);
-                this.columns = coeffs.GetLength(1);
-                this.coeffs = (double[,])coeffs.Clone();
-            }
-
-            internal Matrix(double[] vector)
-            {
-                this.rows = vector.Length;
-                this.columns = 1;
-                this.coeffs = new double[this.rows, this.columns];
-
-                for (int i = 0; i < this.rows; i++)
-                {
-                    this.coeffs[i, 0] = vector[i];
-                }
-            }
-
-            #endregion
-
-            #region IMatrix members
-
-            public int Rows { get { return this.rows; } }
-            public int Columns { get { return this.columns; } }
-
-            public double this[int i, int j]
-            {
-                get { return this.coeffs[i, j]; }
-                set { this.coeffs[i, j] = value; }
-            }
-
-            public IMatrix Clone()
-            {
-                return new Matrix(this.coeffs);
-            }
-
-            #endregion
-        }
-
-        class TransposedMatrix : IMatrix
-        {
-            #region Variables
-
-            private IMatrix matrix;
-
-            #endregion
-
-            #region Constructors
-
-            internal TransposedMatrix(IMatrix matrix)
-            {
-                this.matrix = matrix;
-            }
-
-            #endregion
-
-            #region IMatrix overrides
-
-            public int Rows { get { return matrix.Columns; } }
-            public int Columns { get { return matrix.Rows; } }
-
-            public double this[int i, int j]
-            {
-                get { return this.matrix[j, i]; }
-                set { this.matrix[j, i] = value; }
-            }
-
-            public IMatrix Clone()
-            {
-                return new TransposedMatrix(this);
-            }
-
-            #endregion
-        }
-
-        class ScaledMatrix : IMatrix
-        {
-            #region Variables
-
-            private double scale;
-            private IMatrix matrix;
-
-            #endregion
-
-            #region Constructors
-
-            internal ScaledMatrix(IMatrix matrix, double scale)
-            {
-                this.scale = scale;
-                this.matrix = matrix;
-            }
-
-            #endregion
-
-            #region IMatrix Members
-
-            public int Rows { get { return this.matrix.Rows; } }
-            public int Columns { get { return this.matrix.Columns; } }
-
-            public double this[int i, int j]
-            {
-                get { return this.matrix[i, j] * scale; }
-                set { this.matrix[i, j] = value; }
-            }
-
-            public IMatrix Clone()
-            {
-                return new ScaledMatrix(this, this.scale);
-            }
-
-            #endregion
-        }
-
-        #endregion
-
         #region Methods for Matrices
-
-        private static IMatrix Multiply(IMatrix matrix1, IMatrix matrix2)
-        {
-            int rows = matrix1.Rows;
-            int columns = matrix2.Columns;
-            double[,] result = new double[rows, columns];
-
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < columns; j++)
-                {
-                    for (int k = 0; k < matrix1.Columns; k++)
-                    {
-                        result[i, j] += matrix1[i, k] * matrix2[k, j];
-                    }
-                }
-            }
-
-            return new Matrix(result);
-        }
-
-
-        private static IMatrix Multiply(IMatrix matrix, double scalar)
-        {
-            return new ScaledMatrix(matrix, scalar);
-        }
-
-        private static IMatrix Transpose(IMatrix matrix)
-        {
-            return new TransposedMatrix(matrix);
-        }
 
         /// <summary>
         /// Calculates the values of rows, and the differences from the constants.
@@ -509,7 +339,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
         /// <param name="constants">The constants.</param>
         /// <param name="x">The x to substitue.</param>
         /// <returns>The differences of M(x) from the constants.</returns>
-        private static double[] FunctionEvaluate(IMatrix matrix, double[] constants, double[] x)
+        private static double[] FunctionEvaluate(Matrix matrix, double[] constants, double[] x)
         {
             double[] result = new double[matrix.Rows];
 
@@ -535,7 +365,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
         /// <param name="constants">The constants.</param>
         /// <param name="x">The x to substitue.</param>
         /// <returns>The squares of <see cref="FunctionEvaulate"/>.</returns>
-        private static double[] FunctionSquareEvaluate(IMatrix matrix, double[] constants, double[] x)
+        private static double[] FunctionSquareEvaluate(Matrix matrix, double[] constants, double[] x)
         {
             double[] functionEvaluated = FunctionEvaluate(matrix, constants, x);
             double[] result = new double[functionEvaluated.GetLength(0)];
