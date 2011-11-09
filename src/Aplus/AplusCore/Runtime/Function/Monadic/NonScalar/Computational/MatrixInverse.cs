@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using AplusCore.Runtime.Function.Tools;
 using AplusCore.Types;
@@ -30,85 +31,75 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
 
             if (argument.Rank == 0)
             {
-                result = ScalarInverse(argument);
+                result = AFloat.Create(1 / argument.asFloat);
             }
             else if (argument.Rank == 1)
             {
                 result = VectorInverse(argument);
             }
+            else if (argument.Shape[0] == argument.Shape[1])
+            {
+                Matrix matrix = Matrix.MatrixFromAType(argument);
+                Matrix inverseMatrix = SquareMatrixInverse(matrix);
+                // square matrix
+
+                if (IsIllconditionedSquareMatrix(matrix, inverseMatrix))
+                {
+                    throw new Error.Domain(DomainErrorText);
+                }
+
+                result = inverseMatrix.ToAType();
+            }
             else
             {
-                if (argument.Shape[0] == argument.Shape[1])
-                {
-                    // square matrix
-                    result = SquareMatrixInverse(Matrix.MatrixFromAType(argument)).ToAType();
-                    if (IsIllconditionedSquareMatrix(argument, result))
-                    {
-                        throw new Error.Domain(DomainErrorText);
-                    }
-                }
-                else
-                {
-                    // not a square matrix
-                    Matrix A = Matrix.MatrixFromAType(argument);
-                    Matrix AT = A.Transpose();
-                    Matrix ATA = AT * A;
-                    Matrix pseudoInverse = SquareMatrixInverse(ATA) * AT; // inv(A^T*A)*A^T
+                // not a square matrix
+                Matrix A = Matrix.MatrixFromAType(argument);
+                Matrix AT = A.Transpose();
+                Matrix ATA = AT * A;
+                Matrix pseudoInverse = SquareMatrixInverse(ATA) * AT; // inv(A^T*A)*A^T
 
-                    result = pseudoInverse.ToAType();
-                }
+                result = pseudoInverse.ToAType();
             }
 
             return result;
         }
 
-        public AType ScalarInverse(AType argument)
+        private AType VectorInverse(AType argument)
         {
-            return AFloat.Create(1 / argument.asFloat);
-        }
-
-        public AType VectorInverse(AType argument)
-        {
-            double sqrmagnitude = 0;
-            argument.Type = ATypes.AFloat;
+            AType result = AArray.Create(ATypes.AFloat);
+            double sqrmagnitude = argument.Sum(item => item.asFloat * item.asFloat);
 
             for (int i = 0; i < argument.Length; i++)
             {
-                sqrmagnitude += (argument[i].asFloat * argument[i].asFloat);
+                result.Add(AFloat.Create(argument[i].asFloat / sqrmagnitude));
             }
 
-            for (int i = 0; i < argument.Length; i++)
-            {
-                argument[i] = AFloat.Create(argument[i].asFloat / sqrmagnitude);
-            }
-
-            return argument;
+            return result;
         }
 
         private Matrix SquareMatrixInverse(Matrix argument)
         {
-            int rows = argument.Rows;
-            int columns = argument.Columns;
+            int size = argument.Rows;
             
             Matrix original = argument.Clone();
-            Matrix inverse = new SimpleMatrix(rows, columns);
+            Matrix inverse = new SimpleMatrix(size, size);
 
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < size; i++)
             {
                 inverse[i, i] = 1;
             }
 
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < size; i++)
             {
                 double reciprocal = 1 / original[i, i];
 
-                for (int k = 0; k < rows; k++)
+                for (int k = 0; k < size; k++)
                 {
                     original[i, k] *= reciprocal;
                     inverse[i, k] *= reciprocal;
                 }
 
-                for (int j = 0; j < columns; j++)
+                for (int j = 0; j < size; j++)
                 {
                     if (i == j)
                     {
@@ -117,7 +108,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
 
                     double quotient = original[j, i] / original[i, i];
 
-                    for (int k = 0; k < argument.Rows; k++)
+                    for (int k = 0; k < size; k++)
                     {
                         original[j, k] = original[j, k] - quotient * original[i, k];
                         inverse[j, k] = inverse[j, k] - quotient * inverse[i, k];
@@ -125,23 +116,17 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
                 }
             }
 
-            bool inverseExist = true;
-
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < size; i++)
             {
-                for (int j = 0; j < columns; j++)
+                for (int j = 0; j < size; j++)
                 {
                     if ((i == j && original[i, j] != 1) ||
                         (i != j && original[i, j] != 0))
                     {
-                        inverseExist = false;
+                        // no inverse found report error
+                        throw new Error.Domain(DomainErrorText);
                     }
                 }
-            }
-
-            if (!inverseExist)
-            {
-                throw new Error.Domain(DomainErrorText);
             }
 
             return inverse;
@@ -151,29 +136,29 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
 
         #region Error Checking
 
-        private bool IsIllconditionedSquareMatrix(AType original, AType inverse)
+        private static bool IsIllconditionedSquareMatrix(Matrix original, Matrix inverse)
         {
+            int size = original.Columns;
             double norm = 0;
             double inverseNorm = 0;
-            double condition = 0;
 
-            for (int i = 0; i < original.Shape[0]; i++)
+            for (int i = 0; i < size; i++)
             {
                 double localNorm = 0;
                 double localInverseNorm = 0;
 
-                for (int j = 0; j < original.Shape[1]; j++)
+                for (int j = 0; j < size; j++)
                 {
-                    localNorm += Math.Abs(original[i][j].asFloat);
-                    localInverseNorm += Math.Abs(inverse[i][j].asFloat);
+                    localNorm += Math.Abs(original[i, j]);
+                    localInverseNorm += Math.Abs(inverse[i, j]);
                 }
 
-                norm = (norm < localNorm) ? localNorm : norm;
-                inverseNorm = (inverseNorm < localInverseNorm) ? localInverseNorm : inverseNorm;
+                norm = Math.Max(localNorm, norm);
+                inverseNorm = Math.Max(inverseNorm, localInverseNorm);
             }
 
-            condition = norm * inverseNorm;
-            return (Math.Log(condition) <= Math.Pow(10, -13));
+            double condition = norm * inverseNorm;
+            return Math.Log(condition) <= Math.Pow(10, -13);
         }
 
         private void ErrorCheck(AType argument)
@@ -183,39 +168,29 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Computational
                 throw new Error.Type(TypeErrorText);
             }
 
-            if (argument.Rank == 0)
+            switch (argument.Rank)
             {
-                if (argument.IsTolerablyWholeNumber && argument.asInteger == 0)
-                {
-                    throw new Error.Domain(DomainErrorText);
-                }
-            }
-            else if (argument.Rank == 1)
-            {
-                double sum = 0;
+                case 0:
+                case 1:
+                    AType sumValue = (argument.Rank == 0)
+                        ? argument  // a simple scalar
+                        : AFloat.Create(argument.Sum(item => item.asFloat)); // we have a vector
+                    
+                    if (sumValue.IsTolerablyWholeNumber && sumValue.asInteger == 0)
+                    {
+                        throw new Error.Domain(DomainErrorText);
+                    }
+                    break;
 
-                for (int i = 0; i < argument.Length; i++)
-                {
-                    sum += argument[i].asFloat;
-                }
+                case 2:
+                    if (argument.Shape[1] > argument.Shape[0])
+                    {
+                        throw new Error.Domain(DomainErrorText);
+                    }
+                    break;
 
-                AType sumAType = AFloat.Create(sum);
-
-                if (sumAType.IsTolerablyWholeNumber && sumAType.asInteger == 0)
-                {
-                    throw new Error.Domain(DomainErrorText);
-                }
-            }
-            else if (argument.Rank == 2)
-            {
-                if (argument.Shape[1] > argument.Shape[0])
-                {
-                    throw new Error.Domain(DomainErrorText);
-                }
-            }
-            else if (argument.Rank > 2)
-            {
-                throw new Error.Rank(RankErrorText);
+                default:
+                    throw new Error.Rank(RankErrorText);
             }
         }
 
