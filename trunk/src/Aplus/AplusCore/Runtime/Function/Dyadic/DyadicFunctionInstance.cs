@@ -158,6 +158,7 @@ namespace AplusCore.Runtime.Function.Dyadic
         internal static readonly AbstractDyadicFunction BitwiseGreaterEqual = new BitwiseGreaterEqual();
         internal static readonly AbstractDyadicFunction BitwiseGreater = new BitwiseGreater();
         internal static readonly AbstractDyadicFunction BitwiseNotEqual = new BitwiseNotEqual();
+        internal static readonly AbstractDyadicFunction BitwiseCast = new BitwiseCast();
 
         #endregion
 

@@ -184,6 +184,7 @@
     <Compile Include="Dlr\Operator\Dyadic\Rank.cs" />
     <Compile Include="Dlr\Operator\Monadic\Apply.cs" />
     <Compile Include="Dlr\Operator\Monadic\Bitwise\BitwiseAnd.cs" />
+    <Compile Include="Dlr\Operator\Monadic\Bitwise\BitwiseCast.cs" />
     <Compile Include="Dlr\Operator\Monadic\Bitwise\BitwiseEqual.cs" />
     <Compile Include="Dlr\Operator\Monadic\Bitwise\BitwiseGreater.cs" />
     <Compile Include="Dlr\Operator\Monadic\Bitwise\BitwiseGreaterEqual.cs" />

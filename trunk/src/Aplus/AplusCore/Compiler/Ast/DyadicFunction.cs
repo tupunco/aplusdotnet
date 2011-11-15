@@ -2,6 +2,8 @@
 
 using AplusCore.Compiler.Grammar;
 using AplusCore.Runtime.Function.Dyadic;
+using AplusCore.Runtime.Function.Dyadic.NonScalar.Other;
+using AplusCore.Runtime.Function.Dyadic.Scalar.Bitwise;
 using AplusCore.Types;
 
 using DLR = System.Linq.Expressions;
@@ -173,6 +175,30 @@ namespace AplusCore.Compiler.AST
                     ),
                     valueParam
                  );
+            }
+            else if (this.token.Type == Tokens.BWOR)
+            {
+                DLR.ParameterExpression rightParam = DLR.Expression.Variable(typeof(AType), "$$rightParam");
+                DLR.ParameterExpression leftParam = DLR.Expression.Variable(typeof(AType), "$$leftParam");
+
+                result = DLR.Expression.Block(
+                    new DLR.ParameterExpression[] { leftParam, rightParam },
+                    DLR.Expression.Assign(rightParam, right),
+                    DLR.Expression.Assign(leftParam, left),
+                    DLR.Expression.Condition(
+                    // $left.Type == ATypes.ASymbol
+                        DLR.Expression.Equal(
+                            leftParam.Property("Type"),
+                            DLR.Expression.Constant(ATypes.ASymbol)
+                        ),
+                        DLR.Expression.Constant(DyadicFunctionInstance.BitwiseCast).Call<BitwiseCast>(
+                            "Execute", rightParam, leftParam, environment
+                        ),
+                        DLR.Expression.Constant(DyadicFunctionInstance.BitwiseOr).Call<BitwiseOr>(
+                            "Execute", rightParam, leftParam, environment
+                        )
+                    )
+                );
             }
             else
             {
