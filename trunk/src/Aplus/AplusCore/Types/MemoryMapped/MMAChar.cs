@@ -1,5 +1,4 @@
 ﻿using AplusCore.Runtime;
-using System;
 
 namespace AplusCore.Types.MemoryMapped
 {
@@ -34,13 +33,13 @@ namespace AplusCore.Types.MemoryMapped
         #region Constructor
 
         private MMAChar(long position, MappedFile mappedFile)
-            : base(' ')
+            : base()
         {
             this.position = position;
             this.mappedFile = mappedFile;
         }
 
-        public static AType Create(long position, MappedFile mappedFile)
+        public new static AType Create(long position, MappedFile mappedFile)
         {
             return new AReference(new MMAChar(position, mappedFile));
         }

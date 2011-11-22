@@ -2,22 +2,17 @@
 using System.Collections.Generic;
 using System.Globalization;
 
+using AplusCore.Runtime;
+using AplusCore.Types.MemoryMapped;
+
 namespace AplusCore.Types
 {
-    public class AFloat : AValue
+    public abstract class AFloat : AValue
     {
-        #region Variables
-
-        private double value;
-
-        #endregion
-
         #region Constructor
 
-        protected AFloat(double number)
+        protected AFloat()
         {
-            this.value = number;
-
             this.length = 1;
             this.shape = new List<int>();
             this.rank = 0;
@@ -27,7 +22,12 @@ namespace AplusCore.Types
 
         public static AType Create(double number)
         {
-            return new AReference(new AFloat(number));
+            return LocalAFloat.Create(number);
+        }
+
+        public static AType Create(long position, MappedFile mappedFile)
+        {
+            return MMAFloat.Create(position, mappedFile);
         }
 
         #endregion
@@ -35,6 +35,9 @@ namespace AplusCore.Types
         #region Properties
 
         public override bool IsNumber { get { return true; } }
+
+        public override int asInteger { get { return (int)this.asFloat; } }
+        public override string asString { get { return this.asFloat.ToString(); } }
 
         public override bool IsTolerablyWholeNumber
         {
@@ -46,20 +49,7 @@ namespace AplusCore.Types
 
         #endregion
 
-        #region Converter Properties
-
-        public override int asInteger { get { return (int)this.asFloat; } }
-        public override double asFloat { get { return this.value; } }
-        public override string asString { get { return this.asFloat.ToString(); } }
-
-        #endregion
-
         #region Overrides
-
-        public override AType Clone()
-        {
-            return new AFloat(this.asFloat);
-        }
 
         public override bool Equals(object obj)
         {
@@ -101,6 +91,11 @@ namespace AplusCore.Types
         public override int CompareTo(AType other)
         {
             return this.asFloat.CompareTo(other.asFloat);
+        }
+
+        public override AType Clone()
+        {
+            return LocalAFloat.Create(this.asChar).Data;
         }
 
         #endregion
