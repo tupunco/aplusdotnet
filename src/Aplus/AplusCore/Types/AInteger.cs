@@ -1,20 +1,16 @@
 ﻿using System.Collections.Generic;
 
+using AplusCore.Runtime;
+using AplusCore.Types.MemoryMapped;
+
 namespace AplusCore.Types
 {
-    public class AInteger : AValue
+    public abstract class AInteger : AValue
     {
-        #region Variables
-
-        private int value;
-
-        #endregion
-
         #region Constructor
 
-        protected AInteger(int number)
+        protected AInteger()
         {
-            this.value = number;
             this.length = 1;
             this.shape = new List<int>();
             this.rank = 0;
@@ -24,7 +20,12 @@ namespace AplusCore.Types
 
         public static AType Create(int number)
         {
-            return new AReference(new AInteger(number));
+            return LocalAInteger.Create(number);
+        }
+
+        public static AType Create(long position, MappedFile mappedFile)
+        {
+            return MMAInteger.Create(position, mappedFile);
         }
 
         #endregion
@@ -34,11 +35,6 @@ namespace AplusCore.Types
         public override bool IsNumber { get { return true; } }
         public override bool IsTolerablyWholeNumber { get { return true; } }
 
-        #endregion
-
-        #region Converter Properties
-
-        public override int asInteger { get { return this.value; } }
         public override double asFloat { get { return (double)this.asInteger; } }
         public override string asString { get { return this.asInteger.ToString(); } }
 
@@ -48,7 +44,7 @@ namespace AplusCore.Types
 
         public override AType Clone()
         {
-            return new AInteger(this.asInteger);
+            return LocalAInteger.Create(this.asInteger).Data;
         }
 
         public override bool Equals(object obj)

@@ -33,13 +33,13 @@ namespace AplusCore.Types.MemoryMapped
         #region Constructor
 
         private MMAInteger(long position, MappedFile mappedFile)
-            : base(0)
+            : base()
         {
             this.position = position;
             this.mappedFile = mappedFile;
         }
 
-        public static AType Create(long position, MappedFile mappedFile)
+        public new static AType Create(long position, MappedFile mappedFile)
         {
             return new AReference(new MMAInteger(position, mappedFile));
         }

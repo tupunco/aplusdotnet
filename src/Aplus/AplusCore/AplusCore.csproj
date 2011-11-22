@@ -341,6 +341,10 @@
     <Compile Include="Types\AInteger.cs" />
     <Compile Include="Types\AFloat.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Types\LocalAArray.cs" />
+    <Compile Include="Types\LocalAChar.cs" />
+    <Compile Include="Types\LocalAFloat.cs" />
+    <Compile Include="Types\LocalAInteger.cs" />
     <Compile Include="Types\MemoryMapped\IMapped.cs" />
     <Compile Include="Types\MemoryMapped\MMAArray.cs" />
     <Compile Include="Types\MemoryMapped\MMAArrayIterator.cs" />

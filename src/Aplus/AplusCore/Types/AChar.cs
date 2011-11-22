@@ -1,21 +1,16 @@
 ﻿using System.Collections.Generic;
 
+using AplusCore.Runtime;
+using AplusCore.Types.MemoryMapped;
+
 namespace AplusCore.Types
 {
-    public class AChar : AValue
+    public abstract class AChar : AValue
     {
-        #region Variables
-
-        private char value;
-
-        #endregion
-
         #region Constructor
 
-        protected AChar(char text)
+        protected AChar()
         {
-            this.value = text;
-
             this.length = 1;
             this.shape = new List<int>();
             this.rank = 0;
@@ -25,23 +20,17 @@ namespace AplusCore.Types
 
         public static AType Create(char ch)
         {
-            return new AReference(new AChar(ch));
+            return LocalAChar.Create(ch);
         }
 
-        #endregion
-
-        #region Converter Properties
-
-        public override char asChar { get { return this.value; } }
+        public static AType Create(long position, MappedFile mappedFile)
+        {
+            return MMAChar.Create(position, mappedFile);
+        }
 
         #endregion
 
         #region Overrides
-
-        public override AType Clone()
-        {
-            return new AChar(this.asChar);
-        }
 
         public override bool Equals(object obj)
         {
@@ -67,6 +56,11 @@ namespace AplusCore.Types
         public override int CompareTo(AType other)
         {
             return this.asChar.CompareTo(other.asChar);
+        }
+
+        public override AType Clone()
+        {
+            return LocalAChar.Create(this.asChar).Data;
         }
 
         #endregion

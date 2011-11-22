@@ -17,23 +17,6 @@ namespace AplusCore.Types.MemoryMapped
 
         #endregion
 
-        #region Construction
-
-        private MMAArray(MappedFile mappedFile)
-            : base(ATypes.AArray)
-        {
-            this.mappedFile = mappedFile;
-            this.items = new ConditionalWeakTable<ValueType, AType>();
-            this.indexCache = new Dictionary<int, ValueType>();
-        }
-
-        public static AType Create(MappedFile mappedFile)
-        {
-            return new AReference(new MMAArray(mappedFile));
-        }
-
-        #endregion
-
         #region Properties
 
         public override int Length
@@ -79,25 +62,41 @@ namespace AplusCore.Types.MemoryMapped
         {
             get
             {
-                if (index >= 0 && this.Length > index)
-                {
-                    AType item;
-
-                    ValueType indexValue = GetIndex(index);
-
-                    if (!this.items.TryGetValue(indexValue, out item))
-                    {
-                        item = this.mappedFile.ReadCell(index);
-                        this.items.Add(indexValue, item);
-                    }
-
-                    return item;
-                }
-                else
+                if (index < 0 || this.Length <= index)
+                //if (index >= 0 && this.Length > index)
                 {
                     throw new Error.Index("[]");
                 }
+
+                AType item;
+
+                ValueType indexValue = GetIndex(index);
+
+                if (!this.items.TryGetValue(indexValue, out item))
+                {
+                    item = this.mappedFile.ReadCell(index);
+                    this.items.Add(indexValue, item);
+                }
+
+                return item;
             }
+        }
+
+        #endregion
+
+        #region Construction
+
+        private MMAArray(MappedFile mappedFile)
+            : base(ATypes.AArray)
+        {
+            this.mappedFile = mappedFile;
+            this.items = new ConditionalWeakTable<ValueType, AType>();
+            this.indexCache = new Dictionary<int, ValueType>();
+        }
+
+        public new static AType Create(MappedFile mappedFile)
+        {
+            return new AReference(new MMAArray(mappedFile));
         }
 
         #endregion
@@ -124,24 +123,6 @@ namespace AplusCore.Types.MemoryMapped
             {
                 Add(item);
             }
-        }
-
-        public override AType Clone()
-        {
-            AType result = AArray.Create(this.Type);
-
-            for (int i = 0; i < this.Length; i++)
-            {
-                result.AddWithNoUpdate(this[i].Clone());
-            }
-
-            result.Length = this.Length;
-            result.Shape.Clear();
-            result.Shape.AddRange(this.Shape);
-            result.Type = this.Type;
-            result.Rank = this.Rank;
-
-            return result.Data;
         }
 
         public override int GetHashCode()
