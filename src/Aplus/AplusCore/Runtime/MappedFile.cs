@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.IO.MemoryMappedFiles;
-using System.Runtime.InteropServices;
 
 using AplusCore.Types;
 using AplusCore.Types.MemoryMapped;
@@ -29,19 +27,6 @@ namespace AplusCore.Runtime
         private MemoryMappedFile memoryMappedFile;
         private MemoryMappedViewAccessor accessor;
 
-        private static readonly byte TypePosition           = 4;
-        private static readonly byte RankPosition           = 8;
-        private static readonly byte ItemCountPosition      = 12;
-        private static readonly byte ShapePosition          = 16;
-        private static readonly byte LeadingAxesPosition    = 52;
-        private static readonly byte ItemPosition = 56;
-
-        private static readonly int ByteSize        = Marshal.SizeOf(typeof(byte));
-        private static readonly int IntSize         = Marshal.SizeOf(typeof(int));
-        private static readonly int DoubleSize      = Marshal.SizeOf(typeof(double));
-
-        private static readonly int HeaderSize = 14 * IntSize;
-
         #endregion
 
         #region Properties
@@ -56,8 +41,8 @@ namespace AplusCore.Runtime
         /// </summary>
         public int Rank
         {
-            get { return this.ReadInt32(RankPosition); }
-            set { this.WriteInt32(RankPosition, value); }
+            get { return this.ReadInt32(MappedFileInfo.RankPosition); }
+            set { this.WriteInt32(MappedFileInfo.RankPosition, value); }
         }
 
         /// <summary>
@@ -65,8 +50,8 @@ namespace AplusCore.Runtime
         /// </summary>
         public ATypes Type
         {
-            get { return (ATypes)this.ReadInt32(TypePosition); }
-            set { this.WriteInt32(TypePosition, (int)value); }
+            get { return (ATypes)this.ReadInt32(MappedFileInfo.TypePosition); }
+            set { this.WriteInt32(MappedFileInfo.TypePosition, (int)value); }
         }
 
         /// <summary>
@@ -86,12 +71,12 @@ namespace AplusCore.Runtime
 
             set
             {
-                long position = ShapePosition;
+                long position = MappedFileInfo.ShapePosition;
 
                 for (int i = 0; i < 9; i++)
                 {
                     this.WriteInt32(position, i < value.Count ? value[i] : 0);
-                    position += IntSize;
+                    position += MappedFileInfo.IntSize;
                 }
             }
         }
@@ -106,12 +91,12 @@ namespace AplusCore.Runtime
                 if (this.cellShape == null)
                 {
                     this.cellShape = new List<int>();
-                    int position = ShapePosition + IntSize;
+                    int position = MappedFileInfo.ShapePosition + MappedFileInfo.IntSize;
 
                     for (int i = 1; i < this.Rank; i++)
                     {
                         this.cellShape.Add(ReadInt32(position));
-                        position += IntSize;
+                        position += MappedFileInfo.IntSize;
                     }
                 }
 
@@ -146,8 +131,8 @@ namespace AplusCore.Runtime
         /// </summary>
         public int ItemCount
         {
-            get { return this.ReadInt32(ItemCountPosition); }
-            set { this.WriteInt32(ItemCountPosition, value); }
+            get { return this.ReadInt32(MappedFileInfo.ItemCountPosition); }
+            set { this.WriteInt32(MappedFileInfo.ItemCountPosition, value); }
         }
 
         /// <summary>
@@ -155,8 +140,8 @@ namespace AplusCore.Runtime
         /// </summary>
         public int LeadingAxes
         {
-            get { return this.ReadInt32(LeadingAxesPosition); }
-            set { this.WriteInt32(LeadingAxesPosition, value); }
+            get { return this.ReadInt32(MappedFileInfo.LeadingAxesPosition); }
+            set { this.WriteInt32(MappedFileInfo.LeadingAxesPosition, value); }
         }
 
         /// <summary>
@@ -164,11 +149,11 @@ namespace AplusCore.Runtime
         /// </summary>
         public int Length
         {
-            get { return ReadInt32(ShapePosition); }
+            get { return ReadInt32(MappedFileInfo.ShapePosition); }
 
             set
             {
-                WriteInt32(ShapePosition, value);
+                WriteInt32(MappedFileInfo.ShapePosition, value);
                 this.ItemCount = value * this.CellShapeCount;
             }
         }
@@ -185,15 +170,15 @@ namespace AplusCore.Runtime
                     switch (this.Type)
                     {
                         case ATypes.AFloat:
-                            this.size = DoubleSize;
+                            this.size = MappedFileInfo.DoubleSize;
                             break;
 
                         case ATypes.AChar:
-                            this.size = ByteSize;
+                            this.size = MappedFileInfo.ByteSize;
                             break;
-                        
+
                         default:
-                            this.size = IntSize;
+                            this.size = MappedFileInfo.IntSize;
                             break;
                     }
                 }
@@ -365,17 +350,17 @@ namespace AplusCore.Runtime
             switch (argument.Type)
             {
                 case ATypes.AChar:
-                    size = ByteSize;
+                    size = MappedFileInfo.ByteSize;
                     break;
                 case ATypes.AFloat:
-                    size = DoubleSize;
+                    size = MappedFileInfo.DoubleSize;
                     break;
                 default:
-                    size = IntSize;
+                    size = MappedFileInfo.IntSize;
                     break;
             }
 
-            return HeaderSize + size * AllItem(argument);
+            return MappedFileInfo.HeaderSize + size * AllItem(argument);
         }
 
         /// <summary>
@@ -389,11 +374,11 @@ namespace AplusCore.Runtime
             this.Rank = argument.Rank;
             this.Shape = argument.Shape;
 
-            this.WriteInt32(ItemCountPosition, AllItem(argument));
+            this.WriteInt32(MappedFileInfo.ItemCountPosition, AllItem(argument));
 
             this.LeadingAxes = argument.Rank > 0 ? argument.Shape[0] : 1;
 
-            long position = ItemPosition;
+            long position = MappedFileInfo.HeaderSize;
 
             Write(argument, ref position);
         }
@@ -477,7 +462,7 @@ namespace AplusCore.Runtime
 
             return mappedFile.Rank > 0 ?
                 MMAArray.Create(mappedFile) :
-                mappedFile.Reader(ItemPosition);
+                mappedFile.Reader(MappedFileInfo.HeaderSize);
         }
 
         /// <summary>
@@ -485,42 +470,9 @@ namespace AplusCore.Runtime
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public AType ReadCell(int index)
+        public AType ReadCell(long offset)
         {
-            long position = ItemPosition + (index * this.CellShapeCount * this.Size);
-
-            return CreateAArray(this.CellShape, ref position);
-        }
-
-        /// <summary>
-        /// Create AArray with the given shape. 
-        /// </summary>
-        /// <param name="shape"></param>
-        /// <param name="position"></param>
-        /// <returns></returns>
-        private AType CreateAArray(List<int> shape, ref long position)
-        {
-            if (shape.Count > 0)
-            {
-                List<int> cuttedShape = shape.GetRange(1, shape.Count - 1);
-
-                AType result = AArray.Create(this.Type);
-
-                for (int i = 0; i < shape[0]; i++)
-                {
-                    result.AddWithNoUpdate(CreateAArray(cuttedShape, ref position));
-                }
-
-                result.UpdateInfo();
-
-                return result;
-            }
-            else
-            {
-                AType result = this.Reader(position);
-                position += this.Size;
-                return result;
-            }
+            return this.Reader(offset);
         }
 
         /// <summary>
@@ -564,7 +516,7 @@ namespace AplusCore.Runtime
         /// <returns></returns>
         public int ComputeNewSize(int newLength)
         {
-            return HeaderSize + IntSize * this.CellShapeCount * newLength;
+            return MappedFileInfo.HeaderSize + MappedFileInfo.IntSize * this.CellShapeCount * newLength;
         }
 
         /// <summary>
@@ -578,7 +530,7 @@ namespace AplusCore.Runtime
                 throw new Error.Length("Not enough allocated memory");
             }
 
-            long position = this.ItemCount * this.Size + ItemPosition;
+            long position = this.ItemCount * this.Size + MappedFileInfo.HeaderSize;
 
             Write(argument, ref position);
 
