@@ -15,23 +15,30 @@ namespace AplusCore.Types.MemoryMapped
         private MappedFile mappedFile;
         private ConditionalWeakTable<ValueType, AType> items;
 
+        private long offset;
+        private int depth;
+
         #endregion
 
         #region Properties
 
         public override int Length
         {
-            get { return this.mappedFile.Length; }
+            get { return this.mappedFile.Shape[depth]; }
         }
 
         public override List<int> Shape
         {
-            get { return this.mappedFile.Shape; }
+            get
+            {
+                List<int> actualShape = this.mappedFile.Shape;
+                return actualShape.GetRange(depth, actualShape.Count - depth);
+            }
         }
 
         public override int Rank
         {
-            get { return this.mappedFile.Rank; }
+            get { return this.mappedFile.Rank - depth; }
         }
 
         public override ATypes Type
@@ -74,7 +81,19 @@ namespace AplusCore.Types.MemoryMapped
 
                 if (!this.items.TryGetValue(indexValue, out item))
                 {
-                    item = this.mappedFile.ReadCell(index);
+                    if (this.Rank > 1)
+                    {
+                        List<int> cuttedShape = this.Shape.GetRange(1, this.Shape.Count - 1);
+                        long subDimensionOffset = index * cuttedShape.Product() * this.mappedFile.Size;
+                        item = Create(this.mappedFile, this.depth + 1, this.offset + subDimensionOffset);
+                    }
+                    else
+                    {
+                        int elementSize = this.mappedFile.Size;
+                        int elementOffset = index * elementSize;
+                        item = this.mappedFile.ReadCell(this.offset + elementOffset);
+                    }
+
                     this.items.Add(indexValue, item);
                 }
 
@@ -82,21 +101,52 @@ namespace AplusCore.Types.MemoryMapped
             }
         }
 
+        public override AType this[List<AType> indexers]
+        {
+            get
+            {
+                return base[indexers];
+            }
+            set
+            {
+                if (indexers.Count == 1)
+                {
+                    Utils.PerformAssign(this[indexers[0]], value);
+                }
+                else
+                {
+                    base[indexers] = value;
+                }
+            }
+        }
+
         #endregion
 
         #region Construction
 
-        private MMAArray(MappedFile mappedFile)
+        private MMAArray(MappedFile mappedFile, int depth, long position)
             : base(ATypes.AArray)
         {
             this.mappedFile = mappedFile;
             this.items = new ConditionalWeakTable<ValueType, AType>();
             this.indexCache = new Dictionary<int, ValueType>();
+            this.depth = depth;
+            this.offset = position;
+        }
+
+        private MMAArray(MappedFile mappedFile, int depth = 0)
+            : this(mappedFile, depth, MappedFileInfo.HeaderSize)
+        {
         }
 
         public new static AType Create(MappedFile mappedFile)
         {
             return new AReference(new MMAArray(mappedFile));
+        }
+
+        private static AType Create(MappedFile mappedFile, int depth, long position)
+        {
+            return new AReference(new MMAArray(mappedFile, depth, position));
         }
 
         #endregion

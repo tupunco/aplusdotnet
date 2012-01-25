@@ -324,6 +324,7 @@
     <Compile Include="Runtime\Function\Operator\Monadic\MonadicOperatorInstance.cs" />
     <Compile Include="Runtime\Function\Operator\Monadic\Rank.cs" />
     <Compile Include="Runtime\Helpers.cs" />
+    <Compile Include="Runtime\MappedFileInfo.cs" />
     <Compile Include="Runtime\MemoryMappedFileManager.cs" />
     <Compile Include="Runtime\StopException.cs" />
     <Compile Include="Runtime\SystemCommands.cs" />
