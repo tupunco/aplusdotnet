@@ -87,6 +87,10 @@ namespace AplusCoreUnitTests.Dlr
                     }
                 }
             }
+            else if (actual.Type == ATypes.ABox)
+            {
+                return actual.NestedItem.CompareInfos(other.NestedItem);
+            }
 
             return InfoResult.OK;
         }
