@@ -173,6 +173,7 @@
     <Compile Include="Dlr\Function\System\PermissiveIndexing.cs" />
     <Compile Include="Dlr\Function\System\RemoveDependency.cs" />
     <Compile Include="Dlr\Function\System\ToSlotfiller.cs" />
+    <Compile Include="Dlr\MappedUtils.cs" />
     <Compile Include="Dlr\MemoryMappedFile\Map.cs" />
     <Compile Include="Dlr\MemoryMappedFile\MapIn.cs" />
     <Compile Include="Dlr\MemoryMappedFile\Operations.cs" />

@@ -93,37 +93,6 @@ namespace AplusCoreUnitTests.Dlr
 
         #endregion
 
-        #region MemoryMappedFiles
-
-        public static void CreateMemoryMappedFiles(ScriptEngine engine)
-        {
-            engine.Execute<AType>("`IntegerScalar.m beam 67");
-            engine.Execute<AType>("`FloatScalar.m beam 2.3");
-            engine.Execute<AType>("`CharScalar.m beam 'A'");
-            engine.Execute<AType>("`Integer23.m beam 2 3 rho 5 6 7 9 8 2");
-            engine.Execute<AType>("`Float22.m beam 2 2 rho 3.4 1.4 7.6 1.1");
-            engine.Execute<AType>("`Char25.m beam 2 5 rho 'HelloWorld'");
-        }
-
-        public static void DeleteMemoryMappedFiles(ref ScriptEngine engine)
-        {
-            engine = null;
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-
-            string[] files = new string[] { "IntegerScalar.m", "CharScalar.m", "FloatScalar.m", "Integer23.m", "Float22.m", "Char25.m" };
-
-            for (int i = 0; i < files.Length; i++)
-            {
-                if (File.Exists(files[i]))
-                {
-                    File.Delete(files[i]);
-                }
-            }
-        }
-
-        #endregion
-
         #region CDR related
 
         /// <summary>

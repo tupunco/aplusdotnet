@@ -18,13 +18,13 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
         [TestInitialize]
         public void InitMemoryMappedFile()
         {
-            TestUtils.CreateMemoryMappedFiles(this.engine);
+            MappedUtils.CreateMemoryMappedFiles(this.engine);
         }
 
         [TestCleanup]
         public void CleanUpMemoryMappedFile()
         {
-            TestUtils.DeleteMemoryMappedFiles(ref this.engine);
+            MappedUtils.DeleteMemoryMappedFiles(ref this.engine);
         }
 
         #endregion
@@ -53,7 +53,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := > a", scope);
 
             this.engine.Execute<AType>("(0 0 flip b) := 1 3", scope);
@@ -84,7 +86,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := < a", scope);
             this.engine.Execute<AType>("c := > b", scope);
 
@@ -116,8 +120,10 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
-            this.engine.Execute<AType>("b := 1 beam `Integer23.m", scope);
+            string value = string.Format(" 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(string.Format("a := {0}", value), scope);
+            this.engine.Execute<AType>(string.Format("b := {0}", value), scope);
 
             this.engine.Execute<AType>("c := (a; iota 2 3; b)", scope);
             this.engine.Execute<AType>("d := > c[2]", scope);
@@ -149,7 +155,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
 
             this.engine.Execute<AType>("c := (a; iota 2 3)", scope);
             this.engine.Execute<AType>("d := > c", scope);
@@ -186,7 +194,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := in a", scope);
 
             this.engine.Execute<AType>("c := > b[0]", scope);
@@ -223,7 +233,11 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := pick a", scope);
 
             this.engine.Execute<AType>("(0 0 flip b):=1 3", scope);
@@ -254,7 +268,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := < a", scope);
             this.engine.Execute<AType>("c := pick b", scope);
 
@@ -286,7 +302,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := (a;iota 2 3)", scope);
             this.engine.Execute<AType>("c := pick b", scope);
 
@@ -324,7 +342,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := rtack a", scope);
 
             this.engine.Execute<AType>("b[1;1] := 5", scope);
@@ -355,7 +375,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := rtack < a", scope);
             this.engine.Execute<AType>("c := > b", scope);
 
@@ -387,7 +409,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := + a", scope);
             this.engine.Execute<AType>("b[] := 34", scope);
 
@@ -403,7 +427,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             AType expected = AFloat.Create(2.3);
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `FloatScalar.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.FloatScalar.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := + a", scope);
             this.engine.Execute<AType>("b[] := 3.4", scope);
 
@@ -439,7 +465,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := a[]", scope);
 
             this.engine.Execute<AType>("b[1;1] := 12", scope);
@@ -474,7 +502,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := () # a", scope);
 
             this.engine.Execute<AType>("b[1;1] := 5", scope);
@@ -505,7 +535,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := 1 # a", scope);
 
             this.engine.Execute<AType>("b[1] := 12", scope);
@@ -536,7 +568,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             AType g = this.engine.Execute<AType>("b := (0;0 2) # a", scope);
 
             this.engine.Execute<AType>("b[1] := 65", scope);
@@ -571,7 +605,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := () pick a", scope);
 
             this.engine.Execute<AType>("b[0;0] := 23", scope);
@@ -602,7 +638,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := () pick < a", scope);
             this.engine.Execute<AType>("c := > b", scope);
 
@@ -634,7 +672,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("b := () pick (2;a;8)", scope);
             this.engine.Execute<AType>("c := > b[1]", scope);
 
@@ -672,10 +712,13 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("a[] := 2 3 rho 3 9 1 8 6 5", scope);
 
-            AType result = this.engine.Execute<AType>("1 beam `Integer23.m", scope);
+            executable = string.Format("1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+            AType result = this.engine.Execute<AType>(executable, scope);
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
@@ -699,10 +742,13 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `Float22.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.FloatMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("a[] := 6.4", scope);
 
-            AType result = this.engine.Execute<AType>("1 beam `Float22.m", scope);
+            executable = string.Format("1 beam `{0}", MappedFiles.FloatMatrix.GetFileName());
+            AType result = this.engine.Execute<AType>(executable, scope);
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
@@ -714,7 +760,9 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             AType expected = AChar.Create('B');
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("a := 1 beam `CharScalar", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.CharScalar.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("a[] := 'B'", scope);
 
             AType result = this.engine.Execute<AType>("1 beam `CharScalar", scope);
@@ -800,10 +848,13 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             ScriptScope scope = this.engine.CreateScope();
             this.engine.Execute<AType>("f{a} : {(1 take a) := 1 3 rho 7 4 1 }", scope);
 
-            this.engine.Execute<AType>("a := 1 beam `Integer23.m", scope);
+            string executable = string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+
+            this.engine.Execute<AType>(executable, scope);
             this.engine.Execute<AType>("f{a}", scope);
 
-            AType result = this.engine.Execute<AType>("1 beam `Integer23.m", scope);
+            executable = string.Format("1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName());
+            AType result = this.engine.Execute<AType>(executable, scope);
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
@@ -827,12 +878,96 @@ namespace AplusCoreUnitTests.Dlr.MemoryMappedFile
             );
 
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("f{} : { 1 beam `Float22.m }", scope);
+            string functionDefinition = string.Format("f{{}} : {{ 1 beam `{0}}}", MappedFiles.FloatMatrix.GetFileName());
+            this.engine.Execute<AType>(functionDefinition, scope);
 
             this.engine.Execute<AType>("a := f{}", scope);
             this.engine.Execute<AType>("a[1;1] := 34", scope);
 
-            AType result = this.engine.Execute<AType>("1 beam `Float22.m", scope);
+            string executable = string.Format("1 beam `{0}", MappedFiles.FloatMatrix.GetFileName());
+            AType result = this.engine.Execute<AType>(executable, scope);
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        #endregion
+
+        #region Case 8: Assign
+
+        [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
+        public void ArrayAssignment()
+        {
+            AType expected =
+                AArray.Create(ATypes.AInteger,
+                              AArray.Create(ATypes.AInteger, AInteger.Create(1), AInteger.Create(1), AInteger.Create(1)),
+                              AArray.Create(ATypes.AInteger, AInteger.Create(9), AInteger.Create(8), AInteger.Create(2))
+                              );
+
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>(string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName()), scope);
+            this.engine.Execute<AType>("a[0] := 1", scope);
+
+            AType result =
+                this.engine.Execute<AType>(string.Format("b := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName()));
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
+        public void MultiIndexing()
+        {
+            AType expected =
+                AArray.Create(ATypes.AInteger,
+                              AArray.Create(ATypes.AInteger, AInteger.Create(5), AInteger.Create(1), AInteger.Create(7)),
+                              AArray.Create(ATypes.AInteger, AInteger.Create(9), AInteger.Create(8), AInteger.Create(2))
+                              );
+
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>(string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName()), scope);
+            this.engine.Execute<AType>("a[0;1] := 1", scope);
+
+            AType result =
+                this.engine.Execute<AType>(string.Format("b := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName()));
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
+        public void UnmappingBecauseIndex1()
+        {
+            AType expected =
+                AArray.Create(ATypes.AInteger,
+                              AArray.Create(ATypes.AInteger, AInteger.Create(5), AInteger.Create(6), AInteger.Create(7)),
+                              AArray.Create(ATypes.AInteger, AInteger.Create(9), AInteger.Create(8), AInteger.Create(2))
+                              );
+
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>(string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName()), scope);
+            this.engine.Execute<AType>("c := a[0]", scope);
+            this.engine.Execute<AType>("c := 1", scope);
+
+            AType result =
+                this.engine.Execute<AType>(string.Format("b := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName()));
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("MemoryMappedFiles"), TestCategory("Operations"), TestMethod]
+        public void UnmappingBecauseIndex2()
+        {
+            AType expected =
+                AArray.Create(ATypes.AInteger, AInteger.Create(5), AInteger.Create(6), AInteger.Create(7));
+
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>(string.Format("a := 1 beam `{0}", MappedFiles.IntegerMatrix.GetFileName()), scope);
+            this.engine.Execute<AType>("c := a[0]", scope);
+            this.engine.Execute<AType>("a[0] := 1", scope);
+
+            AType result = scope.GetVariable<AType>("c");
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
