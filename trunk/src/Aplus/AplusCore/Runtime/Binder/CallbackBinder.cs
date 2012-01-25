@@ -6,6 +6,7 @@ using Microsoft.Scripting.Utils;
 
 using AplusCore.Compiler;
 using AplusCore.Runtime.Callback;
+using AplusCore.Runtime.Function.Monadic;
 using AplusCore.Types;
 
 using DLR = System.Linq.Expressions;
@@ -71,10 +72,10 @@ namespace AplusCore.Runtime.Binder
                 IEnumerable<DLR.Expression> callbackBaseArguments = new DLR.Expression[] {
                     callbackItemExpression.Property("StaticData"), // static data
                     DLR.Expression.Convert(args[1].Expression, typeof(AType)), // new value
-                    DLR.Expression.Constant(Utils.ANull(), typeof(AType)), // index/set of indices
-                    DLR.Expression.Constant(Utils.ANull(), typeof(AType)), // path (left argument of pick)
-                    DLR.Expression.Constant(Utils.ANull(), typeof(AType)), // context of the global variable
-                    DLR.Expression.Constant(Utils.ANull(), typeof(AType)) // name of the global variable  
+                    DLR.Expression.Convert(args[2].Expression, typeof(AType)), // index/set of indices
+                    DLR.Expression.Convert(args[3].Expression, typeof(AType)), // path (left argument of pick)
+                    callbackItemExpression.Property("Context"), // context of the global variable
+                    callbackItemExpression.Property("UnqualifiedName") // name of the global variable
                 }.Where((item, i) => i < callbackAFunction.Valence - 1).Reverse();
                 List<DLR.Expression> callbackArguments = new List<DLR.Expression>();
                 

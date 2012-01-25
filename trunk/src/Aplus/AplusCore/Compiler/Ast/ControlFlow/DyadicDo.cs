@@ -91,7 +91,10 @@ namespace AplusCore.Compiler.AST
 
             if (this.expression is Assign && ((Assign)this.expression).Target is Identifier)
             {
+                scope.IsAssignment = true;
                 result.AddFirst(this.expression.Generate(scope));
+                scope.IsAssignment = false;
+
                 // Remove the assignment and leave the identifier only
                 this.expression = ((Assign)this.expression).Target;
             }
@@ -136,17 +139,13 @@ namespace AplusCore.Compiler.AST
                     // Start the loop
                     DLR.Expression.Loop(
                         DLR.Expression.Block(
-
-                    // set the variable to the counter     
                             AST.Assign.GenerateIdentifierAssign(
                                 scope,
                                 variable,
-                                DLR.Expression.Call(
-                                    typeof(AInteger).GetMethod("Create", new Type[] { typeof(int) }),
-                                    counter
-                                )
+                                DLR.Expression.Call(typeof(LocalAInteger).GetMethod("Create"), counter),
+                                false,
+                                false
                             ),
-
                             DLR.Expression.IfThen(
                                 (incrementMode ?
                     // Check if  variable >= EXITVALUE  is true

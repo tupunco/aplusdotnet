@@ -27,6 +27,24 @@ namespace AplusCore.Runtime.Callback
             get { return variableName; }
         }
 
+        public AType UnqualifiedName
+        {
+            get
+            {
+                int contextLength = this.variableName.IndexOf('.') + 1;
+                return ASymbol.Create(this.variableName.Substring(contextLength));
+            }
+        }
+
+        public AType Context
+        {
+            get
+            {
+                int contextLength = this.variableName.IndexOf('.');
+                return ASymbol.Create(this.variableName.Substring(0, contextLength));
+            }
+        }
+
         /// <summary>
         /// Gets the callback function.
         /// </summary>

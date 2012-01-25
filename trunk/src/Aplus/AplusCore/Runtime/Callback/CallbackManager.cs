@@ -14,6 +14,7 @@ namespace AplusCore.Runtime.Callback
         /// Maps the global variable to an AFunc.
         /// </summary>
         private Dictionary<string, CallbackItem> mapping;
+        private Dictionary<string, CallbackItem> presetMapping;
 
         #endregion
 
@@ -22,6 +23,7 @@ namespace AplusCore.Runtime.Callback
         public CallbackManager()
         {
             this.mapping = new Dictionary<string, CallbackItem>();
+            this.presetMapping = new Dictionary<string, CallbackItem>();
         }
 
         #endregion
@@ -50,6 +52,17 @@ namespace AplusCore.Runtime.Callback
         }
 
         /// <summary>
+        /// Gets the <see cref="CallbackItem"/> for the given global variable name.
+        /// </summary>
+        /// <param name="variableName">Global variable name.</param>
+        /// <param name="callback"></param>
+        /// <returns>True if the is a preset callback for the given global variable, otherwise false.</returns>
+        public bool TryGetPresetCallback(string variableName, out CallbackItem callback)
+        {
+            return this.presetMapping.TryGetValue(variableName, out callback);
+        }
+
+        /// <summary>
         /// Register a callback to a global variable.
         /// </summary>
         /// <param name="variableName">Global variable name.</param>
@@ -57,6 +70,16 @@ namespace AplusCore.Runtime.Callback
         public void Register(string variableName, AType callbackFunction, AType staticData)
         {
             this.mapping[variableName] = new CallbackItem(variableName, callbackFunction, staticData);
+        }
+
+        /// <summary>
+        /// Register a preset callback to a global variable.
+        /// </summary>
+        /// <param name="variableName">Global variable name.</param>
+        /// <param name="callbackFunction"></param>
+        public void RegisterPreset(string variableName, AType callbackFunction, AType staticData)
+        {
+            this.presetMapping[variableName] = new CallbackItem(variableName, callbackFunction, staticData);
         }
 
         /// <summary>

@@ -6,7 +6,6 @@ using DLR = System.Linq.Expressions;
 
 namespace AplusCore.Compiler
 {
-    
     public class AplusScope
     {
         #region Variables
@@ -18,7 +17,11 @@ namespace AplusCore.Compiler
         private DLR.ParameterExpression moduleParam;
         private Dictionary<string, DLR.ParameterExpression> variables;
 
+        private CallbackInfoStorage callbackInfo;
+
         private DLR.LabelTarget returnTarget;
+
+        private DLR.ParameterExpression assignDone;
 
         private bool iseval;
 
@@ -50,6 +53,8 @@ namespace AplusCore.Compiler
 
             this.variables = new Dictionary<string, DLR.ParameterExpression>();
 
+            this.callbackInfo = new CallbackInfoStorage();
+
             this.iseval = isEval;
 
             this.ismethod = isMethod;
@@ -75,6 +80,12 @@ namespace AplusCore.Compiler
             set { this.isAssignment = value; }
         }
 
+        internal DLR.ParameterExpression AssignDone
+        {
+            get { return this.assignDone; }
+            set { this.assignDone = value; }
+        }
+
         /// <summary>
         /// Target of return inside of a user defined function
         /// </summary>
@@ -87,6 +98,13 @@ namespace AplusCore.Compiler
         internal Dictionary<string, DLR.ParameterExpression> Variables
         {
             get { return this.variables; }
+            set { this.variables = value; }
+        }
+
+        internal CallbackInfoStorage CallbackInfo
+        {
+            get { return this.callbackInfo; }
+            set { this.callbackInfo = value; }
         }
 
         #endregion
@@ -103,6 +121,7 @@ namespace AplusCore.Compiler
             this.iseval |= parentScope.iseval;
             this.ismethod |= parentScope.IsMethod;
             this.isAssignment |= parentScope.IsAssignment;
+            this.assignDone = parent.assignDone;
         }
 
         #endregion

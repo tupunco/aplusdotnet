@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using AplusCore.Runtime;
 using AplusCore.Runtime.Callback;
@@ -74,25 +75,28 @@ namespace AplusCore.Compiler.AST
 
         public override DLR.Expression Generate(AplusScope scope)
         {
-            DLR.ParameterExpression temp = DLR.Expression.Parameter(typeof(AType), "__TEMP__");
+            DLR.ParameterExpression value = DLR.Expression.Parameter(typeof(AType), "__VALUE__");
+            DLR.ParameterExpression targetParameter = DLR.Expression.Parameter(typeof(AType), "__TARGET__");
+            DLR.ParameterExpression assignDone = DLR.Expression.Parameter(typeof(bool), "__ASSIGNDONE__");
+            DLR.ParameterExpression prevAssignDone = scope.AssignDone;
+
+            scope.AssignDone = assignDone;
+            CallbackInfoStorage savedCallbackInfos = scope.CallbackInfo;
+
+            CallbackInfoStorage callbackInfos =
+                new CallbackInfoStorage()
+                {
+                    Index = DLR.Expression.Parameter(typeof(AType), "__CALLBACKINDEX__"),
+                    QualifiedName = DLR.Expression.Parameter(typeof(string), "__QUALIFIEDNAME__"),
+                    Path = DLR.Expression.Parameter(typeof(AType), "__PATH__"),
+                    NonPresetValue = DLR.Expression.Parameter(typeof(AType), "__NONPRESETVALUE__")
+                };
+
+            scope.CallbackInfo = callbackInfos;
 
             // Clone the rhs value of the assignment to ensure correct results
             // in case of: a:=b:=[...:=] [rhs]  assignments
             DLR.ParameterExpression environment = scope.GetRuntimeExpression();
-            DLR.Expression value =
-                DLR.Expression.Block(
-                    new DLR.ParameterExpression[] { temp },
-                    DLR.Expression.Assign(temp, this.expression.Generate(scope)),
-                    DLR.Expression.Condition(
-                        DLR.Expression.Property(temp, "IsMemoryMappedFile"),
-                        temp,
-                        DLR.Expression.Call(
-                            temp,
-                            typeof(AType).GetMethod("Clone")
-                        )
-                    )
-                );
-
             DLR.Expression result = null;
 
             if (this.target is Identifier)
@@ -118,12 +122,53 @@ namespace AplusCore.Compiler.AST
                     }
 
                     var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static;
-                    result = DLR.Expression.Call(
-                        typeof(Assign).GetMethod("AppendItem", flags),
-                        value,
-                        target.Item.Generate(scope),
-                        environment
-                    );
+
+                    scope.IsAssignment = true;
+                    DLR.Expression item = target.Item.Generate(scope);
+                    scope.IsAssignment = false;
+
+                    DLR.ParameterExpression param = DLR.Expression.Parameter(typeof(AType));
+                    DLR.ParameterExpression errorParam = DLR.Expression.Parameter(typeof(Error.Signal));
+                    DLR.Expression callback = BuildCallbackCall(scope, value);
+                    DLR.Expression presetCallback = BuildPresetCallbackCall(scope, value);
+
+                    result =
+                        DLR.Expression.Block(
+                            new DLR.ParameterExpression[] { param },
+                            DLR.Expression.Assign(param, item),
+                            DLR.Expression.Call(
+                                typeof(Assign).GetMethod("CalculateIndexes", flags),
+                                value,
+                                param,
+                                environment,
+                                scope.CallbackInfo.Index
+                            ),
+                            DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(false)),
+                            DLR.Expression.TryCatch(
+                                DLR.Expression.Block(
+                                    typeof(void),
+                                    DLR.Expression.Assign(value, presetCallback),
+                                    DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(true))
+                                ),
+                                DLR.Expression.Catch(
+                                    errorParam,
+                                    DLR.Expression.Empty()
+                                )
+                            ),
+                            DLR.Expression.IfThen(
+                                scope.AssignDone,
+                                DLR.Expression.Block(
+                                    DLR.Expression.Call(
+                                        typeof(Assign).GetMethod("AppendItem", flags),
+                                        value,
+                                        param,
+                                        environment
+                                    ),
+                                    callback
+                                )
+                            ),
+                            scope.CallbackInfo.NonPresetValue
+                        );
                 }
                 else
                 {
@@ -135,12 +180,50 @@ namespace AplusCore.Compiler.AST
                 var method = typeof(Value).GetMethod("Assign");
                 var targetDLR = ((MonadicFunction)this.target).Expression.Generate(scope);
 
-                result = DLR.Expression.Call(
-                    method,
-                    targetDLR,
-                    value,
-                    environment
-                );
+                DLR.Expression callback = BuildCallbackCall(scope, value);
+                DLR.Expression presetCallback = BuildPresetCallbackCall(scope, value);
+
+                DLR.ParameterExpression errorParam = DLR.Expression.Parameter(typeof(Error.Signal));
+                DLR.ParameterExpression target = DLR.Expression.Parameter(typeof(AType), "__VALUETARGET__");
+
+                DLR.Expression nameMaker =
+                    DLR.Expression.Call(
+                        VariableHelper.BuildValueQualifiedNameMethod,
+                        DLR.Expression.Constant("."),
+                        target.Property("asString")
+                    );
+
+                result =
+                    DLR.Expression.Block(
+                        new DLR.ParameterExpression[] { target },
+                        DLR.Expression.Assign(target, targetDLR),
+                        DLR.Expression.Assign(scope.CallbackInfo.QualifiedName, nameMaker),
+                        DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(false)),
+                        DLR.Expression.TryCatch(
+                            DLR.Expression.Block(
+                                typeof(void),
+                                DLR.Expression.Assign(value, presetCallback),
+                                DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(true))
+                            ),
+                            DLR.Expression.Catch(
+                                errorParam,
+                                DLR.Expression.Empty()
+                            )
+                        ),
+                        DLR.Expression.IfThen(
+                            scope.AssignDone,
+                            DLR.Expression.Block(
+                                DLR.Expression.Call(
+                                    method,
+                                    target,
+                                    value,
+                                    environment
+                                ),
+                                callback
+                            )
+                        ),
+                        scope.CallbackInfo.NonPresetValue
+                    );
             }
             else if (Node.TestDyadicToken(this.target, Grammar.Tokens.VALUEINCONTEXT))
             {
@@ -149,13 +232,56 @@ namespace AplusCore.Compiler.AST
                 var targetDLR = targetNode.Right.Generate(scope);
                 var contextNameDLR = targetNode.Left.Generate(scope);
 
-                result = DLR.Expression.Call(
-                    method,
-                    targetDLR,
-                    contextNameDLR,
-                    value,
-                    environment
-                );
+                DLR.Expression callback = BuildCallbackCall(scope, value);
+                DLR.Expression presetCallback = BuildPresetCallbackCall(scope, value);
+
+                DLR.ParameterExpression target = DLR.Expression.Parameter(typeof(AType), "__VALUETARGET__");
+                DLR.ParameterExpression contextName = DLR.Expression.Parameter(typeof(AType), "__CONTEXTNAME__");
+                DLR.ParameterExpression errorParam = DLR.Expression.Parameter(typeof(Error.Signal));
+
+                DLR.Expression nameMaker =
+                    DLR.Expression.Call(
+                        VariableHelper.BuildValueQualifiedNameMethod,
+                        contextName.Property("asString"),
+                        target.Property("asString")
+                    );
+
+                result =
+                    DLR.Expression.Block(
+                        new DLR.ParameterExpression[] { target, contextName },
+                        DLR.Expression.Assign(target, targetDLR),
+                        DLR.Expression.Assign(contextName, contextNameDLR),
+                        DLR.Expression.Assign(
+                            scope.CallbackInfo.QualifiedName,
+                            nameMaker
+                       ),
+                        DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(false)),
+                        DLR.Expression.TryCatch(
+                            DLR.Expression.Block(
+                                typeof(void),
+                                DLR.Expression.Assign(value, presetCallback),
+                                DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(true))
+                            ),
+                            DLR.Expression.Catch(
+                                errorParam,
+                                DLR.Expression.Empty()
+                            )
+                        ),
+                        DLR.Expression.IfThen(
+                            scope.AssignDone,
+                            DLR.Expression.Block(
+                                DLR.Expression.Call(
+                                    method,
+                                    target,
+                                    contextName,
+                                    value,
+                                    environment
+                                ),
+                                callback
+                            )
+                        ),
+                        scope.CallbackInfo.NonPresetValue
+                    );
             }
             else if (Node.TestDyadicToken(this.target, Grammar.Tokens.PICK))
             {
@@ -171,17 +297,97 @@ namespace AplusCore.Compiler.AST
                 // for pick we need a different method currently..
                 var method = typeof(Assign).GetMethod("AssignHelper", flags);
 
-                result = DLR.Expression.Call(
-                    method,
-                    value,
-                    this.target.Generate(scope)
-                );
+                DLR.Expression callback = AST.Assign.BuildCallbackCall(scope, value);
+                DLR.Expression presetCallback = BuildPresetCallbackCall(scope, value);
+
+                DLR.ParameterExpression temp = DLR.Expression.Parameter(typeof(AType));
+                DLR.ParameterExpression errorParam = DLR.Expression.Parameter(typeof(Error.Signal));
+
+                result =
+                    DLR.Expression.Block(
+                        new DLR.ParameterExpression[] { temp },
+                        DLR.Expression.Assign(temp, this.target.Generate(scope)),
+                        DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(false)),
+                        DLR.Expression.TryCatch(
+                            DLR.Expression.Block(
+                                typeof(void),
+                                DLR.Expression.Assign(value, presetCallback),
+                                DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(true))
+                            ),
+                            DLR.Expression.Catch(
+                                errorParam,
+                                DLR.Expression.Empty()
+                            )
+                        ),
+                        DLR.Expression.IfThen(
+                            scope.AssignDone,
+                            DLR.Expression.Block(
+                                DLR.Expression.Call(
+                                    method,
+                                    value,
+                                    temp
+                                ),
+                                callback
+                            )
+                        )
+                    );
 
                 // switch off Assignment flag
                 scope.IsAssignment = false;
             }
 
-            return result;
+            // error parameter
+            DLR.ParameterExpression errorVariable = DLR.Expression.Parameter(typeof(Error.Signal), "error");
+
+            /**
+             * The dark magic behind callbacks:
+             * $value := the value of the right side of assignment
+             * $target := the left side of the assignment
+             * $qualifiedName := the name of the assigned variable
+             * $index := the index of the assigned variable (if any)
+             * $path := the path of the assigned variable (if any)
+             * 
+             * example for preset callback assignment
+             * a := x := y
+             * if we have a preset callback on x, then the x will get the value of the preset callback on x,
+             * a will be y (or the value of the preset callback on a)
+             * in any case we will result y
+             */
+
+            DLR.Expression blockedResult =
+                DLR.Expression.Block(
+                    new DLR.ParameterExpression[] { value, scope.AssignDone,
+                        scope.CallbackInfo.QualifiedName, scope.CallbackInfo.Index,
+                        scope.CallbackInfo.Path,scope.CallbackInfo.NonPresetValue },
+                    DLR.Expression.Assign(scope.CallbackInfo.QualifiedName, DLR.Expression.Constant("")),
+                    DLR.Expression.Assign(scope.CallbackInfo.Index, DLR.Expression.Constant(Utils.ANull())),
+                    DLR.Expression.Assign(scope.CallbackInfo.Path, DLR.Expression.Constant(Utils.ANull())),
+                    DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(true, typeof(bool))),
+                    DLR.Expression.Assign(scope.CallbackInfo.NonPresetValue, DLR.Expression.Constant(null, typeof(AType))),
+                    DLR.Expression.Assign(value, this.expression.Generate(scope)),
+                    DLR.Expression.IfThen(
+                        DLR.Expression.Equal(scope.CallbackInfo.NonPresetValue, DLR.Expression.Constant(null, typeof(AType))),
+                        DLR.Expression.Assign(scope.CallbackInfo.NonPresetValue, value)
+                    ),
+                    DLR.Expression.Assign(
+                            value,
+                            DLR.Expression.Condition(
+                                DLR.Expression.Property(value, "IsMemoryMappedFile"),
+                                value,
+                                DLR.Expression.Call(
+                                    value,
+                                    typeof(AType).GetMethod("Clone")
+                                )
+                            )
+                        ),
+                    result,
+                    scope.CallbackInfo.NonPresetValue
+                );
+
+            scope.CallbackInfo = savedCallbackInfos;
+            scope.AssignDone = prevAssignDone;
+
+            return blockedResult;
         }
 
         #endregion
@@ -200,7 +406,10 @@ namespace AplusCore.Compiler.AST
             }
 
             DLR.Expression left = function.Left.Generate(scope);
+
+            scope.IsAssignment = true;
             DLR.Expression right = function.Right.Generate(scope);
+            scope.IsAssignment = false;
 
             var method = DyadicFunctionInstance.Pick;
             DLR.Expression pickDLR = DLR.Expression.Call(
@@ -211,13 +420,44 @@ namespace AplusCore.Compiler.AST
                 scope.GetRuntimeExpression()
             );
 
+            DLR.ParameterExpression errorParam = DLR.Expression.Parameter(typeof(Error.Signal));
+
             var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static;
 
-            DLR.Expression result = DLR.Expression.Call(
-                typeof(Assign).GetMethod("PickAssignHelper", flags),
-                value,
-                pickDLR
-            );
+            DLR.ParameterExpression temp = DLR.Expression.Parameter(typeof(AType));
+            DLR.Expression callback = BuildCallbackCall(scope, temp);
+            DLR.Expression presetCallback = BuildPresetCallbackCall(scope, temp);
+
+            DLR.Expression result =
+                DLR.Expression.Block(
+                    new DLR.ParameterExpression[] { temp },
+                    DLR.Expression.Assign(scope.CallbackInfo.Path, left),
+                    DLR.Expression.Assign(temp, value),
+                    DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(false)),
+                    DLR.Expression.TryCatch(
+                        DLR.Expression.Block(
+                            typeof(void),
+                            DLR.Expression.Assign(temp, presetCallback),
+                            DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(true))
+                        ),
+                        DLR.Expression.Catch(
+                            errorParam,
+                            DLR.Expression.Empty()
+                        )
+                    ),
+                    DLR.Expression.IfThen(
+                        scope.AssignDone,
+                        DLR.Expression.Block(
+                            DLR.Expression.Call(
+                                typeof(Assign).GetMethod("PickAssignHelper", flags),
+                                temp,
+                                pickDLR
+                            ),
+                            callback
+                        )
+                    ),
+                    scope.CallbackInfo.NonPresetValue
+                );
 
             return result;
         }
@@ -280,12 +520,70 @@ namespace AplusCore.Compiler.AST
             }
             else if (value.Rank == target.Rank)
             {
-                target.AddRange(value);
+                for (int i = 0; i < value.Length; i++)
+                {
+                    target.Add(value[i].Clone());
+                }
             }
             else
             {
                 throw new Error.Length("assign");
             }
+
+            return value;
+        }
+
+        private static AType CalculateIndexes(AType value, AType target, Aplus environment, out AType indexes)
+        {
+            if (target.Rank == 0)
+            {
+                throw new Error.Rank("assign");
+            }
+
+            if (!Utils.DifferentNumberType(target, value) && target.Type != value.Type)
+            {
+                // The target and value are not numbers and they are of a different type?
+                throw new Error.Type("assign");
+            }
+
+            int currentLength = target.Length;
+
+            if (target.Shape.SequenceEqual<int>(value.Shape))
+            {
+                indexes = AArray.Create(ATypes.AInteger);
+
+                for (int i = 0; i < value.Length; i++)
+                {
+                    indexes.Add(AInteger.Create(currentLength));
+                    currentLength++;
+                }
+            }
+            else if (target.Shape.GetRange(1, target.Shape.Count - 1).SequenceEqual<int>(value.Shape))
+            {
+                indexes = AInteger.Create(currentLength);
+                currentLength++;
+            }
+            else if (value.Rank == 0)
+            {
+                indexes = AInteger.Create(currentLength);
+                currentLength++;
+            }
+            else if (value.Rank == target.Rank)
+            {
+                indexes = AArray.Create(ATypes.AInteger);
+
+                for (int i = 0; i < value.Length; i++)
+                {
+                    indexes.Add(AInteger.Create(currentLength));
+                    currentLength++;
+                }
+            }
+            else
+            {
+                throw new Error.Length("assign");
+            }
+
+            indexes = ABox.Create(indexes);
 
             return value;
         }
@@ -310,19 +608,73 @@ namespace AplusCore.Compiler.AST
             }
             else
             {
-                result = DLR.Expression.Dynamic(
-                    scope.GetRuntime().SetIndexBinder(new System.Dynamic.CallInfo(target.IndexExpression.Length)),
-                    typeof(object),
-                    target.Item.Generate(scope),
+                IEnumerable<DLR.Expression> indexerValues = target.IndexExpression.Items.Reverse().Select(
+                    item => { return item.Generate(scope); }
+                );
+
+                DLR.ParameterExpression indexerParam = DLR.Expression.Parameter(typeof(List<AType>), "__INDEX__");
+
+                DLR.Expression call =
                     DLR.Expression.Call(
                         typeof(Helpers).GetMethod("BuildIndexerArray"),
-                        DLR.Expression.NewArrayInit(
-                            typeof(AType),
-                            target.IndexExpression.Items.Reverse().Select(item => { return item.Generate(scope); })
-                        )
-                    ),
-                    value
-                );
+                        DLR.Expression.NewArrayInit(typeof(AType), indexerValues)
+                    );
+
+                Aplus runtime = scope.GetRuntime();
+                string qualifiedName = ((Identifier)target.Item).BuildQualifiedName(runtime.CurrentContext);
+                DLR.ParameterExpression temp = DLR.Expression.Parameter(typeof(AType));
+                DLR.ParameterExpression errorParam = DLR.Expression.Parameter(typeof(Error.Signal));
+                DLR.Expression callback = BuildCallbackCall(scope, temp);
+                DLR.Expression presetCallback = BuildPresetCallbackCall(scope, temp);
+
+                result =
+                    DLR.Expression.Block(
+                        new DLR.ParameterExpression[] { indexerParam, temp },
+                        DLR.Expression.Assign(
+                            indexerParam,
+                            call
+                        ),
+                        DLR.Expression.Assign(
+                            scope.CallbackInfo.Index,
+                            DLR.Expression.Call(
+                                typeof(Tools).GetMethod("ConvertATypeListToAType", BindingFlags.NonPublic | BindingFlags.Static),
+                                indexerParam
+                            )
+                        ),
+                        DLR.Expression.Assign(
+                                scope.CallbackInfo.QualifiedName,
+                                DLR.Expression.Constant(qualifiedName)
+                        ),
+                        DLR.Expression.Assign(temp, value),
+                        DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(false)),
+                        DLR.Expression.TryCatch(
+                            DLR.Expression.Block(
+                                typeof(void),
+                                DLR.Expression.Assign(value, presetCallback),
+                                DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(true))
+                            ),
+                            DLR.Expression.Catch(
+                                errorParam,
+                                DLR.Expression.Empty()
+                            )
+                        ),
+                        DLR.Expression.IfThen(
+                            scope.AssignDone,
+                            DLR.Expression.Block(
+                                DLR.Expression.Dynamic(
+                                    scope.GetRuntime().SetIndexBinder(new System.Dynamic.CallInfo(target.IndexExpression.Length)),
+                                    typeof(object),
+                                    target.Item.Generate(scope),
+                                    indexerParam,
+                                    value
+                                ),
+                                DLR.Expression.Assign(temp, value),
+                                callback
+                            )
+                        ),
+                        scope.CallbackInfo.NonPresetValue
+                    );
+
             }
             return DLR.Expression.Convert(result, typeof(AType));
         }
@@ -490,7 +842,7 @@ namespace AplusCore.Compiler.AST
                 valuesParam
             );
 
-            return result;
+            return DLR.Expression.Block(result, DLR.Expression.Assign(scope.CallbackInfo.NonPresetValue, value));
         }
 
         #endregion
@@ -498,13 +850,15 @@ namespace AplusCore.Compiler.AST
         #region DLR: Assign to Identifier
 
         internal static DLR.Expression GenerateIdentifierAssign(
-            AplusScope scope, Identifier target, DLR.Expression value, bool isStrand = false)
+            AplusScope scope, Identifier target, DLR.Expression value, bool isStrand = false, bool needCallback = true)
         {
             Aplus runtime = scope.GetRuntime();
             DLR.Expression result = null;
 
             if (scope.IsMethod)
             {
+                string qualifiedName = target.BuildQualifiedName(runtime.CurrentContext);
+
                 // If the generation is inside of a method
                 // check if it has the variablename as function parameter
                 DLR.Expression functionParameter = scope.FindIdentifier(target.Name);
@@ -552,31 +906,43 @@ namespace AplusCore.Compiler.AST
                                     DLR.Expression.Constant(target.Name)
                                 ),
                                 // found the variable in function scope, so assign a value to it
-                                DLR.Expression.Dynamic(
-                                    runtime.SetMemberBinder(target.Name),
-                                    typeof(object),
-                                    functionScopeParam,
+                                DLR.Expression.Block(
+                                    needCallback
+                                    ? DLR.Expression.Assign(scope.CallbackInfo.QualifiedName, DLR.Expression.Constant(qualifiedName))
+                                    : (DLR.Expression)DLR.Expression.Empty(),
+                                    DLR.Expression.Dynamic(
+                                        runtime.SetMemberBinder(target.Name),
+                                        typeof(object),
+                                        functionScopeParam,
+                                        value
+                                    ),
                                     value
                                 ),
                                 // did NOT found the variable in the function scope
                                 // perform the assignment in the global scope
-                                BuildGlobalAssignment(scope, runtime, globalScopeParam, target, value, isStrand)
+                                BuildGlobalAssignment(scope, runtime, globalScopeParam, target, value, isStrand, needCallback)
                             );
 
                         }
                         else if (target.IsEnclosed)
                         {
-                            result = BuildGlobalAssignment(scope, runtime, globalScopeParam, target, value, isStrand);
+                            result = BuildGlobalAssignment(scope, runtime, globalScopeParam, target, value, isStrand, needCallback);
                         }
                         else
                         {
                             // Simple case, we are inside a user defined function, but not inside an eval block
-                            result = DLR.Expression.Dynamic(
-                                runtime.SetMemberBinder(target.Name),
-                                typeof(object),
-                                functionScopeParam,
-                                value
-                            );
+                            result =
+                                DLR.Expression.Block(
+                                    needCallback
+                                    ? DLR.Expression.Assign(scope.CallbackInfo.QualifiedName, DLR.Expression.Constant(qualifiedName))
+                                    : (DLR.Expression)DLR.Expression.Empty(),
+                                    DLR.Expression.Dynamic(
+                                    runtime.SetMemberBinder(target.Name),
+                                    typeof(object),
+                                    functionScopeParam,
+                                    value
+                                    )
+                                );
                         }
                         break;
 
@@ -584,13 +950,13 @@ namespace AplusCore.Compiler.AST
                     case IdentifierType.SystemName:
                     default:
                         // Do an assignment on the global scope
-                        result = BuildGlobalAssignment(scope, runtime, globalScopeParam, target, value);
+                        result = BuildGlobalAssignment(scope, runtime, globalScopeParam, target, value, isStrand, needCallback);
                         break;
                 }
             }
             else
             {
-                result = BuildGlobalAssignment(scope, runtime, scope.GetModuleExpression(), target, value);
+                result = BuildGlobalAssignment(scope, runtime, scope.GetModuleExpression(), target, value, isStrand, needCallback);
             }
 
 
@@ -604,7 +970,9 @@ namespace AplusCore.Compiler.AST
             DLR.Expression variableContainer,
             Identifier target,
             DLR.Expression value,
-            bool isStrand = false)
+            bool isStrand = false,
+            bool needCallback = true
+            )
         {
             // Build the ET for updating the dependency
             DLR.Expression dependencyCall;
@@ -627,8 +995,99 @@ namespace AplusCore.Compiler.AST
                 );
             }
 
-            DLR.ParameterExpression valueParam = DLR.Expression.Parameter(typeof(object), "__VALUE__");
+            DLR.ParameterExpression errorParam = DLR.Expression.Parameter(typeof(Error.Signal), "__ERRORPARAM__");
+            DLR.ParameterExpression valueParam = DLR.Expression.Parameter(typeof(AType), "__VALUEPARAMETER__");
+            scope.AssignDone = (scope.AssignDone == null) ? DLR.Expression.Parameter(typeof(bool), "__ASSIGNDONE__") : scope.AssignDone;
 
+            DLR.Expression presetCallback = BuildPresetCallbackCall(scope, valueParam);
+            DLR.Expression callback = BuildCallbackCall(scope, valueParam);
+
+            DLR.Expression variableSet =
+                DLR.Expression.Block(
+                        VariableHelper.SetVariable(
+                            runtime,
+                            variableContainer,
+                            target.CreateContextNames(runtime.CurrentContext),
+                            valueParam
+                        ),
+                        dependencyCall
+                    );
+
+            DLR.Expression codebody;
+
+            if (needCallback)
+            {
+                codebody =
+                    DLR.Expression.Block(
+                        typeof(void),
+                        DLR.Expression.Assign(scope.CallbackInfo.QualifiedName, DLR.Expression.Constant(qualifiedName)),
+                        DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(false)),
+                        DLR.Expression.TryCatch(
+                            DLR.Expression.Block(
+                                typeof(void),
+                                DLR.Expression.Assign(valueParam, presetCallback),
+                                DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(true))
+                            ),
+                            DLR.Expression.Catch(
+                                errorParam,
+                                DLR.Expression.Empty()
+                            )
+                        ),
+                        DLR.Expression.IfThen(
+                            scope.AssignDone,
+                            DLR.Expression.Block(
+                                variableSet,
+                                callback
+                            )
+                        )
+                    );
+            }
+            else
+            {
+                codebody = variableSet;
+            }
+
+            // value assignment
+            DLR.Expression result = DLR.Expression.Block(
+                new DLR.ParameterExpression[] { valueParam },
+                DLR.Expression.Assign(valueParam, value),
+                codebody,
+                valueParam
+            );
+
+            return result;
+        }
+
+        internal static DLR.Expression BuildPresetCallbackCall(AplusScope scope, DLR.ParameterExpression valueParam)
+        {
+            DLR.ParameterExpression callbackParameter = DLR.Expression.Parameter(typeof(CallbackItem), "__CALLBACK__");
+            DLR.Expression callback = DLR.Expression.Block(
+                new DLR.ParameterExpression[] { callbackParameter },
+                DLR.Expression.Condition(
+                    DLR.Expression.Call(
+                        scope.GetRuntimeExpression().Property("CallbackManager"),
+                        typeof(CallbackManager).GetMethod("TryGetPresetCallback"),
+                        scope.CallbackInfo.QualifiedName,
+                        callbackParameter
+                    ),
+                    DLR.Expression.Dynamic(
+                // TODO: do not instantiate the binder here
+                        new Runtime.Binder.CallbackBinder(),
+                        typeof(object),
+                        callbackParameter,
+                        scope.GetRuntimeExpression(),
+                        valueParam,
+                        scope.CallbackInfo.Index,
+                        scope.CallbackInfo.Path
+                    ).To<AType>(),
+                    (DLR.Expression)valueParam.To<AType>()
+                )
+            );
+            return callback;
+        }
+
+        internal static DLR.Expression BuildCallbackCall(AplusScope scope, DLR.ParameterExpression valueParam)
+        {
             // callback
             /* 
              * CallbackItem callback;
@@ -644,7 +1103,7 @@ namespace AplusCore.Compiler.AST
                     DLR.Expression.Call(
                         scope.GetRuntimeExpression().Property("CallbackManager"),
                         typeof(CallbackManager).GetMethod("TryGetCallback"),
-                        DLR.Expression.Constant(qualifiedName),
+                        scope.CallbackInfo.QualifiedName,
                         callbackParameter
                     ),
                     DLR.Expression.Dynamic(
@@ -653,28 +1112,13 @@ namespace AplusCore.Compiler.AST
                         typeof(object),
                         callbackParameter,
                         scope.GetRuntimeExpression(),
-                        valueParam
+                        valueParam,
+                        scope.CallbackInfo.Index,
+                        scope.CallbackInfo.Path
                     )
                 )
             );
-
-
-            // value assignment
-            DLR.Expression result = DLR.Expression.Block(
-                new DLR.ParameterExpression[] { valueParam },
-                DLR.Expression.Assign(valueParam, value),
-                VariableHelper.SetVariable(
-                    runtime,
-                    variableContainer,
-                    target.CreateContextNames(runtime.CurrentContext),
-                    valueParam
-                ),
-                dependencyCall,
-                callback,
-                valueParam
-            );
-
-            return result;
+            return callback;
         }
 
         #endregion
@@ -718,7 +1162,7 @@ namespace AplusCore.Compiler.AST
         internal static DLR.Expression BuildIndexing(AplusScope scope, DLR.Expression target, DLR.Expression indexExpression)
         {
             var execute = typeof(AbstractMonadicFunction).GetMethod("Execute");
-            DLR.ParameterExpression indexes = DLR.Expression.Parameter(typeof(AType), "_INDEX_");
+            DLR.ParameterExpression indexes = DLR.Expression.Parameter(typeof(List<AType>), "_INDEX_");
 
             // (,x)
             DLR.Expression raveledRight = DLR.Expression.Call(
@@ -729,18 +1173,33 @@ namespace AplusCore.Compiler.AST
             );
 
             // (,x)[indexExpression] := ..
-            DLR.Expression result = DLR.Expression.Convert(
-                DLR.Expression.Dynamic(
-                    scope.GetRuntime().GetIndexBinder(new DYN.CallInfo(1)),
-                    typeof(object),
-                    raveledRight,
-                    DLR.Expression.Call(
-                        typeof(Helpers).GetMethod("BuildIndexerArray"),
-                        DLR.Expression.NewArrayInit(typeof(AType), indexExpression)
-                    )
-                ),
-                typeof(AType)
-            );
+            DLR.Expression result =
+                DLR.Expression.Convert(
+                    DLR.Expression.Block(
+                        new DLR.ParameterExpression[] { indexes },
+                        DLR.Expression.Assign(
+                            indexes,
+                            DLR.Expression.Call(
+                                typeof(Helpers).GetMethod("BuildIndexerArray"),
+                                DLR.Expression.NewArrayInit(typeof(AType), indexExpression)
+                            )
+                        ),
+                        DLR.Expression.Assign(
+                            scope.CallbackInfo.Index,
+                            DLR.Expression.Call(
+                                typeof(Tools).GetMethod("ConvertATypeListToAType", BindingFlags.NonPublic | BindingFlags.Static),
+                                indexes
+                            )
+                        ),
+                        DLR.Expression.Dynamic(
+                            scope.GetRuntime().GetIndexBinder(new DYN.CallInfo(1)),
+                            typeof(object),
+                            raveledRight,
+                            indexes
+                        )
+                    ),
+                    typeof(AType)
+                );
 
             return result;
         }
