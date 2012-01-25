@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 using Microsoft.Scripting.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,13 +17,13 @@ namespace AplusCoreUnitTests.Dlr.Function.System
         [TestInitialize]
         public void InitMemoryMappedFile()
         {
-            TestUtils.CreateMemoryMappedFiles(this.engine);
+            MappedUtils.CreateMemoryMappedFiles(this.engine);
         }
 
         [TestCleanup]
         public void CleanUpMemoryMappedFile()
         {
-            TestUtils.DeleteMemoryMappedFiles(ref this.engine);
+            MappedUtils.DeleteMemoryMappedFiles(ref this.engine);
         }
 
         #endregion
@@ -59,8 +57,10 @@ namespace AplusCoreUnitTests.Dlr.Function.System
 
             ScriptScope scope = this.engine.CreateScope();
 
-            this.engine.Execute<AType>("_items{3;'Integer23'}");
-            this.engine.Execute<AType>("t := 1 beam `Integer23", scope);
+            string mappedName = MappedFiles.IntegerMatrix.GetFileNameWithoutExtension();
+
+            this.engine.Execute<AType>(string.Format("_items{{3;'{0}'}}", mappedName));
+            this.engine.Execute<AType>(string.Format("t := 1 beam `{0}", mappedName), scope);
             this.engine.Execute<AType>("t[,] := 6 2 5", scope);
 
             AType result = scope.GetVariable<AType>(".t");
@@ -98,8 +98,10 @@ namespace AplusCoreUnitTests.Dlr.Function.System
 
             ScriptScope scope = this.engine.CreateScope();
 
-            this.engine.Execute<AType>("_items{4;'Float22'}");
-            this.engine.Execute<AType>("t := 1 beam `Float22", scope);
+            string filename = MappedFiles.FloatMatrix.GetFileNameWithoutExtension();
+
+            this.engine.Execute<AType>(string.Format("_items{{4;'{0}'}}", filename));
+            this.engine.Execute<AType>(string.Format("t := 1 beam `{0}", filename), scope);
             this.engine.Execute<AType>("t[,] := iota 2 2", scope);
 
             AType result = scope.GetVariable<AType>(".t");
@@ -122,8 +124,9 @@ namespace AplusCoreUnitTests.Dlr.Function.System
 
             ScriptScope scope = this.engine.CreateScope();
 
-            this.engine.Execute<AType>("_items{1;`Char25.m}");
-            AType result = this.engine.Execute<AType>("t := 1 beam `Char25.m", scope);
+            string filename = MappedFiles.CharMatrix.GetFileName();
+            this.engine.Execute<AType>(string.Format("_items{{1;`{0}}}", filename));
+            AType result = this.engine.Execute<AType>(string.Format("t := 1 beam `{0}", filename), scope);
 
             Assert.AreEqual(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
@@ -138,8 +141,9 @@ namespace AplusCoreUnitTests.Dlr.Function.System
 
             ScriptScope scope = this.engine.CreateScope();
 
-            this.engine.Execute<AType>("_items{0;`Float22.m}");
-            AType result = this.engine.Execute<AType>("t := 1 beam `Float22.m", scope);
+            string filename = MappedFiles.FloatMatrix.GetFileName();
+            this.engine.Execute<AType>(string.Format("_items{{0;`{0}}}", filename));
+            AType result = this.engine.Execute<AType>(string.Format("t := 1 beam `{0}", filename), scope);
 
             Assert.AreEqual(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
@@ -154,7 +158,8 @@ namespace AplusCoreUnitTests.Dlr.Function.System
         {
             AType expected = AInteger.Create(2);
 
-            AType result =  this.engine.Execute<AType>("_items{-1;'Integer23'}");
+            string filename = MappedFiles.IntegerMatrix.GetFileNameWithoutExtension();
+            AType result = this.engine.Execute<AType>(string.Format("_items{{-1;'{0}'}}", filename));
 
             Assert.AreEqual(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
@@ -165,8 +170,9 @@ namespace AplusCoreUnitTests.Dlr.Function.System
         {
             AType expected = AInteger.Create(15);
 
-            this.engine.Execute<AType>("_items{15;'Char25'}");
-            AType result = this.engine.Execute<AType>("_items{-1;'Char25'}");
+            string filename = MappedFiles.CharMatrix.GetFileNameWithoutExtension();
+            this.engine.Execute<AType>(string.Format("_items{{15;'{0}'}}", filename));
+            AType result = this.engine.Execute<AType>(string.Format("_items{{-1;'{0}'}}", filename));
 
             Assert.AreEqual(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
@@ -181,7 +187,8 @@ namespace AplusCoreUnitTests.Dlr.Function.System
         public void ItemsLengthError()
         {
             ScriptScope scope = this.engine.CreateScope();
-            this.engine.Execute<AType>("t := 1 beam `Integer23", scope);
+            string filename = MappedFiles.IntegerMatrix.GetFileNameWithoutExtension();
+            this.engine.Execute<AType>(string.Format("t := 1 beam `{0}", filename), scope);
             this.engine.Execute<AType>("t[,] := 2 4 1", scope);
         }
 
