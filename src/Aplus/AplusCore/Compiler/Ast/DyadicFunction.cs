@@ -108,14 +108,39 @@ namespace AplusCore.Compiler.AST
             }
             else if (scope.IsAssignment && this.token.Type == Tokens.CHOOSE)
             {
+                scope.IsAssignment = false;
                 DLR.Expression left = this.leftExpression.Generate(scope);
+
+                scope.IsAssignment = true;
                 DLR.Expression right = this.rightExpression.Generate(scope);
 
-                result = DLR.Expression.Call(
-                    DLR.Expression.Constant(DyadicFunctionInstance.Choose),
-                    DyadicFunctionInstance.Choose.GetType().GetMethod("Assign"),
-                    right, left, scope.GetRuntimeExpression()
-                );
+                result =
+                    DLR.Expression.Block(
+                        DLR.Expression.Assign(scope.CallbackInfo.Index, left),
+                        DLR.Expression.Call(
+                            DLR.Expression.Constant(DyadicFunctionInstance.Choose),
+                            DyadicFunctionInstance.Choose.GetType().GetMethod("Assign"),
+                            right, left, scope.GetRuntimeExpression()
+                        )
+                    );
+            }
+            else if (scope.IsAssignment && this.token.Type == Tokens.PICK)
+            {
+                scope.IsAssignment = false;
+                DLR.Expression left = this.leftExpression.Generate(scope);
+
+                scope.IsAssignment = true;
+                DLR.Expression right = this.rightExpression.Generate(scope);
+
+                result =
+                    DLR.Expression.Block(
+                        DLR.Expression.Assign(scope.CallbackInfo.Path, left),
+                        DLR.Expression.Call(
+                            DLR.Expression.Constant(DyadicFunctionInstance.Pick),
+                            DyadicFunctionInstance.Pick.GetType().GetMethod("Execute"),
+                            right, left, scope.GetRuntimeExpression()
+                        )
+                    );
             }
             else
             {

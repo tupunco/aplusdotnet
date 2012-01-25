@@ -6,10 +6,11 @@ using AplusCore.Runtime;
 using AplusCore.Types;
 
 using DLR = System.Linq.Expressions;
+using System.Reflection;
 
 namespace AplusCore.Compiler
 {
-    class VariableHelper
+    static class VariableHelper
     {
         #region DLR helpers
 
@@ -173,13 +174,6 @@ namespace AplusCore.Compiler
             if (isQualified)
             {
                 contextParts = varname.Split(new char[] { '.' }, 2);
-
-                // check the variablename part for an other '.'
-                if (contextParts[1].IndexOf('.') != -1)
-                {
-                    // Found an other '.', this is not a qualified name => error
-                    throw new Error.Value(varname);
-                }
             }
             else
             {
@@ -189,6 +183,29 @@ namespace AplusCore.Compiler
             }
 
             return contextParts;
+        }
+
+        internal static MethodInfo BuildValueQualifiedNameMethod =
+            typeof(VariableHelper).GetMethod("BuildValueQualifiedName", BindingFlags.Static | BindingFlags.NonPublic);
+
+        internal static string BuildValueQualifiedName(string context, string varname)
+        {
+            string result;
+
+            if (varname.IndexOf(".") != -1)
+            {
+                result = varname;
+            }
+            else if (context.IndexOf(".") != -1 && !context.Equals("."))
+            {
+                result = string.Join(context, varname);
+            }
+            else
+            {
+                result = string.Concat(context, ".", varname);
+            }
+
+            return result;
         }
 
         #endregion

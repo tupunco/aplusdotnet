@@ -1,4 +1,6 @@
-﻿using AplusCore.Runtime;
+﻿using System.Collections.Generic;
+
+using AplusCore.Runtime;
 using AplusCore.Types;
 using AplusCore.Types.MemoryMapped;
 
@@ -48,6 +50,21 @@ namespace AplusCore.Compiler
                     ),
                     argumentParam
             );
+        }
+
+        internal static AType ConvertATypeListToAType(List<AType> list)
+        {
+            AType result;
+            AType indexers = AArray.Create(ATypes.AArray);
+
+            indexers.AddRange(list);
+
+            if (!indexers.TryFirstScalar(out result, true))
+            {
+                result = indexers;
+            }
+
+            return result;
         }
     }
 }

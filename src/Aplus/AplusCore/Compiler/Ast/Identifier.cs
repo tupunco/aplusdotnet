@@ -213,29 +213,93 @@ namespace AplusCore.Compiler.AST
              * Simplified code of the resulting ET:
              * 
              * result = $runtime.DependecyManager.IsInvalid($$variable)
-             *          ? ($$variable = $runtime.DependencyManager.GetDependency($$name).Function())
+             *          ? { $$value = $runtime.DependencyManager.GetDependency($$name).Function()
+             *              path, index = Utils.ANull();
+             *              $$nonPresetvalue = $$value.IsMemoryMappedFile ? $$value : $$value.Clone();
+             *              $$qualifiedName = qualifiedname;
+             *              $$value = presetCallback($$value);
+             *              $$variable = $$value
+             *              $$nonPresetvalue
              *          : $$variable
              */
-            DLR.Expression result =
-                DLR.Expression.Condition(
-                    DLR.Expression.Call(
-                        dependencyManager,
-                        typeof(DependencyManager).GetMethod("IsInvalid"),
-                        name
-                    ),
-                    VariableHelper.SetVariable(
-                            runtime,
-                            variableContainer,
-                            contextParts,
-                            dependencyEvaulate
-                    ),
-                    VariableHelper.GetVariable(
-                            runtime,
-                            variableContainer,
-                            contextParts
-                    ),
-                    typeof(object)
+
+            DLR.ParameterExpression errorParam = DLR.Expression.Parameter(typeof(Error.Signal));
+            DLR.ParameterExpression value = DLR.Expression.Parameter(typeof(AType));
+            DLR.Expression callback = AST.Assign.BuildCallbackCall(scope, value);
+            DLR.Expression presetCallback = AST.Assign.BuildPresetCallbackCall(scope, value);
+
+            string qualifiedName = this.BuildQualifiedName(scope.GetRuntime().CurrentContext);
+
+            DLR.Expression temp =
+                DLR.Expression.Block(
+                    new DLR.ParameterExpression[] { value },
+                    DLR.Expression.Condition(
+                        DLR.Expression.Call(
+                            dependencyManager,
+                            typeof(DependencyManager).GetMethod("IsInvalid"),
+                            name
+                        ),
+                        DLR.Expression.Block(
+                            new DLR.ParameterExpression[] { scope.CallbackInfo.QualifiedName, scope.CallbackInfo.NonPresetValue,
+                                                            scope.CallbackInfo.Path, scope.CallbackInfo.Index },
+                            DLR.Expression.Assign(value, dependencyEvaulate),
+                            DLR.Expression.Assign(scope.CallbackInfo.Path, DLR.Expression.Constant(Utils.ANull())),
+                            DLR.Expression.Assign(scope.CallbackInfo.Index, DLR.Expression.Constant(Utils.ANull())),
+                            DLR.Expression.Assign(
+                                scope.CallbackInfo.NonPresetValue,
+                                DLR.Expression.Condition(
+                                    DLR.Expression.Property(value, "IsMemoryMappedFile"),
+                                    value,
+                                    DLR.Expression.Call(
+                                        value,
+                                        typeof(AType).GetMethod("Clone")
+                                    )
+                                )
+                            ),
+                            DLR.Expression.Assign(
+                                scope.CallbackInfo.QualifiedName,
+                                DLR.Expression.Constant(qualifiedName)
+                            ),
+                            DLR.Expression.TryCatch(
+                                DLR.Expression.Block(
+                                    typeof(void),
+                                    DLR.Expression.Assign(value, presetCallback)
+                                ),
+                                DLR.Expression.Catch(
+                                    errorParam,
+                                    DLR.Expression.Empty()
+                                )
+                            ),
+                            VariableHelper.SetVariable(
+                                runtime,
+                                variableContainer,
+                                contextParts,
+                                value
+                            ),
+                            scope.CallbackInfo.NonPresetValue
+                        ),
+                        VariableHelper.GetVariable(
+                                runtime,
+                                variableContainer,
+                                contextParts
+                        ),
+                        typeof(object)
+                    )
                 ).ToAType(runtime);
+
+            DLR.Expression result = temp;
+
+            if (scope.IsAssignment)
+            {
+                result =
+                    DLR.Expression.Block(
+                        DLR.Expression.Assign(
+                            scope.CallbackInfo.QualifiedName,
+                            DLR.Expression.Constant(qualifiedName)
+                            ),
+                        temp
+                    );
+            }
 
             return result;
         }

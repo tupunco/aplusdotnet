@@ -48,6 +48,38 @@ namespace AplusCore.Runtime.Function
             return Utils.ANull();
         }
 
+        [SystemFunction("_spcb", "_spcb{y;x}: set a preset callback for the given 'y' global variable.")]
+        internal static AType SetPresetCallback(Aplus environment, AType callbackInfo, AType symbol)
+        {
+            string qualifiedName;
+
+            if (!TryQualifiedName(environment, symbol, out qualifiedName))
+            {
+                throw new Error.Domain("_spcb");
+            }
+
+            if (callbackInfo.Length != 2)
+            {
+                throw new Error.NonData("_spcb");
+            }
+            else if (!callbackInfo.IsBox)
+            {
+                throw new Error.Domain("_spcb");
+            }
+
+            AType callbackFunction = callbackInfo[0];
+            if (!callbackFunction.IsFunctionScalar)
+            {
+                throw new Error.NonFunction("_spcb");
+            }
+
+            AType staticData = MonadicFunctionInstance.Disclose.Execute(callbackInfo[1], environment);
+
+            environment.CallbackManager.RegisterPreset(qualifiedName, callbackFunction.NestedItem, staticData);
+
+            return Utils.ANull();
+        }
+
         
         /// <summary>
         /// 
