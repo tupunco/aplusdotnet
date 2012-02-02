@@ -345,7 +345,7 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
                 {
                     result = AArray.Create(ATypes.AFloat);
 
-                    for (int i = 0; i < length; i += destinationTypeSize)
+                    for (int i = 0; i < length * sourceTypeSize; i += destinationTypeSize)
                     {
                         result.Add(AFloat.Create(BitConverter.ToDouble(bytes, i)));
                     }
@@ -355,6 +355,14 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
             return result;
         }
 
+        /// <summary>
+        /// Determines the system size of the given AType.
+        /// </summary>
+        /// <exception cref="Error.Domain">
+        /// Throws Domain error, if the argument is invalid for bitwise cast.
+        /// </exception>
+        /// <param name="argument">AType of the input.</param>
+        /// <returns>Size of the given AType.</returns>
         private int GetTypeSize(ATypes argument)
         {
             int result;
