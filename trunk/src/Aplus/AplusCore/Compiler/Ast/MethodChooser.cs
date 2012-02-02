@@ -350,7 +350,7 @@ namespace AplusCore.Compiler.AST
                 case Tokens.OPRESIDUE:
                     return DyadicFunctionInstance.OPResidue;
                 case Tokens.OPSUBSTRACT:
-                    return DyadicFunctionInstance.Subtract;
+                    return DyadicFunctionInstance.OPSubtract;
 
                 #endregion
 
