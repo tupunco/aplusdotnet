@@ -30,6 +30,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Product
                 result.Type = this.NullType;
                 result.Shape = new List<int>(left.Shape);
                 result.Shape.AddRange(right.Shape);
+                result.Rank = result.Shape.Count;
             }
 
             return result;
