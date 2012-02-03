@@ -37,5 +37,12 @@ namespace AplusCoreUnitTests.Dlr.Operator.Monadic.Bitwise
             Assert.AreEqual(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
         }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Bitwise Not"), TestMethod]
+        [ExpectedException(typeof(Error.Type))]
+        public void NotRestrictedWholeNumberArgument()
+        {
+            this.engine.Execute<AType>("bwnot 1 2 3.3");
+        }
     }
 }
