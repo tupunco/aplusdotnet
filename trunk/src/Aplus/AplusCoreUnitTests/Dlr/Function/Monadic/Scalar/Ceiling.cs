@@ -40,5 +40,24 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
 
             Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Incorrect type");
         }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Ceiling"), TestMethod]
+        public void CeilingVectorIntegerArgument()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(10),
+                AInteger.Create(10),
+                AInteger.Create(10),
+                AInteger.Create(10),
+                AInteger.Create(-9),
+                AInteger.Create(-9)
+            );
+
+            AType result = this.engine.Execute<AType>("max 10 10 10 10 -9 -9");
+
+            Assert.AreEqual(expected.Type, result.Type, "Type mismatch");
+            Assert.AreEqual(expected, result);
+        }
     }
 }

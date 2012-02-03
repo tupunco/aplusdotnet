@@ -34,6 +34,25 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Floor"), TestMethod]
+        public void FloorVectorIntegerArgument()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(10),
+                AInteger.Create(10),
+                AInteger.Create(10),
+                AInteger.Create(11),
+                AInteger.Create(-9),
+                AInteger.Create(-9)
+            );
+
+            AType result = this.engine.Execute<AType>("min 10 10 10 11 -9 -9");
+
+            Assert.AreEqual(expected.Type, result.Type, "Type mismatch");
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Floor"), TestMethod]
         public void FloorNull()
         {
             AType result = this.engine.Execute<AType>("min ()");

@@ -22,6 +22,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("AbsoluteValue"), TestMethod]
+        public void AbsoluteValueFloat()
+        {
+            AType expected = AFloat.Create(3.1);
+            AType result = this.engine.Execute<AType>("| -3.1");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("AbsoluteValue"), TestMethod]
         public void AbsoluteValueNull()
         {
             AType result = this.engine.Execute<AType>("| ()");
