@@ -1,16 +1,31 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AplusCore.Types;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using AplusCore.Runtime;
+using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 {
     [TestClass]
     public class EqualTo : AbstractTest
     {
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("EqualTo"), TestMethod]
+        public void EqualToSymbolToSymbol()
+        {
+            AType expected = AInteger.Create(1);
+            AType result = this.engine.Execute<AType>("`valami = `valami");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("EqualTo"), TestMethod]
+        public void EqualToSymbolToSymbol2()
+        {
+            AType expected = AInteger.Create(0);
+            AType result = this.engine.Execute<AType>("`valami = `semmi");
+
+            Assert.AreEqual(expected, result);
+        }
+
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("EqualTo"), TestMethod]
         public void EqualToInteger2Null()
         {

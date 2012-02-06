@@ -1,8 +1,5 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
@@ -10,6 +7,24 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
     [TestClass]
     public class NotEqualTo : AbstractTest
     {
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
+        public void NotEqualToInt2Float()
+        {
+            AType expected = AInteger.Create(1);
+            AType result = this.engine.Execute<AType>("1 ~= 1.2");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
+        public void NotEqualToFloat2Int()
+        {
+            AType expected = AInteger.Create(1);
+            AType result = this.engine.Execute<AType>("1.1 ~= 1");
+
+            Assert.AreEqual(expected, result);
+        }
+
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
         public void NotEqualToCharachterList2CharacterList()
         {
@@ -78,6 +93,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         {
             AType expected = AInteger.Create(0);
             AType result = this.engine.Execute<AType>("`abcd ~= `abcd");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
+        public void NotEqualToSymbolConstant2SymbolConstant2()
+        {
+            AType expected = AInteger.Create(1);
+            AType result = this.engine.Execute<AType>("`abcd ~= `abc");
 
             Assert.AreEqual(expected, result);
         }
