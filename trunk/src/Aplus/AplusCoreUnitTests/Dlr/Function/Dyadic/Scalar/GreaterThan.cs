@@ -1,16 +1,49 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AplusCore.Types;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using AplusCore.Runtime;
+using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 {
     [TestClass]
     public class GreaterThan : AbstractTest
     {
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("GreaterThan"), TestMethod]
+        public void GreaterThanChar2Char()
+        {
+            AType expected = AInteger.Create(1);
+            AType result = this.engine.Execute<AType>("'c' > 'a'");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("GreaterThan"), TestMethod]
+        public void GreaterThanChar2Char2()
+        {
+            AType expected = AInteger.Create(0);
+            AType result = this.engine.Execute<AType>("'a' > 'c'");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("GreaterThan"), TestMethod]
+        public void GreaterThanSym2Sym()
+        {
+            AType expected = AInteger.Create(1);
+            AType result = this.engine.Execute<AType>("`word > `something");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("GreaterThan"), TestMethod]
+        public void GreaterThanSym2Sym2()
+        {
+            AType expected = AInteger.Create(0);
+            AType result = this.engine.Execute<AType>("`something > `word");
+
+            Assert.AreEqual(expected, result);
+        }
+
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("GreaterThan"), TestMethod]
         public void GreaterThanInteger2Null()
         {

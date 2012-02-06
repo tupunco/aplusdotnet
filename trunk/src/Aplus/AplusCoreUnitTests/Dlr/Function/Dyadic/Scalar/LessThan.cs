@@ -1,8 +1,5 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
@@ -10,6 +7,60 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
     [TestClass]
     public class LessThan : AbstractTest
     {
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("LessThan"), TestMethod]
+        public void LessThanFloat2Float()
+        {
+            AType result = this.engine.Execute<AType>("1.1 < 1.3");
+            AType excepted = AInteger.Create(1);
+
+            Assert.AreEqual(excepted, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("LessThan"), TestMethod]
+        public void LessThanFloat2Int()
+        {
+            AType result = this.engine.Execute<AType>("1.1 < 2");
+            AType excepted = AInteger.Create(1);
+
+            Assert.AreEqual(excepted, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("LessThan"), TestMethod]
+        public void LessThanChar2Char()
+        {
+            AType excepted = AInteger.Create(1);
+            AType result = this.engine.Execute<AType>("'a' < 'c'");
+
+            Assert.AreEqual(excepted, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("LessThan"), TestMethod]
+        public void LessThanChar2Char2()
+        {
+            AType excepted = AInteger.Create(0);
+            AType result = this.engine.Execute<AType>("'c' < 'a'");
+
+            Assert.AreEqual(excepted, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("LessThan"), TestMethod]
+        public void LessThanSym2Sym()
+        {
+            AType expected = AInteger.Create(0);
+            AType result = this.engine.Execute<AType>("`valami < `semmi");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("LessThan"), TestMethod]
+        public void LessThanSym2Sym2()
+        {
+            AType expected = AInteger.Create(1);
+            AType result = this.engine.Execute<AType>("`semmi < `valami");
+
+            Assert.AreEqual(expected, result);
+        }
+
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("LessThan"), TestMethod]
         public void LessThanInteger2Null()
         {
