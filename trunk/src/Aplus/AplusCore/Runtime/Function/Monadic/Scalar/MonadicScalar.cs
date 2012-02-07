@@ -52,6 +52,16 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
 
             if (argument.Length == 0)
             {
+                if (currentType == ATypes.AFunc)
+                {
+                    if (!this.allowedTypes.Contains(currentType))
+                    {
+                        throw new Error.NonData(DomainErrorText);
+                    }
+
+                    return ExecutePrimitive((AFunc)argument.Data, environment);
+                }
+
                 return AArray.Create(this.defaultResultType != ATypes.AType ? this.defaultResultType : argument.Type);
             }
             // Check if we have a rule for the specific input type
@@ -162,6 +172,11 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar
         }
 
         public virtual AType ExecutePrimitive(ABox argument, Aplus environment = null)
+        {
+            throw new NotImplementedException("Invalid use-case");
+        }
+
+        public virtual AType ExecutePrimitive(AFunc argument, Aplus environment = null)
         {
             throw new NotImplementedException("Invalid use-case");
         }

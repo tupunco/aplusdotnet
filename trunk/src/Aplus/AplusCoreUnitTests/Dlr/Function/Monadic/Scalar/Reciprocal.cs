@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AplusCore.Types;
+using AplusCore.Runtime;
 
 namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
 {
@@ -36,6 +37,13 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
             AType result = this.engine.Execute<AType>("% ()");
 
             Assert.AreEqual<ATypes>(ATypes.AFloat, result.Type, "Incorrect type");
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Reciprocal"), TestMethod]
+        [ExpectedException(typeof(Error.NonData))]
+        public void ReciprocalFunction()
+        {
+            this.engine.Execute("% {+}");
         }
     }
 }
