@@ -28,5 +28,10 @@ namespace AplusCore.Runtime.Function.Monadic.Scalar.Arithmetic
         {
             return ABox.Create(argument.NestedItem);
         }
+
+        public override AType ExecutePrimitive(AFunc argument, Aplus environment = null)
+        {
+            return new AReference(argument);
+        }
     }
 }
