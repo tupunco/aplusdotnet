@@ -1,16 +1,24 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AplusCore.Types;
+
 using AplusCore.Runtime;
+using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 {
     [TestClass]
     public class Subtract :AbstractTest
     {
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Subtract"), TestMethod]
+        public void SubtractFloat2Float()
+        {
+            AType expected = AFloat.Create(3.2 - 3.1);
+            AType result = this.engine.Execute<AType>("3.2 - 3.1");
+
+            Assert.AreEqual(expected, result);
+        }
+
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Subtract"), TestMethod]
         public void SubtractInteger2Null()
         {

@@ -1,16 +1,24 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AplusCore.Types;
+
 using AplusCore.Runtime;
+using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 {
     [TestClass]
     public class Multiply : AbstractTest
     {
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Multiply"), TestMethod]
+        public void MultiplyFloat2Float()
+        {
+            AType expected = AFloat.Create(1.2 * 3.4);
+            AType result = this.engine.Execute<AType>("1.2 * 3.4");
+
+            Assert.AreEqual(expected, result);
+        }
+
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Multiply"), TestMethod]
         public void MultiplyInteger2Null()
         {
