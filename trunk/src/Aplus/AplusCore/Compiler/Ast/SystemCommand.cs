@@ -189,7 +189,7 @@ namespace AplusCore.Compiler.AST
                     if (this.argument != null)
                     {
                         int stopNumber;
-                        if (!int.TryParse(this.argument, out stopNumber) || stopNumber > 2)
+                        if (!int.TryParse(this.argument, out stopNumber) || stopNumber > 2 || stopNumber < 0)
                         {
                             stopNumber = 0;
                         }
