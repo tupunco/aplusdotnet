@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
@@ -10,6 +9,22 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
     [TestClass]
     public class Exponential : AbstractTest
     {
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Exponential"), TestMethod]
+        public void ExponentialInteger()
+        {
+            AType expected = AArray.Create(
+                ATypes.AFloat,
+                AFloat.Create(Math.Exp(1)),
+                AFloat.Create(Math.Exp(2)),
+                AFloat.Create(Math.Exp(3)),
+                AFloat.Create(Math.Exp(4)),
+                AFloat.Create(Math.Exp(5))
+            );
+            AType result = this.engine.Execute<AType>("^ 1 2 3 4 5");
+
+            Assert.AreEqual(expected, result);
+        }
+
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Exponential"), TestMethod]
         public void ExponentialVector()
         {
