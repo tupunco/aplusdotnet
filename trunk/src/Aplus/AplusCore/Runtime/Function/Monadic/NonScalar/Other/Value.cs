@@ -16,15 +16,7 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
             // Environment is required!
             Assert.NotNull(environment);
 
-            if (!argument.SimpleSymbolArray())
-            {
-                throw new Error.Type(this.TypeErrorText);
-            }
-
-            if (argument.Rank != 0)
-            {
-                throw new Error.Rank(this.RankErrorText);
-            }
+            CheckArgument<Value>(argument);
 
             // Get the context parts, (context, variablename) string pairs
             string[] contextParts = VariableHelper.CreateContextParts(environment.CurrentContext, argument.asString);
@@ -56,6 +48,23 @@ namespace AplusCore.Runtime.Function.Monadic.NonScalar.Other
             Func<AType> method = VariableHelper.BuildVariableAssignMethod(environment, contextParts, value).Compile();
 
             return method();
+        }
+
+        #endregion
+
+        #region Argument check
+
+        internal static void CheckArgument<T>(AType argument) where T : class
+        {
+            if (!argument.SimpleSymbolArray())
+            {
+                throw new Error.Type(typeof(T).Name);
+            }
+
+            if (argument.Rank != 0)
+            {
+                throw new Error.Rank(typeof(T).Name);
+            }
         }
 
         #endregion
