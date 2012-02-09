@@ -172,9 +172,11 @@ namespace AplusCore.Compiler.AST
                     );
                     break;
                 case "$pp":
-                    if (this.argument != null)
+                    int precision = -1;
+
+                    if (this.argument != null && int.TryParse(this.argument, out precision) && precision >= 0)
                     {
-                        runtime.SystemVariables["pp"] = AInteger.Create(int.Parse(this.argument));
+                        runtime.SystemVariables["pp"] = AInteger.Create(precision);
                     }
                     else
                     {
