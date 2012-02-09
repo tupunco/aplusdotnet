@@ -11,6 +11,62 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
     public class Residue : AbstractTest
     {
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Residue"), TestMethod]
+        public void ResidueInteger2Zero()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(1930),
+                AInteger.Create(1941),
+                AInteger.Create(1952),
+                AInteger.Create(1978)
+            );
+            AType result = this.engine.Execute<AType>("0 | 1930 1941 1952 1978");
+            Assert.AreEqual(expected, result);
+            Assert.IsTrue(result.Type == ATypes.AInteger);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Residue"), TestMethod]
+        public void ResidueZero2Zero()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(0),
+                AInteger.Create(0),
+                AInteger.Create(0),
+                AInteger.Create(0)
+            );
+            AType result = this.engine.Execute<AType>("0 | 0 0 0 0");
+            Assert.AreEqual(expected, result);
+            Assert.IsTrue(result.Type == ATypes.AInteger);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Residue"), TestMethod]
+        public void ResidueInt2Float()
+        {
+            AType expected = AArray.Create(
+                ATypes.AFloat,
+                AFloat.Create(5.5 - 5),
+                AFloat.Create(0),
+                AFloat.Create(5.7 - 5)
+            );
+            AType result = this.engine.Execute<AType>("1 | 5.5 5.0 5.7");
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Residue"), TestMethod]
+        public void ResidueFloat2Int()
+        {
+            AType expected = AArray.Create(
+                ATypes.AFloat,
+                AFloat.Create(1),
+                AFloat.Create(2 - 1.1),
+                AFloat.Create(5 - 4.4)
+            );
+            AType result = this.engine.Execute<AType>("1.1 | 1 2 5");
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Residue"), TestMethod]
         public void ResidueInteger2Vector()
         {
             AType expected = AArray.Create(
