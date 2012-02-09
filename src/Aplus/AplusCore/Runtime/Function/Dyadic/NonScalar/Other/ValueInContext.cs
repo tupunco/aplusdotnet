@@ -3,6 +3,7 @@
 using Microsoft.Scripting.Utils;
 
 using AplusCore.Compiler;
+using AplusCore.Runtime.Function.Monadic.NonScalar.Other;
 using AplusCore.Types;
 
 namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
@@ -16,15 +17,8 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Other
             // Environment is required!
             Assert.NotNull(environment);
 
-            if ((right.Type != ATypes.ASymbol) || (left.Type != ATypes.ASymbol))
-            {
-                throw new Error.Type(this.TypeErrorText);
-            }
-
-            if ((right.Rank != 0) || (left.Rank != 0))
-            {
-                throw new Error.Rank(this.RankErrorText);
-            }
+            Value.CheckArgument<ValueInContext>(right);
+            Value.CheckArgument<ValueInContext>(left);
 
             // get the contextparts, (context, variablename) string pair
             string[] contextparts = VariableHelper.CreateContextParts(left.asString, right.asString);

@@ -13,6 +13,20 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
     public class Value : AbstractTest
     {
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Value"), TestMethod]
+        public void ValueUnqualifiedInOtherContext()
+        {
+            AType x = AInteger.Create(100);
+
+            ScriptScope scope = this.engine.CreateScope();
+            scope.SetVariable("ctx.x", x);
+
+            this.engine.Execute("$cx ctx");
+            AType result = this.engine.Execute<AType>("ref `x", scope);
+
+            Assert.AreEqual<AType>(x, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Value"), TestMethod]
         public void ValueUnqualified()
         {
             AType x = AInteger.Create(100);
@@ -39,6 +53,20 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Value"), TestMethod]
+        [ExpectedException(typeof(Error.Rank))]
+        public void ValueErrorRank()
+        {
+            this.engine.Execute<AType>("ref `x `y `z");
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Value"), TestMethod]
+        [ExpectedException(typeof(Error.Rank))]
+        public void ValueSymbolVectorAssign()
+        {
+            this.engine.Execute<AType>("(ref `x `y `z) := 3");
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Value"), TestMethod]
         [ExpectedException(typeof(Error.Value))]
         public void ValueErrorValue()
         {
@@ -61,5 +89,11 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
             this.engine.Execute<AType>("ref 100");
         }
 
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        [ExpectedException(typeof(Error.Type))]
+        public void ValueErrorType2()
+        {
+            this.engine.Execute("(ref <`a) := 3");
+        }
     }
 }

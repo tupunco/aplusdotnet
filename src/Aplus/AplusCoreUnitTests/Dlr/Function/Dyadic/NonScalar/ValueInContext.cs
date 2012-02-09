@@ -38,6 +38,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
             Assert.AreEqual<AType>(x, result);
         }
 
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        [ExpectedException(typeof(Error.Rank))]
+        public void ValueInContextSymbolVectorAssign()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+
+            this.engine.Execute("(`ctx `ctx2 ref `b) := 3", scope);
+        }
+
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Value In Context"), TestMethod]
         [ExpectedException(typeof(Error.Value))]
         public void ValueInContextErrorValue()

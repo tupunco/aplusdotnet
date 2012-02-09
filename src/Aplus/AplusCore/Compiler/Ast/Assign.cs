@@ -186,18 +186,30 @@ namespace AplusCore.Compiler.AST
                 DLR.ParameterExpression errorParam = DLR.Expression.Parameter(typeof(Error.Signal));
                 DLR.ParameterExpression target = DLR.Expression.Parameter(typeof(AType), "__VALUETARGET__");
 
+                MethodInfo genericMethod =
+                    typeof(Value).GetMethod("CheckArgument", BindingFlags.Static | BindingFlags.NonPublic);
+
                 DLR.Expression nameMaker =
-                    DLR.Expression.Call(
-                        VariableHelper.BuildValueQualifiedNameMethod,
-                        DLR.Expression.Constant("."),
-                        target.Property("asString")
-                    );
+                        DLR.Expression.Block(
+                            DLR.Expression.Call(
+                                genericMethod.MakeGenericMethod(typeof(Value)),
+                                target
+                            ),
+                            DLR.Expression.Call(
+                                VariableHelper.BuildValueQualifiedNameMethod,
+                                scope.RuntimeExpression.Property("CurrentContext"),
+                                target.Property("asString")
+                            )
+                        );
 
                 result =
                     DLR.Expression.Block(
                         new DLR.ParameterExpression[] { target },
                         DLR.Expression.Assign(target, targetDLR),
-                        DLR.Expression.Assign(scope.CallbackInfo.QualifiedName, nameMaker),
+                        DLR.Expression.Assign(
+                            scope.CallbackInfo.QualifiedName,
+                            nameMaker
+                        ),
                         DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(false)),
                         DLR.Expression.TryCatch(
                             DLR.Expression.Block(
@@ -239,12 +251,20 @@ namespace AplusCore.Compiler.AST
                 DLR.ParameterExpression contextName = DLR.Expression.Parameter(typeof(AType), "__CONTEXTNAME__");
                 DLR.ParameterExpression errorParam = DLR.Expression.Parameter(typeof(Error.Signal));
 
+                MethodInfo genericMethod =
+                    typeof(Value).GetMethod("CheckArgument", BindingFlags.Static | BindingFlags.NonPublic);
+                MethodInfo chosenMethod = genericMethod.MakeGenericMethod(typeof(ValueInContext));
+
                 DLR.Expression nameMaker =
-                    DLR.Expression.Call(
-                        VariableHelper.BuildValueQualifiedNameMethod,
-                        contextName.Property("asString"),
-                        target.Property("asString")
-                    );
+                        DLR.Expression.Block(
+                            DLR.Expression.Call(chosenMethod, contextName),
+                            DLR.Expression.Call(chosenMethod, target),
+                            DLR.Expression.Call(
+                                VariableHelper.BuildValueQualifiedNameMethod,
+                                contextName.Property("asString"),
+                                target.Property("asString")
+                            )
+                        );
 
                 result =
                     DLR.Expression.Block(
@@ -254,7 +274,7 @@ namespace AplusCore.Compiler.AST
                         DLR.Expression.Assign(
                             scope.CallbackInfo.QualifiedName,
                             nameMaker
-                       ),
+                        ),
                         DLR.Expression.Assign(scope.AssignDone, DLR.Expression.Constant(false)),
                         DLR.Expression.TryCatch(
                             DLR.Expression.Block(
