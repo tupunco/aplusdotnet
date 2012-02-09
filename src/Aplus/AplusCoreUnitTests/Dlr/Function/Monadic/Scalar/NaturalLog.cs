@@ -1,16 +1,29 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AplusCore.Types;
+
 using AplusCore.Runtime;
+using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
 {
     [TestClass]
     public class NaturalLog : AbstractTest
     {
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("NaturalLog"), TestMethod]
+        public void NaturalLogInteger()
+        {
+            AType expected = AArray.Create(
+                ATypes.AFloat,
+                AFloat.Create(Math.Log(2)),
+                AFloat.Create(Math.Log(5)),
+                AFloat.Create(Math.Log(25))
+            );
+            AType result = this.engine.Execute<AType>("log 2 5 25");
+
+            Assert.AreEqual(expected, result);
+        }
+
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("NaturalLog"), TestMethod]
         public void NaturalLogVector()
         {
