@@ -1,8 +1,6 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using AplusCore.Runtime;
 using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr.Operator.Monadic.Reduction
@@ -11,11 +9,43 @@ namespace AplusCoreUnitTests.Dlr.Operator.Monadic.Reduction
     public class ReduceAnd : AbstractTest
     {
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("ReduceAnd"), TestMethod]
-        public void ReduceAndIntegerVector()
+        public void ReduceAndOneLengthVector()
+        {
+            AType expected = AInteger.Create(1);
+            AType result = this.engine.Execute<AType>("&/ 1 rho 1");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("ReduceAnd"), TestMethod]
+        public void ReduceAndTolerablyWholeNumber()
+        {
+            AType expected = AInteger.Create(0);
+
+            AType result = this.engine.Execute<AType>("&/ 0.0000000000000000001");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("ReduceAnd"), TestMethod]
+        public void ReduceAndTolerablyWholeNumber2()
         {
             AType expected = AInteger.Create(1);
 
-            AType result = this.engine.Execute<AType>("?/ 0 0 1 1 0 0");
+            AType result = this.engine.Execute<AType>("&/ 1.0000000000000000001");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("ReduceAnd"), TestMethod]
+        public void ReduceAndIntegerVector()
+        {
+            AType expected = AInteger.Create(0);
+
+            AType result = this.engine.Execute<AType>("&/ 0 0 1 1 0 0");
 
             Assert.AreEqual(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
@@ -61,6 +91,13 @@ namespace AplusCoreUnitTests.Dlr.Operator.Monadic.Reduction
 
             Assert.AreEqual(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("ReduceAnd"), TestMethod]
+        [ExpectedException(typeof(Error.Type))]
+        public void ReduceAndNotTolerablyWholeNumber()
+        {
+            AType result = this.engine.Execute<AType>("&/ 1.1");
         }
     }
 }
