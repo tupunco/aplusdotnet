@@ -1,16 +1,31 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AplusCore.Types;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using AplusCore.Runtime;
+using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 {
     [TestClass]
     public class And : AbstractTest
     {
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("And"), TestMethod]
+        public void AndFloat2Float()
+        {
+            AType expected = AArray.Create(ATypes.AInteger, AInteger.Create(0), AInteger.Create(1));
+            AType result = this.engine.Execute<AType>("0.000000000000001 1.000000000000001 & 0.000000000000001 1.000000000000001");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Type mismatch");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("And"), TestMethod]
+        public void AndInteger2Float()
+        {
+            AType expected = AArray.Create(ATypes.AInteger, AInteger.Create(0), AInteger.Create(1));
+            AType result = this.engine.Execute<AType>("1 1 & 0.000000000000001 1.000000000000001");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Type mismatch");
+        }
+
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("And"), TestMethod]
         public void AndInteger2Null()
         {
@@ -29,7 +44,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("And"), TestMethod]
         [ExpectedException(typeof(Error.Type))]
-        public void AndInteger2Float()
+        public void AndInteger2FloatTypeError()
         {
             AType result = this.engine.Execute<AType>("1 & 3.1");
         }
