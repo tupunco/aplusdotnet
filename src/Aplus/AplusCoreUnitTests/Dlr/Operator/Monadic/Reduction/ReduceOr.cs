@@ -1,10 +1,7 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AplusCore.Types;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using AplusCore.Runtime;
+using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr.Operator.Monadic.Reduction
 {
@@ -23,11 +20,33 @@ namespace AplusCoreUnitTests.Dlr.Operator.Monadic.Reduction
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("ReduceOr"), TestMethod]
+        public void ReduceOrIntegerVector2()
+        {
+            AType expected = AInteger.Create(0);
+
+            AType result = this.engine.Execute<AType>("?/ 0 0 0 0 0 0");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("ReduceOr"), TestMethod]
         public void ReduceOrFloatNumber()
         {
             AType expected = AInteger.Create(1);
 
             AType result = this.engine.Execute<AType>("?/ 5.0000000000000004");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("ReduceAnd"), TestMethod]
+        public void ReduceAndFloatNumber2()
+        {
+            AType expected = AInteger.Create(0);
+
+            AType result = this.engine.Execute<AType>("?/ 0.0000000000000000001");
 
             Assert.AreEqual(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
