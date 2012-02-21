@@ -54,6 +54,31 @@ namespace AplusCoreUnitTests.Dlr
         }
 
         [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        public void GetPresetCallbackDefinition()
+        {
+            AType expected = Helpers.BuildStrand(
+                new AType[] { Helpers.BuildString("fuuu"), Helpers.BuildString(".f") }
+            );
+
+            ScriptScope scope = this.engine.CreateScope();
+            this.engine.Execute<AType>("f{}: drop 'test'", scope);
+            this.engine.Execute<AType>("_spcb{`a; (f;'fuuu')}", scope);
+
+            AType result = this.engine.Execute<AType>("_gpcb{`a}");
+
+            Assert.AreEqual<AType>(expected, result, "Incorrect callback info returned.");
+        }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        public void PresetCallbackNotFound()
+        {
+            AType expected = Utils.ANull();
+            AType result = this.engine.Execute<AType>("_gpcb{`a}");
+
+            Assert.AreEqual<AType>(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
         public void CallbackNotFound()
         {
             AType expected = Utils.ANull();
@@ -61,6 +86,92 @@ namespace AplusCoreUnitTests.Dlr
 
             Assert.AreEqual<AType>(expected, result);
         }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        public void UnregisterNotRegisteredCallback()
+        {
+            this.engine.Execute("_scb{`a;(;)}");
+        }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        public void SymbolVectorAsVariableName()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+
+            AType expected = AInteger.Create(1);
+
+            this.engine.Execute(".callback := 0", scope);
+            this.engine.Execute("cbf{}:{.callback := 1}", scope);
+            this.engine.Execute("_scb{`a `b; (cbf;'static')}", scope);
+            this.engine.Execute(" a.b := 3 ", scope);
+
+            Assert.AreEqual(expected, scope.GetVariable<AType>(".callback"));
+        }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        public void UnRegisterCallback()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+
+            AType expected = AInteger.Create(0);
+
+            this.engine.Execute(".callback := 0", scope);
+            this.engine.Execute("cbf{}:{.callback := 1}", scope);
+            this.engine.Execute("_scb{`a; (cbf;'static')}", scope);
+            this.engine.Execute("_scb{`a;(;)}", scope);
+            this.engine.Execute(" a := 3 ", scope);
+
+            Assert.AreEqual(expected, scope.GetVariable<AType>(".callback"));
+        }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        public void UnRegisterCallback2()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+
+            AType expected = AInteger.Create(0);
+
+            this.engine.Execute(".callback := 0", scope);
+            this.engine.Execute("cbf{}:{.callback := 1}", scope);
+            this.engine.Execute("_scb{`a; (cbf;'static')}", scope);
+            this.engine.Execute("_scb{`a;(;'static')}", scope);
+            this.engine.Execute(" a := 3 ", scope);
+
+            Assert.AreEqual(expected, scope.GetVariable<AType>(".callback"));
+        }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        public void UnRegisterPresetCallback()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+
+            AType expected = AInteger.Create(0);
+
+            this.engine.Execute(".callback := 0", scope);
+            this.engine.Execute("cbf{}:{.callback := 1}", scope);
+            this.engine.Execute("_spcb{`a; (cbf;'static')}", scope);
+            this.engine.Execute("_spcb{`a;(;)}", scope);
+            this.engine.Execute(" a := 3 ", scope);
+
+            Assert.AreEqual(expected, scope.GetVariable<AType>(".callback"));
+        }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        public void UnRegisterPresetCallback2()
+        {
+            ScriptScope scope = this.engine.CreateScope();
+
+            AType expected = AInteger.Create(0);
+
+            this.engine.Execute(".callback := 0", scope);
+            this.engine.Execute("cbf{}:{.callback := 1}", scope);
+            this.engine.Execute("_spcb{`a; (cbf;'static')}", scope);
+            this.engine.Execute("_spcb{`a;(;'static')}", scope);
+            this.engine.Execute(" a := 3 ", scope);
+
+            Assert.AreEqual(expected, scope.GetVariable<AType>(".callback"));
+        }
+
 
         #region Callbacks
 
@@ -587,6 +698,55 @@ namespace AplusCoreUnitTests.Dlr
 
         #region Errors
 
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        [ExpectedException(typeof(Error.Domain))]
+        public void SymbolVectorDomainErrorGetPresetCallback()
+        {
+            this.engine.Execute<AType>("_gpcb{`a `b `c}");
+        }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        [ExpectedException(typeof(Error.Domain))]
+        public void SymbolVectorDomainErrorGetCallback()
+        {
+            this.engine.Execute<AType>("_gcb{`a `b `c}");
+        }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        [ExpectedException(typeof(Error.NonData))]
+        public void NonDataErrorPreset()
+        {
+            this.engine.Execute<AType>("_spcb{`a `b; ('somestring';'fuuu'; 'extra')}");
+        }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        [ExpectedException(typeof(Error.NonFunction))]
+        public void NonFunctionErrorPreset()
+        {
+            this.engine.Execute<AType>("_spcb{`a `b; ('somesting';'foo')}");
+        }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        [ExpectedException(typeof(Error.Domain))]
+        public void NonBoxCallbackInfoErrorPreset()
+        {
+            this.engine.Execute<AType>("_spcb{`a; 1 2}");
+        }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        [ExpectedException(typeof(Error.Domain))]
+        public void SymbolVectorDomainErrorPreset()
+        {
+            this.engine.Execute<AType>("_spcb{`a `b `c; ('somestring';'fuuu')}");
+        }
+
+        [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
+        [ExpectedException(typeof(Error.NonFunction))]
+        public void NonFunctionError()
+        {
+            this.engine.Execute<AType>("_scb{`a; ('somestring';'fuuu')}");
+        }
+        
         [TestCategory("DLR"), TestCategory("Callback"), TestMethod]
         [ExpectedException(typeof(Error.Domain))]
         public void GlobalNameCallbackError()

@@ -92,6 +92,16 @@ namespace AplusCore.Runtime.Callback
             return this.mapping.Remove(variableName);
         }
 
+        /// <summary>
+        /// Removes a preset callback for the given global variable.
+        /// </summary>
+        /// <param name="variableName">Global variable name.</param>
+        /// <returns>True if there was a global variable with a preset callback, false otherwise.</returns>
+        public bool UnRegisterPreset(string variableName)
+        {
+            return this.presetMapping.Remove(variableName);
+        }
+
         #endregion
     }
 }

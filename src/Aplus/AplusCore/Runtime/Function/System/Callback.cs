@@ -38,12 +38,19 @@ namespace AplusCore.Runtime.Function
             AType callbackFunction = callbackInfo[0];
             if (!callbackFunction.IsFunctionScalar)
             {
-                throw new Error.NonFunction("_scb");
+                if (callbackFunction.NestedItem.Type != ATypes.ANull)
+                {
+                    throw new Error.NonFunction("_scb");
+                }
+
+                environment.CallbackManager.UnRegister(qualifiedName);
             }
+            else
+            {
+                AType staticData = MonadicFunctionInstance.Disclose.Execute(callbackInfo[1], environment);
 
-            AType staticData = MonadicFunctionInstance.Disclose.Execute(callbackInfo[1], environment);
-
-            environment.CallbackManager.Register(qualifiedName, callbackFunction.NestedItem, staticData);
+                environment.CallbackManager.Register(qualifiedName, callbackFunction.NestedItem, staticData);
+            }
 
             return Utils.ANull();
         }
@@ -70,22 +77,29 @@ namespace AplusCore.Runtime.Function
             AType callbackFunction = callbackInfo[0];
             if (!callbackFunction.IsFunctionScalar)
             {
-                throw new Error.NonFunction("_spcb");
+                if (callbackFunction.NestedItem.Type != ATypes.ANull)
+                {
+                    throw new Error.NonFunction("_spcb");
+                }
+
+                environment.CallbackManager.UnRegisterPreset(qualifiedName);
             }
+            else
+            {
+                AType staticData = MonadicFunctionInstance.Disclose.Execute(callbackInfo[1], environment);
 
-            AType staticData = MonadicFunctionInstance.Disclose.Execute(callbackInfo[1], environment);
-
-            environment.CallbackManager.RegisterPreset(qualifiedName, callbackFunction.NestedItem, staticData);
+                environment.CallbackManager.RegisterPreset(qualifiedName, callbackFunction.NestedItem, staticData);
+            }
 
             return Utils.ANull();
         }
 
-        
+
         /// <summary>
-        /// 
+        /// Returns with the name of the callback function, and the static data for the given variable.
         /// </summary>
         /// <param name="environment"></param>
-        /// <param name="symbol"></param>
+        /// <param name="symbol">The name of the global variable</param>
         /// <returns></returns>
         [SystemFunction("_gcb", "_gcb{y}: returns the callback info for the 'x' global variable.")]
         internal static AType GetCallback(Aplus environment, AType symbol)
@@ -94,13 +108,49 @@ namespace AplusCore.Runtime.Function
 
             if (!TryQualifiedName(environment, symbol, out qualifiedName))
             {
-                throw new Error.Domain("_scb");
+                throw new Error.Domain("_gcb");
             }
 
+            return GetCallback(environment, qualifiedName, false);
+        }
+
+        /// <summary>
+        /// Returns with the name of the preset callback function, and the static data for the given variable.
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <param name="symbol">The name of the global variable</param>
+        /// <returns></returns>
+        [SystemFunction("_gpcb", "_gpcb{y}: returns the callback info for the 'x' global variable.")]
+        internal static AType GetPresetCallback(Aplus environment, AType symbol)
+        {
+            string qualifiedName;
+
+            if (!TryQualifiedName(environment, symbol, out qualifiedName))
+            {
+                throw new Error.Domain("_gpcb");
+            }
+
+            return GetCallback(environment, qualifiedName, true);
+        }
+
+
+        /// <summary>
+        /// Returns with the name of the callback function, and the static data for the given variable.
+        /// </summary>
+        /// <param name="environment">The Aplus runtime environment.</param>
+        /// <param name="qualifiedName">The name of the global variable.</param>
+        /// <param name="isPresetCallback">Specifies if the preset callback is required or the simple callback.</param>
+        /// <returns>Empyt array if not found, otherwise the callback information.</returns>
+        private static AType GetCallback(Aplus environment, string qualifiedName, bool isPresetCallback)
+        {
             AType result;
             CallbackItem callbackItem;
 
-            if(environment.CallbackManager.TryGetCallback(qualifiedName, out callbackItem))
+            bool found = isPresetCallback
+                ? environment.CallbackManager.TryGetPresetCallback(qualifiedName, out callbackItem)
+                : environment.CallbackManager.TryGetCallback(qualifiedName, out callbackItem);
+
+            if (found)
             {
                 string functionName = ((AFunc)callbackItem.CallbackFunction.Data).Name;
                 result = Helpers.BuildStrand(
