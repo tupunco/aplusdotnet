@@ -146,16 +146,9 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
         [ExpectedException(typeof(Error.Domain))]
-        public void PowerDomainError1()
+        public void PowerDomainErrorNaN()
         {
-            AType result = this.engine.Execute<AType>("-2 log -3.4");
-        }
-
-        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
-        [ExpectedException(typeof(Error.Domain))]
-        public void PowerDomainError2()
-        {
-            AType result = this.engine.Execute<AType>("-2 log 8.4");
+            AType result = this.engine.Execute<AType>("-2 ^ -5.2");
         }
 
         /*================================
@@ -239,20 +232,6 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 
             Assert.AreEqual(expected, result);
             Assert.IsTrue(result.Type == ATypes.AFloat);
-        }
-
-        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
-        [ExpectedException(typeof(Error.Domain))]
-        public void PowerDomainError3()
-        {
-            AType result = this.engine.Execute<AType>("-1 log 8.4");
-        }
-
-        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
-        [ExpectedException(typeof(Error.Domain))]
-        public void PowerDomainError4()
-        {
-            AType result = this.engine.Execute<AType>("-1 log -8.5");
         }
 
         /*==============================
