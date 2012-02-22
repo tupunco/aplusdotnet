@@ -12,6 +12,40 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
     public class Circle : AbstractTest
     {
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Circle"), TestMethod]
+        [ExpectedException(typeof(Error.Domain))]
+        public void DomainError()
+        {
+            this.engine.Execute("8 pi 3.14");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Circle"), TestMethod]
+        public void ComputeCos()
+        {
+            AType expected = AFloat.Create(Math.Cos(3.14));
+
+            AType result = this.engine.Execute<AType>("`cos pi 3.14");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Circle"), TestMethod]
+        [ExpectedException(typeof(Error.Domain))]
+        public void ComputeArcoshNegativeInfinity()
+        {
+            AType result = this.engine.Execute<AType>("`arccosh pi -Inf");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Circle"), TestMethod]
+        public void ArcSinhNegativeInfinity()
+        {
+            AType expected = AFloat.Create(Double.NegativeInfinity);
+
+            AType result = this.engine.Execute<AType>("-5 pi -Inf");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Circle"), TestMethod]
         public void NullWithInt()
         {
             AType result = this.engine.Execute<AType>("() pi 3");

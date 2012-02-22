@@ -20,9 +20,37 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Log"), TestMethod]
         [ExpectedException(typeof(Error.Domain))]
-        public void LogDomainError1()
+        public void LogDomainError0()
         {
             AType result = this.engine.Execute<AType>("-2 log 4");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
+        [ExpectedException(typeof(Error.Domain))]
+        public void LogDomainError1()
+        {
+            AType result = this.engine.Execute<AType>("-2 log -3.4");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
+        [ExpectedException(typeof(Error.Domain))]
+        public void LogDomainError2()
+        {
+            AType result = this.engine.Execute<AType>("-2 log 8.4");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
+        [ExpectedException(typeof(Error.Domain))]
+        public void LogDomainError3()
+        {
+            AType result = this.engine.Execute<AType>("-1 log 8.4");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
+        [ExpectedException(typeof(Error.Domain))]
+        public void LogDomainError4()
+        {
+            AType result = this.engine.Execute<AType>("-1 log -8.5");
         }
 
         /*===============================
@@ -32,7 +60,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Log"), TestMethod]
         [ExpectedException(typeof(Error.Domain))]
-        public void LogDomainError2()
+        public void LogDomainError5()
         {
             AType result = this.engine.Execute<AType>("2 log -8");
         }
@@ -58,14 +86,14 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Log"), TestMethod]
         [ExpectedException(typeof(Error.Domain))]
-        public void LogDomainError3()
+        public void LogDomainError6()
         {
             AType result = this.engine.Execute<AType>("0 log 0");
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Log"), TestMethod]
         [ExpectedException(typeof(Error.Domain))]
-        public void LogDomainError4()
+        public void LogDomainError7()
         {
             AType result = this.engine.Execute<AType>("0 log Inf");
         }
@@ -135,7 +163,7 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Log"), TestMethod]
         [ExpectedException(typeof(Error.Domain))]
-        public void LogDomainError5()
+        public void LogDomainError8()
         {
             AType result = this.engine.Execute<AType>("1 log 1");
         }
@@ -187,14 +215,14 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Log"), TestMethod]
         [ExpectedException(typeof(Error.Domain))]
-        public void LogDomainError6()
+        public void LogDomainError9()
         {
             AType result = this.engine.Execute<AType>("Inf log 0");
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Log"), TestMethod]
         [ExpectedException(typeof(Error.Domain))]
-        public void LogDomainError7()
+        public void LogDomainError10()
         {
             AType result = this.engine.Execute<AType>("Inf log Inf");
         }

@@ -67,7 +67,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar.Elementary
         /// <exception cref="Error.Domain">If number is not in range [-7;7]</exception>
         private void DomainCheck(int number)
         {
-            if (!(-7 <= number && number <= 7))
+            if (Math.Abs(number) > 7)
             {
                 throw new Error.Domain(DomainErrorText);
             }
