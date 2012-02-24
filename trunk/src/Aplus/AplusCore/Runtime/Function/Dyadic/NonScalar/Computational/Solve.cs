@@ -117,11 +117,14 @@ namespace AplusCore.Runtime.Function.Dyadic.NonScalar.Computational
                         actualconstants = constants.Select(item => item[objective].asFloat).ToArray();
 
                         double[] solution = OverDeterminedEquationSolve(beta, actualconstants, originalEquations);
+                        AType solutionArray = AArray.Create(ATypes.AFloat);
 
                         foreach (double item in solution)
                         {
-                            result.Add(AFloat.Create(item));
+                            solutionArray.Add(AFloat.Create(item));
                         }
+
+                        result.Add(solutionArray);
                     }
                 }
             }

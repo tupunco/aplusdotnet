@@ -11,6 +11,43 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic
         #region Correct cases
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Solve"), TestMethod]
+        public void Rank0Example()
+        {
+            AType expected = AFloat.Create(0.2);
+            AType result = this.engine.Execute<AType>("1 mdiv 5");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Solve"), TestMethod]
+        public void Rank2SquareExample()
+        {
+            AType expected =
+                AArray.Create(ATypes.AFloat,
+                              AArray.Create(ATypes.AFloat, AFloat.Create(1), AFloat.Create(0)),
+                              AArray.Create(ATypes.AFloat, AFloat.Create(0), AFloat.Create(1))
+                              );
+
+            AType result = this.engine.Execute<AType>("(iota 2 2) mdiv iota 2 2");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Solve"), TestMethod]
+        public void Rank2Example()
+        {
+            AType expected =
+                AArray.Create(ATypes.AFloat,
+                              AArray.Create(ATypes.AFloat, AFloat.Create(1), AFloat.Create(0)),
+                              AArray.Create(ATypes.AFloat, AFloat.Create(0), AFloat.Create(1))
+                              );
+
+            AType result = this.engine.Execute<AType>("(iota 3 2) mdiv iota 3 2");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Solve"), TestMethod]
         public void SquareEquationSystem()
         {
             AType expected = AArray.Create(ATypes.AFloat, AFloat.Create(0.5), AFloat.Create(0.0));
@@ -44,10 +81,24 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Solve"), TestMethod]
+        [ExpectedException(typeof(Error.Rank))]
+        public void RankErrorException2()
+        {
+            this.engine.Execute("1 mdiv (3 3 3 rho 1)");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Solve"), TestMethod]
         [ExpectedException(typeof(Error.Type))]
         public void TypeErrorException()
         {
             this.engine.Execute("(3 3 3 rho 'a') mdiv 1");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Solve"), TestMethod]
+        [ExpectedException(typeof(Error.Type))]
+        public void TypeErrorException2()
+        {
+            this.engine.Execute("1 mdiv (3 3 3 rho 'a')");
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Solve"), TestMethod]
