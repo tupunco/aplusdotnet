@@ -75,10 +75,24 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("MatrixInverse"), TestMethod]
+        [ExpectedException(typeof(Error.Domain))]
+        public void ZeroVector()
+        {
+            this.engine.Execute<AType>("mdiv 0 0 0 0");
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("MatrixInverse"), TestMethod]
         [ExpectedException(typeof(Error.Rank))]
         public void WrongRankExeption()
         {
             this.engine.Execute<AType>("mdiv 3 3 3 rho 1");
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("MatrixInverse"), TestMethod]
+        [ExpectedException(typeof(Error.Domain))]
+        public void MoreRowsThanColumnsMatrix()
+        {
+            this.engine.Execute<AType>("mdiv iota 2 3");
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("MatrixInverse"), TestMethod]
