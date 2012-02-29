@@ -37,7 +37,10 @@ namespace AplusCore.Runtime.Function
             }
             else if (input.Type == ATypes.ASymbol)
             {
-                result = AArray.Create(ATypes.ABox, ABox.Create(input), ABox.Create(Utils.ANull()));
+                result = AArray.Create(ATypes.ABox,
+                    ABox.Create(input),
+                    ABox.Create(ABox.Create(Utils.ANull()))
+                );
             }
             else
             {
