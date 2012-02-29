@@ -127,9 +127,16 @@ namespace AplusCoreUnitTests.Dlr
         #region A+ external functions
 
         /// <summary>
-        /// <see cref="TypeAlternateMethod"/>
+        /// <see cref="MonadicTypeAlternate"/>
         /// </summary>
-        public static Func<Aplus, AType, AType> TypeAlternateFunction = TypeAlternateMethod;
+        public static Func<Aplus, AType, AType> MonadicTypeAlternateFunction = MonadicTypeAlternate;
+
+
+        /// <summary>
+        /// <see cref="MonadicTypeAlternate"/>
+        /// </summary>
+        public static Func<Aplus, AType, AType, AType> DyadicTypeAlternateFunction = DyadicTypeAlternate;
+
 
         /// <summary>
         /// Tester method which returns different typed results.
@@ -148,7 +155,7 @@ namespace AplusCoreUnitTests.Dlr
         /// </list>
         /// </remarks>
         /// <returns>Different typed ATypes.</returns>
-        public static AType TypeAlternateMethod(Aplus env, AType number)
+        public static AType MonadicTypeAlternate(Aplus env, AType number)
         {
             AType result;
 
@@ -172,6 +179,15 @@ namespace AplusCoreUnitTests.Dlr
             }
 
             return result;
+        }
+
+
+        /// <summary>
+        /// <see cref="MonadicTypeAlternate"/>
+        /// </summary>
+        public static AType DyadicTypeAlternate(Aplus env, AType number, AType ignored)
+        {
+            return MonadicTypeAlternate(env, number);
         }
 
         #endregion

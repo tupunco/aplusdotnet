@@ -13,6 +13,18 @@ namespace AplusCoreUnitTests.Dlr.Operator.Dyadic
     public class Rank : AbstractTest
     {
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Rank"), TestMethod]
+        [ExpectedException(typeof(Error.Type))]
+        public void TypeError()
+        {
+            AType function = AFunc.Create("f", TestUtils.DyadicTypeAlternateFunction, 3, "TypeAlternatingMethod");
+
+            var scope = this.engine.CreateScope();
+            scope.SetVariable(".f", function);
+
+            this.engine.Execute<AType>("1 2 3 f @ 0 (1 2 3)", scope);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Rank"), TestMethod]
         public void RankUseAddWithCellScalarVector2Vector()
         {
             AType expected = AArray.Create(
@@ -42,6 +54,36 @@ namespace AplusCoreUnitTests.Dlr.Operator.Dyadic
 
             Assert.AreEqual(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Rank"), TestMethod]
+        public void FloatIntMixedTypeResult1()
+        {
+            AType expected = AArray.Create(ATypes.AFloat, AFloat.Create(0), AFloat.Create(1.1));
+
+            AType function = AFunc.Create("f", TestUtils.DyadicTypeAlternateFunction, 3, "TypeAlternatingMethod");
+
+            var scope = this.engine.CreateScope();
+            scope.SetVariable(".f", function);
+
+            AType result = this.engine.Execute<AType>("1 0 f @ 0 (1 0)", scope);
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Rank"), TestMethod]
+        public void FloatIntMixedTypeResult2()
+        {
+            AType expected = AArray.Create(ATypes.AFloat, AFloat.Create(1.1), AFloat.Create(0));
+
+            AType function = AFunc.Create("f", TestUtils.DyadicTypeAlternateFunction, 3, "TypeAlternatingMethod");
+
+            var scope = this.engine.CreateScope();
+            scope.SetVariable(".f", function);
+
+            AType result = this.engine.Execute<AType>("0 1 f @ 0 (0 1)", scope);
+
+            Assert.AreEqual(expected, result);
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Rank"), TestMethod]
@@ -298,10 +340,38 @@ namespace AplusCoreUnitTests.Dlr.Operator.Dyadic
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Rank"), TestMethod]
+        [ExpectedException(typeof(Error.Domain))]
+        public void DomainError()
+        {
+            this.engine.Execute<AType>("(iota 2 4 4) + @ 1 2 -1 (iota 2 3 9)");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Rank"), TestMethod]
+        [ExpectedException(typeof(Error.NonFunction))]
+        public void NonFunctionError()
+        {
+            this.engine.Execute<AType>("(iota 2 4 4) () @ 1 1 (iota 2 3 9)");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Rank"), TestMethod]
         [ExpectedException(typeof(Error.Mismatch))]
         public void RankMismatchError1()
         {
             this.engine.Execute<AType>("(iota 2 4 4) , @ 1 1 (iota 2 3 9)");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Rank"), TestMethod]
+        [ExpectedException(typeof(Error.Type))]
+        public void TypeError1()
+        {
+            this.engine.Execute<AType>("(iota 2 4 4) , @ 1.1 (iota 2 3 9)");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Rank"), TestMethod]
+        [ExpectedException(typeof(Error.Length))]
+        public void LengthError1()
+        {
+            this.engine.Execute<AType>("(iota 2 4 4) , @ (iota 2 2) (iota 2 3 9)");
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Rank"), TestMethod]
