@@ -25,6 +25,41 @@ namespace AplusCoreUnitTests.Dlr.Function.System
         }
 
         [TestCategory("DLR"), TestCategory("System"), TestCategory("ToSlotfiller"), TestMethod]
+        public void BoxArgument()
+        {
+            AType expected = AArray.Create(ATypes.ABox,
+                                           ABox.Create(AArray.Create(ATypes.ANull)),
+                                           ABox.Create(AArray.Create(ATypes.ANull))
+                                           );
+
+            AType result = this.engine.Execute<AType>("_alsf{<()}");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("System"), TestCategory("ToSlotfiller"), TestMethod]
+        public void SymbolArgument()
+        {
+            AType expected = AArray.Create(ATypes.ABox,
+                                           ABox.Create(ASymbol.Create("symbol")),
+                                           ABox.Create(ABox.Create(Utils.ANull()))
+                                           );
+
+            AType result = this.engine.Execute<AType>("_alsf{`symbol}");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("System"), TestCategory("ToSlotfiller"), TestMethod]
+        public void SlotFillerExample()
+        {
+            AType expected = this.engine.Execute<AType>("(`small `medium `large `super;(16;32;64;72))");
+            AType result = this.engine.Execute<AType>("_alsf{(`small `medium `large `super;(16;32;64;72))}");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("System"), TestCategory("ToSlotfiller"), TestMethod]
         public void SymbolVector()
         {
             AType expected = 
