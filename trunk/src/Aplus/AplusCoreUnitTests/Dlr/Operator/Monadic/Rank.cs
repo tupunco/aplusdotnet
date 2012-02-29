@@ -13,6 +13,27 @@ namespace AplusCoreUnitTests.Dlr.Operator.Monadic
     public class Rank : AbstractTest
     {
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Rank"), TestMethod]
+        public void RankUseOnNull()
+        {
+            AType expected = this.engine.Execute<AType>("<()");
+            AType result = this.engine.Execute<AType>("(< @ 1) ()");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Rank"), TestMethod]
+        [ExpectedException(typeof(Error.Type))]
+        public void TypeError()
+        {
+            AType function = AFunc.Create("f", TestUtils.TypeAlternateFunction, 2, "TypeAlternatingMethod");
+
+            var scope = this.engine.CreateScope();
+            scope.SetVariable(".f", function);
+
+            this.engine.Execute<AType>("f @ 0 (1 2 3)", scope);
+        }
+        
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Rank"), TestMethod]
         public void RankUseReduceAddWithCellScalar1()
         {
             AType expected = AArray.Create(

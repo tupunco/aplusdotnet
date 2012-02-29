@@ -4,6 +4,7 @@ using System.Linq;
 
 using Microsoft.Scripting.Hosting;
 
+using AplusCore.Runtime;
 using AplusCore.Types;
 
 namespace AplusCoreUnitTests.Dlr
@@ -119,6 +120,58 @@ namespace AplusCoreUnitTests.Dlr
             }
 
             return buffer;
+        }
+
+        #endregion
+
+        #region A+ external functions
+
+        /// <summary>
+        /// <see cref="TypeAlternateMethod"/>
+        /// </summary>
+        public static Func<Aplus, AType, AType> TypeAlternateFunction = TypeAlternateMethod;
+
+        /// <summary>
+        /// Tester method which returns different typed results.
+        /// </summary>
+        /// <param name="env"><see cref="Aplus"/> environemnt.</param>
+        /// <param name="number">Input number.</param>
+        /// <remarks>
+        /// The resulting type of the value is determined by the input number's value.
+        /// If the value is:
+        /// <list type="bullet">
+        ///  <item><description>0: returns 1.1 as a AFloat.</description></item>
+        ///  <item><description>1: returns 0 as a AInteger.</description></item>
+        ///  <item><description>2: returns `a as a ASymbol.</description></item>
+        ///  <item><description>3: returns 'a' as a AFChar.</description></item>
+        ///  <item><description>otherwise: returns empty array.</description></item>
+        /// </list>
+        /// </remarks>
+        /// <returns>Different typed ATypes.</returns>
+        public static AType TypeAlternateMethod(Aplus env, AType number)
+        {
+            AType result;
+
+            switch (number.asInteger)
+            {
+                case 0:
+                    result = AFloat.Create(1.1);
+                    break;
+                case 1:
+                    result = AInteger.Create(0);
+                    break;
+                case 2:
+                    result = ASymbol.Create("a");
+                    break;
+                case 3:
+                    result = AChar.Create('a');
+                    break;
+                default:
+                    result = Utils.ANull();
+                    break;
+            }
+
+            return result;
         }
 
         #endregion
