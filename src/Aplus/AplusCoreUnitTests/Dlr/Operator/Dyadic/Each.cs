@@ -13,6 +13,15 @@ namespace AplusCoreUnitTests.Dlr.Operator.Dyadic
     public class Each : AbstractTest
     {
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Each"), TestMethod]
+        public void ShapeContaining0Rank()
+        {
+            AType expected = Utils.ANull();
+            AType result = this.engine.Execute<AType>("3 + each 0 rho ()");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Each"), TestMethod]
         public void EachUseDyadicScalarFunctionScalar2Strand()
         {
             AType expected = Helpers.BuildStrand(

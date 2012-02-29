@@ -25,7 +25,7 @@ namespace AplusCoreUnitTests.Dlr.Operator.Monadic
         [ExpectedException(typeof(Error.Type))]
         public void TypeError()
         {
-            AType function = AFunc.Create("f", TestUtils.TypeAlternateFunction, 2, "TypeAlternatingMethod");
+            AType function = AFunc.Create("f", TestUtils.MonadicTypeAlternateFunction, 2, "TypeAlternatingMethod");
 
             var scope = this.engine.CreateScope();
             scope.SetVariable(".f", function);
