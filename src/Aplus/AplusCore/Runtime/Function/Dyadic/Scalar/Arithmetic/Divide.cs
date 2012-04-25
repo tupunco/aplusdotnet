@@ -20,7 +20,7 @@ namespace AplusCore.Runtime.Function.Dyadic.Scalar.Arithmetic
         /// </summary>
         private void CheckZeroPerZero(AType right, AType left)
         {
-            if (right.asInteger == 0 && left.asInteger == 0)
+            if (right.asFloat == 0.0 && left.asFloat == 0.0)
             {
                 throw new Error.Domain(DomainErrorText);
             }
