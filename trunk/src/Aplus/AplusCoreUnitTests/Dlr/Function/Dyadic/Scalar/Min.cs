@@ -27,6 +27,22 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Min"), TestMethod]
+        public void MinVector2IntegerUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AFloat,
+                AFloat.Create(99.5),
+                AFloat.Create(100),
+                AFloat.Create(91.1),
+                AFloat.Create(100),
+                AFloat.Create(99)
+            );
+            AType result = this.engineUni.Execute<AType>("99.5 100 91.1 112 99 M.- 100");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Min"), TestMethod]
         public void MinNull2Null()
         {
             AType result = this.engine.Execute<AType>("() min ()");

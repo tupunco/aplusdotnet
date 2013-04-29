@@ -24,6 +24,17 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Disclose"), TestMethod]
+        public void DiscloseNestedScalarUni()
+        {
+            AType expected = AInteger.Create(6);
+
+            AType result = this.engineUni.Execute<AType>("> < 6");
+
+            Assert.AreEqual<AType>(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Disclose"), TestMethod]
         public void DiscloseNestedUniformIntegerVector()
         {
             AType expected = AArray.Create(
@@ -43,6 +54,31 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
             );
 
             AType result = this.engine.Execute<AType>(">(4 2 1; 4 5 6)");
+
+            Assert.AreEqual<AType>(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Disclose"), TestMethod]
+        public void DiscloseNestedUniformIntegerVectorUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AArray.Create(
+                    ATypes.AInteger,
+                    AInteger.Create(4),
+                    AInteger.Create(2),
+                    AInteger.Create(1)
+                ),
+                AArray.Create(
+                    ATypes.AInteger,
+                    AInteger.Create(4),
+                    AInteger.Create(5),
+                    AInteger.Create(6)
+                )
+            );
+
+            AType result = this.engineUni.Execute<AType>(">(4 2 1; 4 5 6)");
 
             Assert.AreEqual<AType>(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));

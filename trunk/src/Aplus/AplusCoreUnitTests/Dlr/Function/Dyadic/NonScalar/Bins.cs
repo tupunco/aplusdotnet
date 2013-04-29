@@ -30,6 +30,24 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Bins"), TestMethod]
+        public void BinsIntegerList2FloatListUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(2),
+                AInteger.Create(1),
+                AInteger.Create(0),
+                AInteger.Create(2),
+                AInteger.Create(2),
+                AInteger.Create(3)
+            );
+            AType result = this.engineUni.Execute<AType>("-1 0 1 I.+ 0.3 -0.3 -2 0.1 1 5");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Bins"), TestMethod]
         public void BinsFloatList2IntegerList()
         {
             AType expected = AArray.Create(

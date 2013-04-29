@@ -17,6 +17,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("LessThan"), TestMethod]
+        public void LessThanFloat2FloatUni()
+        {
+            AType result = this.engineUni.Execute<AType>("1.1 < 1.3");
+            AType excepted = AInteger.Create(1);
+
+            Assert.AreEqual(excepted, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("LessThan"), TestMethod]
         public void LessThanFloat2Int()
         {
             AType result = this.engine.Execute<AType>("1.1 < 2");

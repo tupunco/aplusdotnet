@@ -26,6 +26,19 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Value In Context"), TestMethod]
+        public void ValueInContextUnqualifiedUni()
+        {
+            AType x = AInteger.Create(100);
+
+            ScriptScope scope = this.engineUni.CreateScope();
+            scope.SetVariable(".x", x);
+
+            AType result = this.engineUni.Execute<AType>("`. ^ `x", scope);
+
+            Assert.AreEqual<AType>(x, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Value In Context"), TestMethod]
         public void ValueInContextQualified()
         {
             AType x = AInteger.Create(100);

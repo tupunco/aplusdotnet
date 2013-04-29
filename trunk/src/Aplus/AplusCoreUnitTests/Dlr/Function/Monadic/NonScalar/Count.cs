@@ -21,6 +21,16 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Count"), TestMethod]
+        public void CountScalarIntegerUni()
+        {
+            AType expected = AInteger.Create(1);
+            AType result = this.engineUni.Execute<AType>("# 4");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Count"), TestMethod]
         public void CountScalarFloat()
         {
             AType expected = AInteger.Create(1);
@@ -35,6 +45,16 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         {
             AType expected = AInteger.Create(3);
             AType result = this.engine.Execute<AType>("# 5 8 7.0");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Count"), TestMethod]
+        public void CountVectorUni()
+        {
+            AType expected = AInteger.Create(3);
+            AType result = this.engineUni.Execute<AType>("# 5 8 7.0");
 
             Assert.AreEqual(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));

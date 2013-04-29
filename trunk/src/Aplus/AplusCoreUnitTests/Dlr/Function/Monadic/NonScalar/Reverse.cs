@@ -38,6 +38,22 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Reverse"), TestMethod]
+        public void ReverseIntegerVectorUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(7),
+                AInteger.Create(56),
+                AInteger.Create(4),
+                AInteger.Create(2),
+                AInteger.Create(3)
+            );
+            AType result = this.engineUni.Execute<AType>("S.| 3 2 4 56 7");
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Reverse"), TestMethod]
         public void ReverseCharacterConstant()
         {
             AType expected = AArray.Create(

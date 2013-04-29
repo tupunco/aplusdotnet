@@ -20,10 +20,27 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Identity"), TestMethod]
+        public void IdentityNullUni()
+        {
+            AType result = this.engineUni.Execute<AType>("+ ()");
+
+            Assert.AreEqual<ATypes>(ATypes.ANull, result.Type, "Incorrect type");
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Identity"), TestMethod]
         public void IdentityChar()
         {
             AType expected = Helpers.BuildString("abc");
             AType result = this.engine.Execute<AType>("+ 'abc'");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Identity"), TestMethod]
+        public void IdentityCharUni()
+        {
+            AType expected = Helpers.BuildString("abc");
+            AType result = this.engineUni.Execute<AType>("+ 'abc'");
 
             Assert.AreEqual(expected, result);
         }
@@ -38,10 +55,28 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Identity"), TestMethod]
+        public void IdentitySymbolUni()
+        {
+            AType expected = ASymbol.Create("abc");
+            AType result = this.engineUni.Execute<AType>("+ `abc");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Identity"), TestMethod]
         public void IdentityBox()
         {
             AType expected = ABox.Create(AArray.Create(ATypes.AInteger, AInteger.Create(1), AInteger.Create(2), AInteger.Create(3)));
             AType result = this.engine.Execute<AType>("+ <1 2 3");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Identity"), TestMethod]
+        public void IdentityBoxUni()
+        {
+            AType expected = ABox.Create(AArray.Create(ATypes.AInteger, AInteger.Create(1), AInteger.Create(2), AInteger.Create(3)));
+            AType result = this.engineUni.Execute<AType>("+ <1 2 3");
 
             Assert.AreEqual(expected, result);
         }
@@ -54,5 +89,14 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
 
             Assert.AreEqual(expected, result);
         }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Identity"), TestMethod]
+        public void IdentifyFunctionUni()
+        {
+            AType expected = this.engineUni.Execute<AType>("+");
+            AType result = this.engineUni.Execute<AType>("+ {+}");
+
+            Assert.AreEqual(expected, result);
     }
+}
 }

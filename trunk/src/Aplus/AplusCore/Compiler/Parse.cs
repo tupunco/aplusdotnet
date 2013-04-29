@@ -9,6 +9,7 @@ namespace AplusCore.Compiler
     {
         ASCII,
         APL,
+        UNI,
     }
     
     public class Parse
@@ -37,6 +38,16 @@ namespace AplusCore.Compiler
             return parser.Tree;
         }
 
+        public static AST.Node UNIString(string input, FunctionInformation functionInfo)
+        {
+            Antlr.Runtime.Lexer lexer = new Grammar.Uni.AplusLexer(new ANTLRStringStream(input ?? ""));
+            Grammar.AplusParser parser = new Grammar.AplusParser(new CommonTokenStream(lexer));
+            parser.FunctionInfo = functionInfo;
+
+            bool parseOk = parser.Parse();
+            return parser.Tree;
+        }
+
         public static AST.Node String(string input, LexerMode mode, FunctionInformation functionInfo)
         {
             switch (mode)
@@ -46,6 +57,9 @@ namespace AplusCore.Compiler
 
                 case LexerMode.APL:
                     return APLString(input, functionInfo);
+
+                case LexerMode.UNI:
+                    return UNIString(input, functionInfo);
 
                 default:
                     break;

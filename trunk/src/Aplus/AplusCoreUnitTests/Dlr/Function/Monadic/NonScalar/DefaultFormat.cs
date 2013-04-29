@@ -23,11 +23,33 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("DefaultFormat"), TestMethod]
+        public void DefaultFormatIntegerUni()
+        {
+            AType expected = Helpers.BuildString(" 435");
+
+            AType result = this.engineUni.Execute<AType>("E.% 435");
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("DefaultFormat"), TestMethod]
         public void DefaultFormatIntegerList()
         {
             AType expected = Helpers.BuildString(" 42 23 65 353");
 
             AType result = this.engine.Execute<AType>("form 42 23 65 353");
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("DefaultFormat"), TestMethod]
+        public void DefaultFormatIntegerListUni()
+        {
+            AType expected = Helpers.BuildString(" 42 23 65 353");
+
+            AType result = this.engineUni.Execute<AType>("E.% 42 23 65 353");
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);
@@ -44,6 +66,22 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
             );
 
             AType result = this.engine.Execute<AType>("form 3 3 rho 3 4 54 332 2 4");
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("DefaultFormat"), TestMethod]
+        public void DefaultFormatIntegerMatrixUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AChar,
+                Helpers.BuildString("   3   4  54"),
+                Helpers.BuildString(" 332   2   4"),
+                Helpers.BuildString("   3   4  54")
+            );
+
+            AType result = this.engineUni.Execute<AType>("E.% 3 3 S.? 3 4 54 332 2 4");
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);

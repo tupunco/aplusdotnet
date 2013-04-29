@@ -28,6 +28,21 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Expand"), TestMethod]
+        public void ExpandIntegerList2IntegerListUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(4),
+                AInteger.Create(0),
+                AInteger.Create(8)
+            );
+            AType result = this.engineUni.Execute<AType>("1 0 1 \\ 4 8");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Expand"), TestMethod]
         public void ExpandIntegerList2SymbolConstantList()
         {
             AType expected = AArray.Create(

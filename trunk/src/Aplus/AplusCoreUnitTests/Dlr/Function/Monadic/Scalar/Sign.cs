@@ -28,6 +28,23 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Sign"), TestMethod]
+        public void SignVectorUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(1),
+                AInteger.Create(-1),
+                AInteger.Create(0),
+                AInteger.Create(1),
+                AInteger.Create(-1)
+            );
+
+            AType result = this.engineUni.Execute<AType>("* 100 -2.5 0 5 -Inf");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Sign"), TestMethod]
         public void SignNull()
         {
             AType result = this.engine.Execute<AType>("* ()");

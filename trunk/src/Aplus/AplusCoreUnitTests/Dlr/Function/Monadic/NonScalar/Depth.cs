@@ -22,6 +22,16 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Depth"), TestMethod]
+        public void DepthScalarUni()
+        {
+            AType expected = AInteger.Create(0);
+
+            AType result = this.engineUni.Execute<AType>("== 'a'");
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Depth"), TestMethod]
         public void DepthSimpleVector()
         {
             AType expected = AInteger.Create(0);

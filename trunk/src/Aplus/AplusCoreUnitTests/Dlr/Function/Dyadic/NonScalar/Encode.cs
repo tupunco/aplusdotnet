@@ -23,6 +23,17 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Encode"), TestMethod]
+        public void EncodeInteger2IntegerUni()
+        {
+            AType expected = AInteger.Create(2);
+
+            AType result = this.engineUni.Execute<AType>("5 M.> 7");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Encode"), TestMethod]
         public void EncodeIntegerList2Integer1()
         {
             AType expected = AArray.Create(

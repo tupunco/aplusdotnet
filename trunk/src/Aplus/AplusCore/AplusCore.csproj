@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="GenerateParser;Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <UseHostCompilerIfAvailable>False</UseHostCompilerIfAvailable>
@@ -104,6 +104,11 @@
       <DependentUpon>AplusLexer.g</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Compiler\Grammar\Uni\AplusLexer.cs">
+      <Autogen>True</Autogen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AplusLexer.g</DependentUpon>
     </Compile>
     <Compile Include="Compiler\Grammar\Variables.cs" />
     <Compile Include="Compiler\Grammar\StringProcessor.cs" />
@@ -365,6 +370,9 @@
     </Antlr3>
     <Antlr3 Include="Compiler\Grammar\Apl\AplusLexer.g">
       <OutputFiles>Compiler\Grammar\Apl\AplusLexer.cs</OutputFiles>
+    </Antlr3>
+    <Antlr3 Include="Compiler\Grammar\Uni\AplusLexer.g">
+      <OutputFiles>Compiler\Grammar\Uni\AplusLexer.cs</OutputFiles>
     </Antlr3>
   </ItemGroup>
   <ItemGroup>

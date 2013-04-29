@@ -215,6 +215,10 @@ namespace AplusCore.Runtime
             {
                 return Compiler.LexerMode.APL;
             }
+            else if (mode.ToLower() == "uni")
+            {
+                return Compiler.LexerMode.UNI;
+            }
 
             return Compiler.LexerMode.ASCII;
         }

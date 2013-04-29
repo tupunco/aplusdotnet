@@ -24,6 +24,17 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Raze"), TestMethod]
+        public void RazeStrandWithCharacterConstantUni()
+        {
+            AType expected = Helpers.BuildString("abcdef");
+
+            AType result = this.engineUni.Execute<AType>("I.> ('ab';'cde';'f')");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Raze"), TestMethod]
         public void RazeStrandWithMatrix()
         {
             AType expected = AArray.Create(

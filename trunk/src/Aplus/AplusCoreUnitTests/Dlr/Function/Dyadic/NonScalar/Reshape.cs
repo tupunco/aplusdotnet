@@ -28,6 +28,21 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Reshape"), TestMethod]
+        public void IntegerCycleReshapeUni()
+        {
+            AType expected = AArray.Create(ATypes.AInteger,
+                AArray.Create(ATypes.AInteger, AInteger.Create(5), AInteger.Create(5), AInteger.Create(5)),
+                AArray.Create(ATypes.AInteger, AInteger.Create(5), AInteger.Create(5), AInteger.Create(5)),
+                AArray.Create(ATypes.AInteger, AInteger.Create(5), AInteger.Create(5), AInteger.Create(5))
+            );
+
+            AType result = this.engineUni.Execute<AType>(" 3 3 S.? 5 5");
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual<AType>(expected, result, "Incorrect integer matrix generated");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Reshape"), TestMethod]
         public void ZeroShapedReshape()
         {
             AType expected = AArray.Create(ATypes.AInteger);

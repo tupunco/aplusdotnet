@@ -23,6 +23,17 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Pack"), TestMethod]
+        public void PackCharacterConstant1Uni()
+        {
+            AType expected = ASymbol.Create("a");
+
+            AType result = this.engineUni.Execute<AType>("M.< 'a'");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Pack"), TestMethod]
         public void PackCharacterConstant2()
         {
             AType expected = ASymbol.Create("");
@@ -39,6 +50,17 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
             AType expected = ASymbol.Create("      a");
 
             AType result = this.engine.Execute<AType>("pack '      a      '");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Pack"), TestMethod]
+        public void PackCharacterConstantVector1Uni()
+        {
+            AType expected = ASymbol.Create("      a");
+
+            AType result = this.engineUni.Execute<AType>("M.< '      a      '");
 
             Assert.AreEqual(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));

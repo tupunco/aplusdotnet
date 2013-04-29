@@ -23,6 +23,10 @@ namespace AplusCore.Hosting
                     {
                         this.LanguageSetup.Options["LexerMode"] = LexerMode.APL;
                     }
+                    else if (value == "uni")
+                    {
+                        this.LanguageSetup.Options["LexerMode"] = LexerMode.UNI;
+                    }
                     else
                     {
                         this.LanguageSetup.Options["LexerMode"] = LexerMode.ASCII;
@@ -37,6 +41,9 @@ namespace AplusCore.Hosting
                     this.LanguageSetup.Options["LexerMode"] = LexerMode.ASCII;
                     break;
 
+                case "--uni":
+                    this.LanguageSetup.Options["LexerMode"] = LexerMode.UNI;
+                    break;
 
                 default:
                     base.ParseArgument(arg);
@@ -52,7 +59,8 @@ namespace AplusCore.Hosting
             string[,] aplusoptions = new string[,] {
                 {"--apl",               "APL input mode"},
                 {"--ascii",             "ASCII input mode"},
-                {"--mode [ascii|apl]",  "Choose input mode"},
+                {"--uni",               "UNI input mode"},
+                {"--mode [ascii|apl|uni]",  "Choose input mode"},
             };
 
             options = ArrayUtils.Concatenate<string>(standardOptions, aplusoptions);

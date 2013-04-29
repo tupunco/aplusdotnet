@@ -43,6 +43,22 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("SeparateSymbols"), TestMethod]
+        public void SeparateSymbolsSymbolConstantListUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.ASymbol,
+                AArray.Create(ATypes.ASymbol, ASymbol.Create(""), ASymbol.Create("x")),
+                AArray.Create(ATypes.ASymbol, ASymbol.Create(""), ASymbol.Create("y")),
+                AArray.Create(ATypes.ASymbol, ASymbol.Create("c"), ASymbol.Create("z")),
+                AArray.Create(ATypes.ASymbol, ASymbol.Create("a.b"), ASymbol.Create("d"))
+            );
+
+            AType result = this.engineUni.Execute<AType>("Y.& `x `.y `c.z `a.b.d");
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("SeparateSymbols"), TestMethod]
         public void SeparateSymbolsSymbolConstantMatrix()
         {
             AType expected = AArray.Create(

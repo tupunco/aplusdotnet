@@ -26,6 +26,18 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Execute In Context"), TestMethod]
+        public void GlobalAssignExecuteUni()
+        {
+            ScriptScope scope = this.engineUni.CreateScope();
+            AType expected = AInteger.Create(10);
+            AType result = this.engineUni.Execute<AType>("`X E.* 'b:=10'", scope);
+
+            Assert.IsTrue(scope.ContainsVariable("X.b"), "No variable found in global scope");
+            Assert.AreEqual<AType>(expected, scope.GetVariable<AType>("X.b"), "Incorrect result in global variable");
+            Assert.AreEqual<AType>(expected, result, "Incorrect result returned");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Execute In Context"), TestMethod]
         public void FunctionAssignExecute()
         {
             AType expected = AInteger.Create(20);

@@ -18,6 +18,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("And"), TestMethod]
+        public void AndFloat2FloatUni()
+        {
+            AType expected = AArray.Create(ATypes.AInteger, AInteger.Create(0), AInteger.Create(1));
+            AType result = this.engineUni.Execute<AType>("0.000000000000001 1.000000000000001 & 0.000000000000001 1.000000000000001");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Type mismatch");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("And"), TestMethod]
         public void AndInteger2Float()
         {
             AType expected = AArray.Create(ATypes.AInteger, AInteger.Create(0), AInteger.Create(1));

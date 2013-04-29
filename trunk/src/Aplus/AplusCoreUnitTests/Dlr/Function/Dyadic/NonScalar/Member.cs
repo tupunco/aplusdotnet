@@ -19,6 +19,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Member"), TestMethod]
+        public void SimpleIntegerMemberUni()
+        {
+            AType result = this.engineUni.Execute<AType>("1 I.? 1");
+
+            Assert.AreEqual<AType>(AInteger.Create(1), result, "Invalid value produced");
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(AInteger.Create(1)));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Member"), TestMethod]
         public void SimpleFloatComparisonMember()
         {
             ScriptScope scope = this.engine.CreateScope();

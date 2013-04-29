@@ -63,6 +63,27 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
             Assert.AreEqual(expected, result);
         }
 
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("MatrixInverse"), TestMethod]
+        public void PseudoInverseTestUni()
+        {
+            AType expected = AArray.Create(ATypes.AFloat,
+                                           AArray.Create(ATypes.AFloat, AFloat.Create(-1.3333), AFloat.Create(-0.3333), AFloat.Create(0.6667)),
+                                           AArray.Create(ATypes.AFloat, AFloat.Create(1.0833), AFloat.Create(0.3333), AFloat.Create(-0.4167))
+                                           );
+
+            AType result = this.engineUni.Execute<AType>("M.# 3 2 S.? 1 2 3 4 5 6");
+
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    result[i][j] = AFloat.Create(Math.Round(result[i][j].asFloat, 4));
+                }
+            }
+
+            Assert.AreEqual(expected, result);
+        }
+
         #endregion
 
         #region Error Cases

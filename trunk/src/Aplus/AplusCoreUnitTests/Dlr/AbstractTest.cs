@@ -14,6 +14,7 @@ namespace AplusCoreUnitTests.Dlr
     public abstract class AbstractTest
     {
         protected ScriptEngine engine;
+        protected ScriptEngine engineUni;
 
         [TestInitialize]
         public void Setup()
@@ -23,6 +24,13 @@ namespace AplusCoreUnitTests.Dlr
 
             ScriptRuntime dlrRuntime = new ScriptRuntime(setup);
             this.engine = dlrRuntime.GetEngine("A+");
+
+            ScriptRuntimeSetup setupUni = new ScriptRuntimeSetup();
+            setupUni.LanguageSetups.Add(AplusCore.Runtime.AplusLanguageContext.LanguageSetup);
+            setupUni.Options.Add("LexerMode", AplusCore.Compiler.LexerMode.UNI);
+
+            ScriptRuntime dlrRuntimeUni = new ScriptRuntime(setupUni);
+            this.engineUni = dlrRuntimeUni.GetEngine("A+");
         }
     }
 }

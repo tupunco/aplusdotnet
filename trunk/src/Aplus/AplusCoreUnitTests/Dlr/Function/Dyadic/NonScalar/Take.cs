@@ -27,6 +27,20 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Take"), TestMethod]
+        public void TakeNegativeCountUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(2),
+                AInteger.Create(3)
+            );
+            AType result = this.engineUni.Execute<AType>("-2 S.+ 1 2 3");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Take"), TestMethod]
         public void TakeNegativeCountWithFill()
         {
             AType expected = AArray.Create(

@@ -22,6 +22,16 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Ravel"), TestMethod]
+        public void RavelIntegerUni()
+        {
+            AType expected = AArray.Create(ATypes.AInteger, AInteger.Create(4));
+            AType result = this.engineUni.Execute<AType>(", 4");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Ravel"), TestMethod]
         public void RavelIntegerMatrix()
         {
             AType expected = AArray.Create(

@@ -24,6 +24,16 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Not"), TestMethod]
+        public void NotRestrictedWholeNumberUni()
+        {
+            AType expected = AInteger.Create(1);
+
+            AType result = this.engineUni.Execute<AType>("! 0.0000000000000000000000000000000000000001");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Not"), TestMethod]
         public void NotVector()
         {
             AType expected = AArray.Create(
@@ -36,6 +46,23 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
             );
 
             AType result = this.engine.Execute<AType>("~ -1 0 1 2 3");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Not"), TestMethod]
+        public void NotVectorUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(0),
+                AInteger.Create(1),
+                AInteger.Create(0),
+                AInteger.Create(0),
+                AInteger.Create(0)
+            );
+
+            AType result = this.engineUni.Execute<AType>("! -1 0 1 2 3");
 
             Assert.AreEqual(expected, result);
         }
@@ -56,9 +83,32 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Not"), TestMethod]
+        public void NotRestrictedWholeVectorUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(0),
+                AInteger.Create(0),
+                AInteger.Create(1)
+            );
+
+            AType result = this.engineUni.Execute<AType>("! -3.0000000000000000000001 2.0000000000000003 0");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Not"), TestMethod]
         public void NotNull()
         {
             AType result = this.engine.Execute<AType>("~ ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Incorrect type");
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Not"), TestMethod]
+        public void NotNullUni()
+        {
+            AType result = this.engineUni.Execute<AType>("! ()");
 
             Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Incorrect type");
         }
@@ -72,6 +122,13 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
         public void NotRestrictedWholeNumberArgument()
         {
             AType result = this.engine.Execute<AType>("~ -3.3");
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Not"), TestMethod]
+        [ExpectedException(typeof(Error.Type))]
+        public void NotRestrictedWholeNumberArgumentUni()
+        {
+            AType result = this.engineUni.Execute<AType>("! -3.3");
         }
 
         #endregion

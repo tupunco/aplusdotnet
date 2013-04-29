@@ -19,6 +19,13 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Deal"), TestMethod]
+        public void DealInteger2Integer1Uni()
+        {
+            AType result = this.engineUni.Execute<AType>("10 M.? 10");
+            TestDuplication(result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Deal"), TestMethod]
         public void DealInteger2Integer2()
         {
             AType result = this.engine.Execute<AType>("5 rand 20");

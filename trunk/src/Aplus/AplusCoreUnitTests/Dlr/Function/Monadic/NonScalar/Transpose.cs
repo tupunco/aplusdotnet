@@ -27,6 +27,22 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Transpose"), TestMethod]
+        public void TransposeMatrixUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AArray.Create(ATypes.AInteger, AInteger.Create(0), AInteger.Create(3)),
+                AArray.Create(ATypes.AInteger, AInteger.Create(1), AInteger.Create(4)),
+                AArray.Create(ATypes.AInteger, AInteger.Create(2), AInteger.Create(5))
+            );
+
+            AType result = this.engineUni.Execute<AType>("S.\\ I.# 2 3");
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Transpose"), TestMethod]
         public void TransposeMatrixWithFrame()
         {
             AType expected = AArray.Create(
