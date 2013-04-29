@@ -85,6 +85,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Log"), TestMethod]
+        public void LogYEqualTo0AndXGreaterThan0Uni()
+        {
+            AType expected = AFloat.Create(0);
+            AType result = this.engineUni.Execute<AType>("0 M.& 3");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Log"), TestMethod]
         [ExpectedException(typeof(Error.Domain))]
         public void LogDomainError6()
         {

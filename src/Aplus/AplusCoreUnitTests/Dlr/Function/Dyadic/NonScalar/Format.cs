@@ -23,6 +23,17 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Format"), TestMethod]
+        public void FormatFloat2Float1Uni()
+        {
+            AType expected = Helpers.BuildString("             1.1");
+
+            AType result = this.engineUni.Execute<AType>("16.12 E.% 1.123456789012");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Format"), TestMethod]
         public void FormatFloat2Float2()
         {
             AType expected = Helpers.BuildString(" 12345.6789120");

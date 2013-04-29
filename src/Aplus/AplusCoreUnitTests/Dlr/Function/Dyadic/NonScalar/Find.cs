@@ -74,6 +74,17 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Find"), TestMethod]
+        public void FindIntegerList2FloatUni()
+        {
+            AType expected = AInteger.Create(2);
+
+            AType result = this.engineUni.Execute<AType>("3 4 5 6 2 I.# 5.00000000000004");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Find"), TestMethod]
         public void FindFloatMatrix2IntegerMatrix()
         {
             AType expected = AArray.Create(

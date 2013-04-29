@@ -41,10 +41,40 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Shape"), TestMethod]
+        public void ShapeScalarUni()
+        {
+            AType expected = AArray.Create(ATypes.AInteger);
+
+            AType result = this.engineUni.Execute<AType>("S.? 1");
+            Assert.AreEqual(expected, result, "Shape of integer failed");
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+
+
+            result = this.engineUni.Execute<AType>("S.? 56.54");
+            Assert.AreEqual(expected, result, "Shape of float failed");
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+
+
+            result = this.engineUni.Execute<AType>("S.? 'd'");
+            Assert.AreEqual(expected, result, "Shape of char failed");
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Shape"), TestMethod]
         public void ShapeVector()
         {
             AType expected = AArray.Create(ATypes.AInteger, AInteger.Create(4));
             AType result = this.engine.Execute<AType>("rho 5 6.2 7 8");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Shape"), TestMethod]
+        public void ShapeVectorUni()
+        {
+            AType expected = AArray.Create(ATypes.AInteger, AInteger.Create(4));
+            AType result = this.engineUni.Execute<AType>("S.? 5 6.2 7 8");
 
             Assert.AreEqual(expected, result);
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));

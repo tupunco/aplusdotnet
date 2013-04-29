@@ -121,6 +121,23 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Partition"), TestMethod]
+        public void PartitionIntegerList2NullUni()
+        {
+            AType expected = Helpers.BuildStrand(
+                new AType[]{
+                   AArray.Create(ATypes.ANull),
+                   AArray.Create(ATypes.ANull),
+                   AArray.Create(ATypes.ANull)
+                }
+            );
+
+            AType result = this.engineUni.Execute<AType>("3 2 2 I.< ()");
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Partition"), TestMethod]
         public void PartitionFloat2Null()
         {
             AType expected = AArray.Create(ATypes.ANull);

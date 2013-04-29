@@ -16,6 +16,14 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("LessThanOrEqualTo"), TestMethod]
+        public void LessThanOrEqualToInteger2NullUni()
+        {
+            AType result = this.engineUni.Execute<AType>("1 <= ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Type mismatch");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("LessThanOrEqualTo"), TestMethod]
         public void LessThanOrEqualToNull2Null()
         {
             AType result = this.engine.Execute<AType>("() <= ()");

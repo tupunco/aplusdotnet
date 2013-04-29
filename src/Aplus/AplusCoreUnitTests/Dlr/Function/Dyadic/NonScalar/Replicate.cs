@@ -31,6 +31,23 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Replicate"), TestMethod]
+        public void ReplicateIntegerList2IntegerListUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(1),
+                AInteger.Create(1),
+                AInteger.Create(4),
+                AInteger.Create(4),
+                AInteger.Create(4)
+            );
+            AType result = this.engineUni.Execute<AType>("2 3 0 / 1 4 8");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Replicate"), TestMethod]
         public void ReplicateIntegerList2MatrixWithFrame()
         {
             AType expected = AArray.Create(

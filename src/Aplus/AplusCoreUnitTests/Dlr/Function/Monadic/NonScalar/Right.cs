@@ -19,5 +19,14 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
             Assert.AreEqual<AType>(expected, result, "Incorrect result returned");
         }
 
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Right"), TestMethod]
+        public void NullUni()
+        {
+            AType expected = AArray.Create(ATypes.AInteger, AInteger.Create(1), AInteger.Create(2));
+            AType result = this.engineUni.Execute<AType>("A.> 1 2");
+
+            Assert.AreEqual<AType>(expected, result, "Incorrect result returned");
     }
+
+}
 }

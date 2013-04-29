@@ -29,6 +29,22 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Rotate"), TestMethod]
+        public void RotatePositiveInteger2IntegerListUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(3),
+                AInteger.Create(5),
+                AInteger.Create(8),
+                AInteger.Create(2)
+            );
+            AType result = this.engineUni.Execute<AType>("5 S.| 2 3 5 8");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Rotate"), TestMethod]
         public void RotateNegativeInteger2IntegerList()
         {
             AType expected = AArray.Create(

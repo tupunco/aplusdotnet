@@ -26,6 +26,16 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
             Assert.IsTrue(result.Type == ATypes.AFloat);
         }
 
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Power"), TestMethod]
+        public void PowerXEqualToAnyValueAndYEqualTo0Uni()
+        {
+            AType expected = AFloat.Create(1);
+            AType result = this.engineUni.Execute<AType>("6 M.* 0");
+
+            Assert.AreEqual(expected, result);
+            Assert.IsTrue(result.Type == ATypes.AFloat);
+        }
+
         /*================================
 			        x = -Inf :
         ================================

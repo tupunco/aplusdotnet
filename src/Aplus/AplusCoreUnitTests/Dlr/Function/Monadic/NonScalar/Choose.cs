@@ -23,6 +23,17 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Choose"), TestMethod]
+        public void ChooseInteger2SymbolConstantListUni()
+        {
+            AType expected = ASymbol.Create("c");
+
+            AType result = this.engineUni.Execute<AType>("2 # `a`b`c`d`e");
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Choose"), TestMethod]
         public void ChooseRestrictedWholeNumber2CharaterConstantList()
         {
             AType expected = AChar.Create('t');
@@ -43,6 +54,21 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
             );
 
             AType result = this.engine.Execute<AType>("2 0 # 3 3 rho 'abcdefghi'");
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Choose"), TestMethod]
+        public void ChooseIntegerList2CharacterConstantMatrixUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AChar,
+                Helpers.BuildString("ghi"),
+                Helpers.BuildString("abc")
+            );
+
+            AType result = this.engineUni.Execute<AType>("2 0 # 3 3 S.? 'abcdefghi'");
 
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
             Assert.AreEqual(expected, result);

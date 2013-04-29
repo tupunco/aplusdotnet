@@ -18,6 +18,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("GreaterThanOrEqualTo"), TestMethod]
+        public void GreaterThanOrEqualChar2CharUni()
+        {
+            AType expected = AInteger.Create(1);
+            AType result = this.engineUni.Execute<AType>("'c' >= 'b'");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("GreaterThanOrEqualTo"), TestMethod]
         public void GreaterThanOrEqualChar2Char2()
         {
             AType expected = AInteger.Create(0);

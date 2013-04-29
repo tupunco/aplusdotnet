@@ -19,6 +19,14 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Add"), TestMethod]
+        public void AddInteger2NullUni()
+        {
+            AType result = this.engineUni.Execute<AType>("1 + ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AInteger, result.Type, "Type mismatch");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Add"), TestMethod]
         public void AddNull2Null()
         {
             AType result = this.engine.Execute<AType>("() + ()");

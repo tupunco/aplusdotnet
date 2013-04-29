@@ -58,6 +58,17 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Pick"), TestMethod]
+        public void PickInteger2SimpleIntegerUni()
+        {
+            AType expected = AInteger.Create(6);
+
+            AType result = this.engineUni.Execute<AType>("0 I.> 6");
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Pick"), TestMethod]
         public void PickInteger2SimpleCharacter()
         {
             AType expected = AChar.Create('a');

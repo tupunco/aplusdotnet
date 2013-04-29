@@ -26,6 +26,21 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Residue"), TestMethod]
+        public void ResidueInteger2ZeroUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(1930),
+                AInteger.Create(1941),
+                AInteger.Create(1952),
+                AInteger.Create(1978)
+            );
+            AType result = this.engineUni.Execute<AType>("0 M.| 1930 1941 1952 1978");
+            Assert.AreEqual(expected, result);
+            Assert.IsTrue(result.Type == ATypes.AInteger);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Residue"), TestMethod]
         public void ResidueZero2Zero()
         {
             AType expected = AArray.Create(

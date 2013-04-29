@@ -18,6 +18,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("EqualTo"), TestMethod]
+        public void EqualToSymbolToSymbolUni()
+        {
+            AType expected = AInteger.Create(1);
+            AType result = this.engineUni.Execute<AType>("`valami = `valami");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("EqualTo"), TestMethod]
         public void EqualToSymbolToSymbol2()
         {
             AType expected = AInteger.Create(0);

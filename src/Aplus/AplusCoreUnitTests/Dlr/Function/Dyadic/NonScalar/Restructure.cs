@@ -155,6 +155,19 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Restructure"), TestMethod]
+        public void RestructureInteger2SymbolConstantUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.ASymbol,
+                ASymbol.Create("test")
+            );
+            AType result = this.engineUni.Execute<AType>("1 S.! `test");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Restructure"), TestMethod]
         public void RestructureIntegerList2NestedArray()
         {
             ScriptScope scope = this.engine.CreateScope();

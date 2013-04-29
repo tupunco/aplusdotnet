@@ -20,6 +20,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Divide"), TestMethod]
+        public void DivideFloat2FloatUni()
+        {
+            AType expected = AFloat.Create(3.4 / 1.2);
+            AType result = this.engineUni.Execute<AType>("3.4 % 1.2");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Divide"), TestMethod]
         public void DivideInteger2Null()
         {
             AType result = this.engine.Execute<AType>("1 % ()");

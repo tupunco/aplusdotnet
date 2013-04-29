@@ -17,6 +17,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
+        public void NotEqualToInt2FloatUni()
+        {
+            AType expected = AInteger.Create(1);
+            AType result = this.engineUni.Execute<AType>("1 != 1.2");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Not Equal to"), TestMethod]
         public void NotEqualToFloat2Int()
         {
             AType expected = AInteger.Create(1);

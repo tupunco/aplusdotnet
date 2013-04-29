@@ -20,6 +20,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Match"), TestMethod]
+        public void MatchInt2FloatUni()
+        {
+            AType expected = AInteger.Create(1);
+            AType result = this.engineUni.Execute<AType>("1.0000000000001 == 1");
+
+            Assert.AreEqual<AType>(expected, result, "Incorrect result returned");
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Match"), TestMethod]
         public void MatchInt2FloatFail()
         {
             AType expected = AInteger.Create(0);

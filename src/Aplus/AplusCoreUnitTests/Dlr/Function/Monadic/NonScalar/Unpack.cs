@@ -53,6 +53,22 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Unpack"), TestMethod]
+        public void UnpackSymbolConstantVector1Uni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AChar,
+                AArray.Create(ATypes.AChar, AChar.Create('a'), AChar.Create('b'), AChar.Create(' ')),
+                AArray.Create(ATypes.AChar, AChar.Create('e'), AChar.Create(' '), AChar.Create(' ')),
+                AArray.Create(ATypes.AChar, AChar.Create('g'), AChar.Create('f'), AChar.Create('h'))
+            );
+
+            AType result = this.engineUni.Execute<AType>("M.> `ab `e `gfh");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Unpack"), TestMethod]
         public void UnpackSymbolConstantVector2()
         {
             AType expected = AArray.Create(

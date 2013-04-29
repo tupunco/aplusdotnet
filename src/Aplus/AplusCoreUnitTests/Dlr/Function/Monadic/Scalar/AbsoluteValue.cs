@@ -22,10 +22,30 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("AbsoluteValue"), TestMethod]
+        public void AbsoluteValueVectorUni()
+        {
+            AType expected = AArray.Create(ATypes.AFloat,
+                AFloat.Create(3), AFloat.Create(6), AFloat.Create(2147483648)
+            );
+            AType result = this.engineUni.Execute<AType>("M.| -3 6 -2147483648");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("AbsoluteValue"), TestMethod]
         public void AbsoluteValueFloat()
         {
             AType expected = AFloat.Create(3.1);
             AType result = this.engine.Execute<AType>("| -3.1");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("AbsoluteValue"), TestMethod]
+        public void AbsoluteValueFloatUni()
+        {
+            AType expected = AFloat.Create(3.1);
+            AType result = this.engineUni.Execute<AType>("M.| -3.1");
 
             Assert.AreEqual(expected, result);
         }
@@ -37,5 +57,13 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.Scalar
 
             Assert.AreEqual<ATypes>(ATypes.AFloat, result.Type, "Incorrect type");
         }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("AbsoluteValue"), TestMethod]
+        public void AbsoluteValueNullUni()
+        {
+            AType result = this.engineUni.Execute<AType>("M.| ()");
+
+            Assert.AreEqual<ATypes>(ATypes.AFloat, result.Type, "Incorrect type");
     }
+}
 }

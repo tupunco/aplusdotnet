@@ -19,6 +19,13 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Circle"), TestMethod]
+        [ExpectedException(typeof(Error.Domain))]
+        public void DomainErrorUni()
+        {
+            this.engineUni.Execute("8 M.^ 3.14");
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Circle"), TestMethod]
         public void ComputeCos()
         {
             AType expected = AFloat.Create(Math.Cos(3.14));

@@ -27,6 +27,20 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Drop"), TestMethod]
+        public void DropInteger2IntegerListUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(6),
+                AInteger.Create(7)
+            );
+            AType result = this.engineUni.Execute<AType>("2 S.- 1 3 6 7");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Drop"), TestMethod]
         public void DropRestrictedWholeNumber2Matrix()
         {
             AType expected = AArray.Create(

@@ -25,6 +25,20 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Max"), TestMethod]
+        public void MaxInt2FloatUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AFloat,
+                AFloat.Create(3.1),
+                AFloat.Create(7),
+                AFloat.Create(10)
+            );
+            AType result = this.engineUni.Execute<AType>("2 5 8 M.+ 3.1 7.0 10.0");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Max"), TestMethod]
         public void MaxFloat2Int()
         {
             AType expected = AArray.Create(

@@ -20,6 +20,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Multiply"), TestMethod]
+        public void MultiplyFloat2FloatUni()
+        {
+            AType expected = AFloat.Create(1.2 * 3.4);
+            AType result = this.engineUni.Execute<AType>("1.2 * 3.4");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Multiply"), TestMethod]
         public void MultiplyInteger2Null()
         {
             AType result = this.engine.Execute<AType>("1 * ()");

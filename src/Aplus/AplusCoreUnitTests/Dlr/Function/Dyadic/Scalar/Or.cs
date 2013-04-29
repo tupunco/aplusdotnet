@@ -24,6 +24,21 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.Scalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Or"), TestMethod]
+        public void OrVector2IntegerUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(0),
+                AInteger.Create(1),
+                AInteger.Create(1),
+                AInteger.Create(1)
+            );
+            AType result = this.engineUni.Execute<AType>("0 0 5 1 | 0 9 0 1");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Or"), TestMethod]
         public void OrFloat2Integer()
         {
             AType expected = AArray.Create(

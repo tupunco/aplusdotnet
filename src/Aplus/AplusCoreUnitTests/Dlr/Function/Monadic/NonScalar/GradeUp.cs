@@ -28,6 +28,22 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("GradeUp"), TestMethod]
+        public void GradeUpIntegerVectorUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(4),
+                AInteger.Create(2),
+                AInteger.Create(1),
+                AInteger.Create(3),
+                AInteger.Create(0)
+            );
+            AType result = this.engineUni.Execute<AType>("I.+ 7 4 2 5 1");
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("GradeUp"), TestMethod]
         public void GradeUpIntegerVectorWithDuplicateElement()
         {
             AType expected = AArray.Create(

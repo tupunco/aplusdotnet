@@ -26,6 +26,19 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
         }
 
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Catenate"), TestMethod]
+        public void Integer2IntegerCatenateUni()
+        {
+            AType expected = AArray.Create(ATypes.AInteger,
+                AInteger.Create(1), AInteger.Create(2)
+            );
+
+            AType result = this.engineUni.Execute<AType>("1, 2");
+
+            Assert.AreEqual<AType>(expected, result, "Incorrect result created");
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Catenate"), TestMethod]
         public void Integer2IntegerDifferentLengthCatenate()

@@ -66,6 +66,17 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("TransposeAxes"), TestMethod]
+        public void TransposeAxisNumber2NullUni()
+        {
+            AType expected = Utils.ANull();
+
+            AType result = this.engineUni.Execute<AType>("0 S.\\ ()");
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("TransposeAxes"), TestMethod]
         public void TransposeAxisRestrictedWholeNumberList2ArrayRank3()
         {
             AType expected = AArray.Create(

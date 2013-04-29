@@ -27,6 +27,21 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("PartitionCount"), TestMethod]
+        public void PartitionCountIntegerList1Uni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(4),
+                AInteger.Create(2)
+            );
+
+            AType result = this.engineUni.Execute<AType>("I.< 1 0 0 0 1 0");
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("PartitionCount"), TestMethod]
         public void PartitionCountIntegerList2()
         {
             AType expected = AArray.Create(

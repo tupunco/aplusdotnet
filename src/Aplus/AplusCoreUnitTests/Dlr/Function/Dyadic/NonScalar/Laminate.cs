@@ -37,6 +37,30 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Laminate"), TestMethod]
+        public void LaminateIntegerList2IntegerListUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AArray.Create(
+                    ATypes.AInteger,
+                    AInteger.Create(2),
+                    AInteger.Create(3),
+                    AInteger.Create(4)
+                ),
+                AArray.Create(
+                    ATypes.AInteger,
+                    AInteger.Create(5),
+                    AInteger.Create(2),
+                    AInteger.Create(2)
+                )
+            );
+            AType result = this.engineUni.Execute<AType>("2 3 4 ! 5 2 2");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Laminate"), TestMethod]
         public void LaminateFloatToFloat()
         {
             AType expected = AArray.Create(

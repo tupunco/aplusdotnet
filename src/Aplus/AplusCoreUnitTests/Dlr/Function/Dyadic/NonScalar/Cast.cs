@@ -38,6 +38,29 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Cast"), TestMethod]
+        public void CastInteger2FloatList1Uni()
+        {
+            AType expected = AArray.Create(
+                ATypes.AInteger,
+                AInteger.Create(1),
+                AInteger.Create(1),
+                AInteger.Create(1),
+                AInteger.Create(1),
+                AInteger.Create(1),
+                AInteger.Create(2),
+                AInteger.Create(2),
+                AInteger.Create(2),
+                AInteger.Create(2),
+                AInteger.Create(2)
+            );
+
+            AType result = this.engineUni.Execute<AType>("`int | 1.055 1.155 1.255 1.355 1.455 1.555 1.655 1.755 1.855 1.955");
+
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Cast"), TestMethod]
         public void CastInteger2FloatList2()
         {
             AType expected = AArray.Create(

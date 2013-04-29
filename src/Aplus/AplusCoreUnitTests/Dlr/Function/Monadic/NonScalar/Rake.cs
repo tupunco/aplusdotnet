@@ -45,6 +45,27 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Rake"), TestMethod]
+        public void RakeVectorUni()
+        {
+            AType expected = AArray.Create(
+                ATypes.ABox,
+                ABox.Create(
+                    AArray.Create(
+                        ATypes.AInteger,
+                        AInteger.Create(0),
+                        AInteger.Create(1),
+                        AInteger.Create(2),
+                        AInteger.Create(3)
+                    )
+                )
+            );
+            AType result = this.engineUni.Execute<AType>("I.? I.# 4");
+
+            Assert.AreEqual(expected, result);
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Rake"), TestMethod]
         public void RakeNull()
         {
             AType expected = Utils.ANull();

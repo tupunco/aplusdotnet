@@ -25,6 +25,18 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Execute"), TestMethod]
+        public void GlobalAssignExecuteUni()
+        {
+            ScriptScope scope = this.engineUni.CreateScope();
+            AType expected = AInteger.Create(10);
+            AType result = this.engineUni.Execute<AType>("E.* 'b:=10'", scope);
+
+            Assert.IsTrue(scope.ContainsVariable(".b"), "No variable found in global scope");
+            Assert.AreEqual<AType>(expected, scope.GetVariable<AType>(".b"), "Incorrect result in global variable");
+            Assert.AreEqual<AType>(expected, result, "Incorrect result returned");
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Execute"), TestMethod]
         public void ExecuteReturn()
         {
             ScriptScope scope = this.engine.CreateScope();
@@ -32,6 +44,20 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
             AType expected_a = AInteger.Create(20);
 
             AType result = this.engine.Execute<AType>("eval 'a:=20; :=10; b:=30'", scope);
+
+            Assert.IsFalse(scope.ContainsVariable(".b"), "Variable '.b' found in global scope");
+            Assert.AreEqual<AType>(expected_a, scope.GetVariable<AType>(".a"), "Incorrect result in global variable");
+            Assert.AreEqual<AType>(expected_return, result, "Incorrect result returned");
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Execute"), TestMethod]
+        public void ExecuteReturnUni()
+        {
+            ScriptScope scope = this.engineUni.CreateScope();
+            AType expected_return = AInteger.Create(10);
+            AType expected_a = AInteger.Create(20);
+
+            AType result = this.engineUni.Execute<AType>("E.* 'a:=20; :=10; b:=30'", scope);
 
             Assert.IsFalse(scope.ContainsVariable(".b"), "Variable '.b' found in global scope");
             Assert.AreEqual<AType>(expected_a, scope.GetVariable<AType>(".a"), "Incorrect result in global variable");

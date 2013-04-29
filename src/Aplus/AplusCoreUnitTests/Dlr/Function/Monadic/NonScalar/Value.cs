@@ -27,6 +27,20 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
         }
 
         [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Value"), TestMethod]
+        public void ValueUnqualifiedInOtherContextUni()
+        {
+            AType x = AInteger.Create(100);
+
+            ScriptScope scope = this.engineUni.CreateScope();
+            scope.SetVariable("ctx.x", x);
+
+            this.engineUni.Execute("$cx ctx");
+            AType result = this.engineUni.Execute<AType>("^ `x", scope);
+
+            Assert.AreEqual<AType>(x, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Value"), TestMethod]
         public void ValueUnqualified()
         {
             AType x = AInteger.Create(100);

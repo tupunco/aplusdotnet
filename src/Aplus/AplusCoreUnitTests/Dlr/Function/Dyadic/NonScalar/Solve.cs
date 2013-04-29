@@ -20,6 +20,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Dyadic
         }
 
         [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Solve"), TestMethod]
+        public void Rank0ExampleUni()
+        {
+            AType expected = AFloat.Create(0.2);
+            AType result = this.engineUni.Execute<AType>("1 M.# 5");
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCategory("DLR"), TestCategory("Dyadic"), TestCategory("Solve"), TestMethod]
         public void Rank2SquareExample()
         {
             AType expected =

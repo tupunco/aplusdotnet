@@ -20,5 +20,15 @@ namespace AplusCoreUnitTests.Dlr.Function.Monadic.NonScalar
             Assert.AreEqual<AType>(expected, result, "Invalid return value");
             Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
         }
+
+        [TestCategory("DLR"), TestCategory("Monadic"), TestCategory("Print"), TestMethod]
+        public void SimplePrintUni()
+        {
+            AType expected = Helpers.BuildString("Hello");
+            AType result = this.engineUni.Execute<AType>("S.- 'Hello'");
+
+            Assert.AreEqual<AType>(expected, result, "Invalid return value");
+            Assert.AreEqual(InfoResult.OK, result.CompareInfos(expected));
     }
+}
 }
