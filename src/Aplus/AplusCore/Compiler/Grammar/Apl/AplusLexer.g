@@ -56,7 +56,7 @@ SMin:			'\u00C4\\';
 SMultiply:		'\u00AB\\';
 SOr:			'\u00A9\\';
 
-AbsoluteValue:		'\u00CD';
+AbsoluteValue:		'|';
 Ceiling:			'\u00D3';
 Count:				'\u0023';
 DefaultFormat:		'\u00EE';
